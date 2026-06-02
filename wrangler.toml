@@ -1,0 +1,15 @@
+name = "bbnews"
+compatibility_date = "2024-01-01"
+
+# Build configuration
+[build]
+command = "npm install -g pnpm && pnpm install && pnpm --filter @workspace/balebeleq-web run build"
+cwd = "."
+
+# Pages build output directory
+[site]
+bucket = "artifacts/balebeleq-web/dist/public"
+
+# SPA fallback
+[[site.fallbacks]]
+not_found = "artifacts/balebeleq-web/dist/public/index.html"

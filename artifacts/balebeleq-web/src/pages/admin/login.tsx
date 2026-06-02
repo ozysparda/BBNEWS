@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Newspaper, Lock, User } from "lucide-react";
+import { Lock, User } from "lucide-react";
+import logoImg from "/logo.png";
 
 const formSchema = z.object({
   username: z.string().min(1, "Username wajib diisi"),
@@ -52,14 +52,21 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 dark:bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground mb-6 shadow-lg shadow-primary/20">
-            <Newspaper className="w-8 h-8" />
-          </div>
-          <h1 className="text-3xl font-serif font-bold text-foreground">BaleBeleq News</h1>
-          <p className="text-muted-foreground mt-2 font-medium tracking-wide uppercase text-sm">Administration Portal</p>
+          <img
+            src={logoImg}
+            alt="BaleBeleqNews Logo"
+            className="h-24 w-24 object-contain mx-auto mb-4 drop-shadow-md"
+          />
+          <h1 className="text-3xl font-serif font-bold text-foreground">Bale Beleq News</h1>
+          <p className="text-muted-foreground mt-1 font-medium tracking-widest uppercase text-xs">
+            Administration Portal
+          </p>
+          <p className="text-muted-foreground/60 text-xs mt-1 italic">
+            Informasi · Budaya · Aspirasi
+          </p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden">
@@ -76,14 +83,20 @@ export default function AdminLogin() {
                       <FormControl>
                         <div className="relative">
                           <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input placeholder="admin" className="pl-10" {...field} />
+                          <Input
+                            placeholder="admin"
+                            className="pl-10"
+                            autoComplete="username"
+                            data-testid="input-username"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="password"
@@ -93,7 +106,14 @@ export default function AdminLogin() {
                       <FormControl>
                         <div className="relative">
                           <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="pl-10"
+                            autoComplete="current-password"
+                            data-testid="input-password"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -101,10 +121,11 @@ export default function AdminLogin() {
                   )}
                 />
 
-                <Button 
-                  type="submit" 
-                  className="w-full mt-2 py-6 text-md font-bold" 
+                <Button
+                  type="submit"
+                  className="w-full mt-2 py-6 text-md font-bold"
                   disabled={loginMutation.isPending}
+                  data-testid="button-submit"
                 >
                   {loginMutation.isPending ? "Memverifikasi..." : "Masuk"}
                 </Button>

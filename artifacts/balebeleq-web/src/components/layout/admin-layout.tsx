@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { LayoutDashboard, FileText, Tags, LogOut } from "lucide-react";
+import logoImg from "/logo.png";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, logout } = useAuth();
@@ -11,7 +12,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return null; // Will redirect in useAuth
+    return null;
   }
 
   const navItems = [
@@ -23,8 +24,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex bg-muted/20">
       <aside className="w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
-          <span className="font-serif font-bold text-xl text-sidebar-primary">BaleBeleq Admin</span>
+        <div className="h-16 flex items-center px-4 border-b border-sidebar-border gap-2">
+          <img src={logoImg} alt="Logo" className="h-8 w-8 object-contain" />
+          <span className="font-serif font-bold text-lg text-sidebar-primary">Bale Beleq Admin</span>
         </div>
         <div className="p-4 flex-1">
           <nav className="space-y-1">
@@ -35,8 +37,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    active 
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground" 
+                    active
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
                       : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   }`}
                 >
@@ -56,7 +58,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <div className="font-medium text-sidebar-foreground">{user.username}</div>
             </div>
           </div>
-          <button 
+          <button
             onClick={logout}
             className="flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
           >
@@ -66,8 +68,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <main className="flex-1 overflow-auto">
-        <header className="h-16 bg-background border-b border-border flex items-center px-6 md:hidden">
-          <span className="font-serif font-bold text-xl text-primary">BaleBeleq Admin</span>
+        <header className="h-16 bg-background border-b border-border flex items-center px-6 gap-3 md:hidden">
+          <img src={logoImg} alt="Logo" className="h-8 w-8 object-contain" />
+          <span className="font-serif font-bold text-xl text-primary">Bale Beleq Admin</span>
         </header>
         <div className="p-6 md:p-8 max-w-6xl mx-auto">
           {children}

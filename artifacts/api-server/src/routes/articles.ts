@@ -1,9 +1,22 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { articlesTable, categoriesTable } from "@workspace/db/schema";
+import { articlesTable, categoriesTable, activityLogTable, adminsTable } from "@workspace/db/schema";
 import { eq, desc, ilike, sql, and, count } from "drizzle-orm";
 import { requireAuth, type AuthRequest } from "../middlewares/auth";
 import slugify from "slugify";
+
+async function logActivity(adminId: number, action: string, articleId?: number, articleTitle?: string) {
+  try {
+    const [admin] = await db.select({ username: adminsTable.username }).from(adminsTable).where(eq(adminsTable.id, adminId)).limit(1);
+    await db.insert(activityLogTable).values({
+      adminId,
+      adminUsername: admin?.username ?? "unknown",
+      action,
+      articleId: articleId ?? null,
+      articleTitle: articleTitle ?? null,
+    });
+  } catch (_) {}
+}
 
 const router = Router();
 
@@ -255,6 +268,7 @@ router.post("/articles", requireAuth, async (req: AuthRequest, res) => {
     .leftJoin(categoriesTable, eq(articlesTable.categoryId, categoriesTable.id))
     .where(eq(articlesTable.id, article.id));
 
+  await logActivity(req.adminId!, "Buat artikel", article.id, title);
   res.status(201).json(formatArticleRow(row));
 });
 
@@ -293,6 +307,7 @@ router.put("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
     res.status(404).json({ error: "Article not found" });
     return;
   }
+  await logActivity(req.adminId!, "Edit artikel", id, title ?? row?.article?.title);
   res.json(formatArticleRow(row));
 });
 
@@ -303,7 +318,9 @@ router.delete("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
     res.status(404).json({ error: "Not found" });
     return;
   }
+  const [toDelete] = await db.select({ title: articlesTable.title }).from(articlesTable).where(eq(articlesTable.id, id)).limit(1);
   await db.delete(articlesTable).where(eq(articlesTable.id, id));
+  await logActivity(req.adminId!, "Hapus artikel", id, toDelete?.title);
   res.status(204).send();
 });
 

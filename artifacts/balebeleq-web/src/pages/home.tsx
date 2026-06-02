@@ -4,6 +4,7 @@ import { ArticleCard } from "@/components/article-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { ChevronRight, Flame } from "lucide-react";
+import { NewsTicker } from "@/components/news-ticker";
 const bannerImg = `${import.meta.env.BASE_URL}banner.png`;
 
 export default function Home() {
@@ -13,6 +14,9 @@ export default function Home() {
 
   return (
     <PublicLayout>
+      {/* News Ticker */}
+      <NewsTicker />
+
       {/* Hero Banner */}
       <div className="w-full overflow-hidden max-h-48 sm:max-h-64 relative">
         <img

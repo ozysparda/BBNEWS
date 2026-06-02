@@ -12,9 +12,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, Save, Upload, X, ImageIcon, Loader2 } from "lucide-react";
+import { ChevronLeft, Save, X, ImageIcon, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RichTextEditor } from "@/components/rich-text-editor";
 
 const formSchema = z.object({
   title: z.string().min(3, "Judul minimal 3 karakter"),
@@ -238,15 +239,15 @@ export default function AdminArticleForm() {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Konten HTML</FormLabel>
+                      <FormLabel className="text-base">Konten Artikel</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="<p>Tulis konten artikel Anda di sini menggunakan tag HTML dasar...</p>"
-                          className="font-mono text-sm min-h-[400px]"
-                          {...field}
+                        <RichTextEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Mulai menulis artikel di sini..."
+                          minHeight="450px"
                         />
                       </FormControl>
-                      <FormDescription>Gunakan tag HTML (h2, p, strong, ul, li) untuk memformat konten.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

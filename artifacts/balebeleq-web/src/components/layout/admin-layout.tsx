@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users } from "lucide-react";
+import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users, User, Activity, Globe } from "lucide-react";
 import { useState } from "react";
 const logoImg = `${import.meta.env.BASE_URL}logo.png`;
 
@@ -29,9 +29,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/artikel", label: "Artikel", icon: FileText },
     { href: "/admin/kategori", label: "Kategori", icon: Tags },
     ...(isOwner ? [{ href: "/admin/pengguna", label: "Pengguna", icon: Users }] : []),
+    { href: "/admin/halaman", label: "Daftar Halaman", icon: Globe },
   ];
 
-  const NavLinks = () => (
+  const bottomItems = [
+    { href: "/admin/profil", label: "Profil Saya", icon: User },
+  ];
+
+  const NavLinks = ({ onClick }: { onClick?: () => void }) => (
     <>
       {navItems.map((item) => {
         const active = location === item.href || location.startsWith(`${item.href}/`);
@@ -39,7 +44,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <Link
             key={item.href}
             href={item.href}
-            onClick={() => setMobileOpen(false)}
+            onClick={onClick}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               active
                 ? "bg-primary text-primary-foreground"
@@ -65,12 +70,30 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <div className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Admin Panel</div>
           </div>
         </div>
-        <div className="p-3 flex-1">
-          <div className="mb-2 px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Menu</div>
+        <div className="p-3 flex-1 overflow-y-auto">
+          <div className="mb-2 px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Menu Utama</div>
           <nav className="space-y-1">
             <NavLinks />
           </nav>
-          <div className="mt-4 pt-4 border-t border-sidebar-border">
+          <div className="mt-4 pt-4 border-t border-sidebar-border space-y-1">
+            <div className="mb-2 px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Akun</div>
+            {bottomItems.map((item) => {
+              const active = location === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  }`}
+                >
+                  <item.icon className="w-4 h-4 shrink-0" />
+                  {item.label}
+                </Link>
+              );
+            })}
             <Link
               href="/"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
@@ -114,11 +137,22 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-3 flex-1">
+            <div className="p-3 flex-1 overflow-y-auto">
               <nav className="space-y-1">
-                <NavLinks />
+                <NavLinks onClick={() => setMobileOpen(false)} />
               </nav>
-              <div className="mt-4 pt-4 border-t border-sidebar-border">
+              <div className="mt-4 pt-4 border-t border-sidebar-border space-y-1">
+                {bottomItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.label}
+                  </Link>
+                ))}
                 <Link
                   href="/"
                   onClick={() => setMobileOpen(false)}

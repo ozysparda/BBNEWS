@@ -73,6 +73,36 @@ export const CreateArticleBody = zod.object({
 
 
 /**
+ * @summary Get any article by ID including drafts (admin only)
+ */
+export const GetAdminArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminArticleResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "categoryId": zod.number().nullish(),
+  "category": zod.union([zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "color": zod.string(),
+  "articleCount": zod.number().optional()
+}),zod.null()]).optional(),
+  "isPublished": zod.boolean(),
+  "isFeatured": zod.boolean(),
+  "viewCount": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
  * @summary List all articles including drafts (admin only)
  */
 export const listAllArticlesQueryPageDefault = 1;

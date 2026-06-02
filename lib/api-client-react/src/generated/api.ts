@@ -278,6 +278,83 @@ export const useCreateArticle = <TError = ErrorType<void>,
       return useMutation(getCreateArticleMutationOptions(options));
     }
 
+export const getGetAdminArticleUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/articles/${id}`
+}
+
+/**
+ * @summary Get any article by ID including drafts (admin only)
+ */
+export const getAdminArticle = async (id: number, options?: RequestInit): Promise<Article> => {
+
+  return customFetch<Article>(getGetAdminArticleUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminArticleQueryKey = (id: number,) => {
+    return [
+    `/api/admin/articles/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdminArticleQueryOptions = <TData = Awaited<ReturnType<typeof getAdminArticle>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminArticleQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminArticle>>> = ({ signal }) => getAdminArticle(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminArticle>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminArticleQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminArticle>>>
+export type GetAdminArticleQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get any article by ID including drafts (admin only)
+ */
+
+export function useGetAdminArticle<TData = Awaited<ReturnType<typeof getAdminArticle>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminArticleQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getListAllArticlesUrl = (params?: ListAllArticlesParams,) => {
   const normalizedParams = new URLSearchParams();
 

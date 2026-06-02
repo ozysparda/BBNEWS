@@ -3,7 +3,7 @@ import { useParams, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useGetArticle, getGetArticleQueryKey, useCreateArticle, useUpdateArticle, useListCategories } from "@workspace/api-client-react";
+import { useGetAdminArticle, getGetAdminArticleQueryKey, useCreateArticle, useUpdateArticle, useListCategories } from "@workspace/api-client-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,8 +35,8 @@ export default function AdminArticleForm() {
   const { toast } = useToast();
 
   const { data: categories } = useListCategories();
-  const { data: article, isLoading: loadingArticle } = useGetArticle(id!, {
-    query: { enabled: isEdit, queryKey: getGetArticleQueryKey(id!) }
+  const { data: article, isLoading: loadingArticle } = useGetAdminArticle(id!, {
+    query: { enabled: isEdit, queryKey: getGetAdminArticleQueryKey(id!) }
   });
 
   const createMutation = useCreateArticle();

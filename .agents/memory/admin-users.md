@@ -1,15 +1,14 @@
 ---
 name: BaleBeleq admin users
-description: Admin accounts and credentials seeded in DB
+description: Admin accounts setup pattern and secret code info
 ---
 
-Three admin accounts in the admins table:
-- admin / admin123 (id=1, seeded during initial setup)
-- hendra / 310304 (id=2, bcrypt hash in password column)
-- toni / toni100 (id=3, bcrypt hash in password column)
+Three admin accounts exist in the admins table (usernames: admin, hendra, toni).
+Credentials are NOT stored here — managed by the site owner only.
 
 JWT_SECRET is required — set as Replit Secret (not env var). Server throws at startup if missing.
-Secret code on search page to reveal admin login: type "adminbale" in the access code field.
 
-**Why:** User explicitly requested these three admins. Secret code pattern added to search
-page to allow discreet access to admin login without a visible link.
+Secret code on the public search page: type it into the "Kode akses khusus" field to reveal
+an admin login button. The constant `SECRET_CODE` is in `artifacts/balebeleq-web/src/pages/search.tsx`.
+
+**Why:** User requested discreet admin access without a visible link on the public site.

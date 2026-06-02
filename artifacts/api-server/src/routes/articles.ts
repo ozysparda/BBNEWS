@@ -149,8 +149,29 @@ router.get("/articles/stats", requireAuth, async (_req, res) => {
   res.json({ ...totals[0], byCategory });
 });
 
-// Public: get article by numeric ID (admin uses this for edit form)
+// Public: get article by numeric ID (published only)
 router.get("/articles/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  const [row] = await db
+    .select(buildArticleWithCategory())
+    .from(articlesTable)
+    .leftJoin(categoriesTable, eq(articlesTable.categoryId, categoriesTable.id))
+    .where(and(eq(articlesTable.id, id), eq(articlesTable.isPublished, true)))
+    .limit(1);
+
+  if (!row) {
+    res.status(404).json({ error: "Article not found" });
+    return;
+  }
+  res.json(formatArticleRow(row));
+});
+
+// Admin: get any article by ID (including drafts)
+router.get("/admin/articles/:id", requireAuth, async (req: AuthRequest, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
     res.status(404).json({ error: "Not found" });

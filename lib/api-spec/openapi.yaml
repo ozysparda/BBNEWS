@@ -83,6 +83,31 @@ paths:
         "401":
           description: Unauthorized
 
+  /admin/articles/{id}:
+    get:
+      operationId: getAdminArticle
+      tags: [articles]
+      summary: Get any article by ID including drafts (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
   /admin/articles:
     get:
       operationId: listAllArticles

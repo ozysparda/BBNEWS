@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import ArticleDetail from "@/pages/article-detail";
 import CategoryPage from "@/pages/category-page";
+import SearchPage from "@/pages/search";
 
 import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/berita/:slug" component={ArticleDetail} />
       <Route path="/kategori/:slug" component={CategoryPage} />
+      <Route path="/cari" component={SearchPage} />
       
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />

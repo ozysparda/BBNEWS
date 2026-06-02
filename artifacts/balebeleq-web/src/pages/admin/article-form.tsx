@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft, Save, X, ImageIcon, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/rich-text-editor";
 
 const formSchema = z.object({
@@ -286,7 +287,7 @@ export default function AdminArticleForm() {
 
                 {/* Image Upload Section */}
                 <div className="space-y-3">
-                  <FormLabel>Gambar Utama</FormLabel>
+                  <Label className="text-sm font-medium">Gambar Utama</Label>
                   
                   {imageUrl ? (
                     <div className="space-y-2">

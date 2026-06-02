@@ -1,22 +1,38 @@
-import { useSearch } from "wouter";
+import { useSearch, useLocation } from "wouter";
 import { useListArticles } from "@workspace/api-client-react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { ArticleCard } from "@/components/article-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SearchX, Search } from "lucide-react";
+import { SearchX, Search, ShieldCheck } from "lucide-react";
+import { useState, useRef } from "react";
+
+const SECRET_CODE = "adminbale";
 
 export default function SearchPage() {
   const rawSearch = useSearch();
+  const [, navigate] = useLocation();
   const params = new URLSearchParams(rawSearch);
   const q = params.get("q") ?? "";
 
+  const [secretInput, setSecretInput] = useState("");
+  const [showAdminLink, setShowAdminLink] = useState(false);
+  const secretRef = useRef<HTMLInputElement>(null);
+
   const { data, isLoading } = useListArticles(
     { search: q, limit: 20 },
-    { query: { enabled: q.trim().length > 0 } }
+    { query: { enabled: q.trim().length > 0, queryKey: undefined as any } }
   );
 
   const articles = data?.articles ?? [];
   const total = data?.total ?? 0;
+
+  function handleSecretChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    setSecretInput(val);
+    if (val === SECRET_CODE) {
+      setShowAdminLink(true);
+    }
+  }
 
   return (
     <PublicLayout>
@@ -36,9 +52,35 @@ export default function SearchPage() {
         </div>
 
         {!q && (
-          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
+          <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
             <Search className="w-12 h-12 mb-4 opacity-30" />
             <p className="text-lg">Ketik kata kunci di search bar untuk mulai mencari.</p>
+
+            {/* Secret code field — hidden in plain sight */}
+            <div className="mt-16 w-full max-w-xs">
+              <input
+                ref={secretRef}
+                type="text"
+                value={secretInput}
+                onChange={handleSecretChange}
+                placeholder="Kode akses khusus..."
+                className="w-full text-center text-sm px-4 py-2 rounded-full border border-border bg-muted/40 text-muted-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                autoComplete="off"
+              />
+
+              {showAdminLink && (
+                <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <button
+                    onClick={() => navigate("/admin")}
+                    className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-semibold shadow-md hover:bg-primary/90 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Masuk Panel Admin
+                  </button>
+                  <p className="text-xs text-muted-foreground mt-2">Hanya untuk pengelola website</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

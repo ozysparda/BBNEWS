@@ -1,1 +1,3 @@
-- [BaleBeleq stack](balebeleq-stack.md) — React+Vite+Express+PG news portal; admin seeded via executeSql with pre-computed bcrypt hash; logo path via BASE_URL not import
+- [BaleBeleq DB schema](db-schema.md) — admins table uses `password` column (NOT `password_hash`); articles/categories/admins tables created
+- [BaleBeleq admin users](admin-users.md) — three admin accounts seeded; JWT_SECRET must be set as a secret
+- [BaleBeleq API client](api-client.md) — generated hooks in lib/api-client-react/src/generated/api.ts; useListAllArticles for admin endpoint

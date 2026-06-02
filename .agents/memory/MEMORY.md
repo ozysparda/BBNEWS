@@ -1,0 +1,1 @@
+- [BaleBeleq stack](balebeleq-stack.md) — React+Vite+Express+PG news portal; admin seeded via executeSql with pre-computed bcrypt hash; logo path via BASE_URL not import

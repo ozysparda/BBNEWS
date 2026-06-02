@@ -1,0 +1,16 @@
+{
+  "framework": "vite",
+  "buildCommand": "cd artifacts/balebeleq-web && npx vite build",
+  "outputDirectory": "artifacts/balebeleq-web/dist/public",
+  "installCommand": "npm install -g pnpm && pnpm install --no-frozen-lockfile",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://bbnews--hpejanggik.replit.app",
+    "BASE_PATH": "/"
+  }
+}

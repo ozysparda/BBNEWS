@@ -1,10 +1,8 @@
 {
   "version": 2,
   "framework": "vite",
-  "rootDirectory": "artifacts/balebeleq-web",
   "buildCommand": "npx vite build",
   "outputDirectory": "dist/public",
-  "installCommand": "cd ../.. && npm install -g pnpm && pnpm install --no-frozen-lockfile",
   "rewrites": [
     {
       "source": "/(.*)",

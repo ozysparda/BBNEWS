@@ -47,12 +47,3 @@ Thumbs.db
 # Replit
 .cache/
 .local/
-.agents/
-
-# Secrets
-.env
-.env.local
-.env.production
-
-# Build output
-artifacts/*/dist/

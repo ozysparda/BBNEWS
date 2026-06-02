@@ -6,6 +6,10 @@ compatibility_date = "2024-01-01"
 command = "npm install -g pnpm && pnpm install && pnpm --filter @workspace/balebeleq-web run build"
 cwd = "."
 
+# Environment variables
+[vars]
+VITE_API_URL = "https://bbnews--hpejanggik.replit.app"
+
 # Pages build output directory
 [site]
 bucket = "artifacts/balebeleq-web/dist/public"

@@ -98,3 +98,8 @@ categoryId?: number;
 search?: string;
 };
 
+export type ListAllArticlesParams = {
+page?: number;
+limit?: number;
+};
+

@@ -28,6 +28,7 @@ import type {
   Category,
   CategoryInput,
   HealthStatus,
+  ListAllArticlesParams,
   ListArticlesParams,
   LoginCredentials,
   LoginResponse
@@ -276,6 +277,90 @@ export const useCreateArticle = <TError = ErrorType<void>,
       > => {
       return useMutation(getCreateArticleMutationOptions(options));
     }
+
+export const getListAllArticlesUrl = (params?: ListAllArticlesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/articles?${stringifiedParams}` : `/api/admin/articles`
+}
+
+/**
+ * @summary List all articles including drafts (admin only)
+ */
+export const listAllArticles = async (params?: ListAllArticlesParams, options?: RequestInit): Promise<ArticleListResponse> => {
+
+  return customFetch<ArticleListResponse>(getListAllArticlesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAllArticlesQueryKey = (params?: ListAllArticlesParams,) => {
+    return [
+    `/api/admin/articles`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListAllArticlesQueryOptions = <TData = Awaited<ReturnType<typeof listAllArticles>>, TError = ErrorType<void>>(params?: ListAllArticlesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAllArticles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAllArticlesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAllArticles>>> = ({ signal }) => listAllArticles(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAllArticles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAllArticlesQueryResult = NonNullable<Awaited<ReturnType<typeof listAllArticles>>>
+export type ListAllArticlesQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all articles including drafts (admin only)
+ */
+
+export function useListAllArticles<TData = Awaited<ReturnType<typeof listAllArticles>>, TError = ErrorType<void>>(
+ params?: ListAllArticlesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAllArticles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAllArticlesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetFeaturedArticlesUrl = () => {
 

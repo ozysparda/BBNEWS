@@ -83,6 +83,34 @@ paths:
         "401":
           description: Unauthorized
 
+  /admin/articles:
+    get:
+      operationId: listAllArticles
+      tags: [articles]
+      summary: List all articles including drafts (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        "200":
+          description: All articles (published + draft)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleListResponse"
+        "401":
+          description: Unauthorized
+
   /articles/featured:
     get:
       operationId: getFeaturedArticles

@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "balebeleq-secret-change-in-prod";
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is required but was not provided.");
+  }
+  return secret;
+}
 
 export interface AuthRequest extends Request {
   adminId?: number;
@@ -17,7 +23,7 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
 
   const token = authHeader.slice(7);
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { id: number; username: string };
+    const payload = jwt.verify(token, getJwtSecret()) as { id: number; username: string };
     req.adminId = payload.id;
     req.adminUsername = payload.username;
     next();

@@ -7,7 +7,14 @@ import { eq } from "drizzle-orm";
 import { requireAuth, type AuthRequest } from "../middlewares/auth";
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || "balebeleq-secret-change-in-prod";
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is required but was not provided.");
+  }
+  return secret;
+}
 
 router.post("/auth/login", async (req, res) => {
   const { username, password } = req.body;
@@ -28,7 +35,7 @@ router.post("/auth/login", async (req, res) => {
     return;
   }
 
-  const token = jwt.sign({ id: admin.id, username: admin.username }, JWT_SECRET, { expiresIn: "7d" });
+  const token = jwt.sign({ id: admin.id, username: admin.username }, getJwtSecret(), { expiresIn: "7d" });
   res.json({
     token,
     user: { id: admin.id, username: admin.username, email: admin.email }

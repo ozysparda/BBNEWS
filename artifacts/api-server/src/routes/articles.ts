@@ -27,7 +27,7 @@ function buildArticleWithCategory() {
   };
 }
 
-function formatArticleRow(row: ReturnType<typeof buildArticleWithCategory> extends object ? any : any) {
+function formatArticleRow(row: any) {
   const { categoryName, categorySlug, categoryColor, ...article } = row;
   return {
     ...article,
@@ -39,6 +39,7 @@ function formatArticleRow(row: ReturnType<typeof buildArticleWithCategory> exten
   };
 }
 
+// Public: only published articles
 router.get("/articles", async (req, res) => {
   const page = Math.max(1, parseInt(req.query.page as string) || 1);
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
@@ -74,6 +75,34 @@ router.get("/articles", async (req, res) => {
   });
 });
 
+// Admin: all articles (published + drafts)
+router.get("/admin/articles", requireAuth, async (req: AuthRequest, res) => {
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 100));
+  const offset = (page - 1) * limit;
+
+  const [totalResult, rows] = await Promise.all([
+    db.select({ count: count() }).from(articlesTable),
+    db
+      .select(buildArticleWithCategory())
+      .from(articlesTable)
+      .leftJoin(categoriesTable, eq(articlesTable.categoryId, categoriesTable.id))
+      .orderBy(desc(articlesTable.createdAt))
+      .limit(limit)
+      .offset(offset),
+  ]);
+
+  const total = totalResult[0].count;
+  res.json({
+    articles: rows.map(formatArticleRow),
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  });
+});
+
+// Public: featured articles
 router.get("/articles/featured", async (_req, res) => {
   const rows = await db
     .select(buildArticleWithCategory())
@@ -98,6 +127,7 @@ router.get("/articles/featured", async (_req, res) => {
   res.json(rows.map(formatArticleRow));
 });
 
+// Admin: stats (all articles)
 router.get("/articles/stats", requireAuth, async (_req, res) => {
   const [totals, byCategory] = await Promise.all([
     db.select({
@@ -119,6 +149,7 @@ router.get("/articles/stats", requireAuth, async (_req, res) => {
   res.json({ ...totals[0], byCategory });
 });
 
+// Public: get article by numeric ID (admin uses this for edit form)
 router.get("/articles/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
@@ -139,6 +170,7 @@ router.get("/articles/:id", async (req, res) => {
   res.json(formatArticleRow(row));
 });
 
+// Public: get article by slug (only published)
 router.get("/articles/:slug/slug", async (req, res) => {
   const slug = req.params.slug;
   const [row] = await db
@@ -155,6 +187,7 @@ router.get("/articles/:slug/slug", async (req, res) => {
   res.json(formatArticleRow(row));
 });
 
+// Public: increment view count
 router.post("/articles/:id/views", async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
@@ -168,6 +201,7 @@ router.post("/articles/:id/views", async (req, res) => {
   res.status(204).send();
 });
 
+// Admin: create article
 router.post("/articles", requireAuth, async (req: AuthRequest, res) => {
   const { title, excerpt, content, imageUrl, categoryId, isPublished, isFeatured } = req.body;
   if (!title || !excerpt || !content) {
@@ -201,6 +235,7 @@ router.post("/articles", requireAuth, async (req: AuthRequest, res) => {
   res.status(201).json(formatArticleRow(row));
 });
 
+// Admin: update article
 router.put("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
@@ -237,6 +272,7 @@ router.put("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
   res.json(formatArticleRow(row));
 });
 
+// Admin: delete article
 router.delete("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {

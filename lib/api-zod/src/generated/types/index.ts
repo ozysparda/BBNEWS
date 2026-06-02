@@ -15,6 +15,7 @@ export * from './articleStatsByCategoryItem';
 export * from './category';
 export * from './categoryInput';
 export * from './healthStatus';
+export * from './listAllArticlesParams';
 export * from './listArticlesParams';
 export * from './loginCredentials';
 export * from './loginResponse';

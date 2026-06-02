@@ -73,6 +73,46 @@ export const CreateArticleBody = zod.object({
 
 
 /**
+ * @summary List all articles including drafts (admin only)
+ */
+export const listAllArticlesQueryPageDefault = 1;
+export const listAllArticlesQueryLimitDefault = 100;
+
+export const ListAllArticlesQueryParams = zod.object({
+  "page": zod.coerce.number().default(listAllArticlesQueryPageDefault),
+  "limit": zod.coerce.number().default(listAllArticlesQueryLimitDefault)
+})
+
+export const ListAllArticlesResponse = zod.object({
+  "articles": zod.array(zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "categoryId": zod.number().nullish(),
+  "category": zod.union([zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "color": zod.string(),
+  "articleCount": zod.number().optional()
+}),zod.null()]).optional(),
+  "isPublished": zod.boolean(),
+  "isFeatured": zod.boolean(),
+  "viewCount": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
  * @summary Get featured/latest articles for homepage
  */
 export const GetFeaturedArticlesResponseItem = zod.object({

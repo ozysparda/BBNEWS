@@ -2,7 +2,14 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
+
+setAuthTokenGetter(() => localStorage.getItem("admin_token"));
+
+const API_URL = import.meta.env.VITE_API_URL;
+if (API_URL) {
+  setBaseUrl(API_URL);
+}
 
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -18,8 +25,6 @@ import AdminCategoryList from "@/pages/admin/category-list";
 import AdminUserManagement from "@/pages/admin/user-management";
 import AdminProfile from "@/pages/admin/profile";
 import AdminSitePages from "@/pages/admin/site-pages";
-
-setAuthTokenGetter(() => localStorage.getItem("admin_token"));
 
 const queryClient = new QueryClient();
 

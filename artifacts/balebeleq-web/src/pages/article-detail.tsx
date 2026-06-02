@@ -6,7 +6,64 @@ import { useGetArticleBySlug, getGetArticleBySlugQueryKey, useIncrementArticleVi
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Calendar } from "lucide-react";
+import { Eye, Calendar, Copy, Check } from "lucide-react";
+import { FaFacebook, FaWhatsapp, FaTwitter } from "react-icons/fa";
+import { useState } from "react";
+
+function ShareButtons({ title, url }: { title: string; url: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function copyLink() {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + url)}`;
+  const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 mt-8 pt-8 border-t border-border">
+      <span className="text-sm font-semibold text-muted-foreground">Bagikan:</span>
+      <a
+        href={fbUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 bg-[#1877F2] text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        <FaFacebook className="w-4 h-4" />
+        Facebook
+      </a>
+      <a
+        href={waUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        <FaWhatsapp className="w-4 h-4" />
+        WhatsApp
+      </a>
+      <a
+        href={twUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        <FaTwitter className="w-4 h-4" />
+        Twitter/X
+      </a>
+      <button
+        onClick={copyLink}
+        className="flex items-center gap-2 bg-muted text-foreground px-4 py-2 rounded-full text-sm font-medium hover:bg-muted/80 transition-colors"
+      >
+        {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+        {copied ? "Tersalin!" : "Salin Link"}
+      </button>
+    </div>
+  );
+}
 
 export default function ArticleDetail() {
   const params = useParams<{ slug: string }>();
@@ -28,6 +85,8 @@ export default function ArticleDetail() {
       incrementViews.mutate({ id: article.id });
     }
   }, [article?.id, incrementViews]);
+
+  const articleUrl = typeof window !== "undefined" ? window.location.href : "";
 
   if (isLoading) {
     return (
@@ -96,12 +155,19 @@ export default function ArticleDetail() {
               alt={article.title} 
               className="w-full h-auto object-cover max-h-[600px]"
             />
+            {(article as any).imageCaption && (
+              <p className="text-xs text-center text-muted-foreground bg-muted/50 px-4 py-2 italic">
+                {(article as any).imageCaption}
+              </p>
+            )}
           </div>
         )}
 
         <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-a:text-primary hover:prose-a:text-primary/80">
           <div dangerouslySetInnerHTML={{ __html: article.content }} />
         </div>
+
+        <ShareButtons title={article.title} url={articleUrl} />
       </article>
     </PublicLayout>
   );

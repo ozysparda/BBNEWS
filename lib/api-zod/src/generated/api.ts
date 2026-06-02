@@ -37,6 +37,7 @@ export const ListArticlesResponse = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "category": zod.union([zod.object({
   "id": zod.number(),
@@ -66,6 +67,7 @@ export const CreateArticleBody = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "isPublished": zod.boolean(),
   "isFeatured": zod.boolean()
@@ -86,6 +88,7 @@ export const GetAdminArticleResponse = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "category": zod.union([zod.object({
   "id": zod.number(),
@@ -121,6 +124,7 @@ export const ListAllArticlesResponse = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "category": zod.union([zod.object({
   "id": zod.number(),
@@ -152,6 +156,7 @@ export const GetFeaturedArticlesResponseItem = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "category": zod.union([zod.object({
   "id": zod.number(),
@@ -198,6 +203,7 @@ export const GetArticleResponse = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "category": zod.union([zod.object({
   "id": zod.number(),
@@ -226,6 +232,7 @@ export const UpdateArticleBody = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "isPublished": zod.boolean(),
   "isFeatured": zod.boolean()
@@ -238,6 +245,7 @@ export const UpdateArticleResponse = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "category": zod.union([zod.object({
   "id": zod.number(),
@@ -276,6 +284,7 @@ export const GetArticleBySlugResponse = zod.object({
   "excerpt": zod.string(),
   "content": zod.string(),
   "imageUrl": zod.string().nullish(),
+  "imageCaption": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "category": zod.union([zod.object({
   "id": zod.number(),
@@ -336,7 +345,8 @@ export const AdminLoginResponse = zod.object({
   "user": zod.object({
   "id": zod.number(),
   "username": zod.string(),
-  "email": zod.string().nullish()
+  "email": zod.string().nullish(),
+  "role": zod.string().optional()
 })
 })
 
@@ -347,7 +357,89 @@ export const AdminLoginResponse = zod.object({
 export const GetMeResponse = zod.object({
   "id": zod.number(),
   "username": zod.string(),
-  "email": zod.string().nullish()
+  "email": zod.string().nullish(),
+  "role": zod.string().optional()
+})
+
+
+/**
+ * @summary Request presigned upload URL
+ */
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string(),
+  "size": zod.number(),
+  "contentType": zod.string()
+})
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().optional(),
+  "size": zod.number().optional(),
+  "contentType": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Get/redirect to object
+ */
+export const GetObjectParams = zod.object({
+  "objectPath": zod.coerce.string()
+})
+
+
+/**
+ * @summary List all admin users (owner only)
+ */
+export const ListAdminUsersResponseItem = zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullish(),
+  "role": zod.string().optional()
+})
+export const ListAdminUsersResponse = zod.array(ListAdminUsersResponseItem)
+
+
+/**
+ * @summary Create admin user (owner only)
+ */
+export const CreateAdminUserBody = zod.object({
+  "username": zod.string(),
+  "password": zod.string(),
+  "email": zod.string().optional(),
+  "role": zod.string()
+})
+
+
+/**
+ * @summary Update admin user (owner only)
+ */
+export const UpdateAdminUserParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminUserBody = zod.object({
+  "username": zod.string(),
+  "password": zod.string(),
+  "email": zod.string().optional(),
+  "role": zod.string()
+})
+
+export const UpdateAdminUserResponse = zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullish(),
+  "role": zod.string().optional()
+})
+
+
+/**
+ * @summary Delete admin user (owner only)
+ */
+export const DeleteAdminUserParams = zod.object({
+  "id": zod.coerce.number()
 })
 
 

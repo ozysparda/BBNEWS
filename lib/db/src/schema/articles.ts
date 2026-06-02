@@ -11,6 +11,7 @@ export const articlesTable = pgTable("articles", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   imageUrl: text("image_url"),
+  imageCaption: text("image_caption"),
   categoryId: integer("category_id").references(() => categoriesTable.id, { onDelete: "set null" }),
   isPublished: boolean("is_published").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),

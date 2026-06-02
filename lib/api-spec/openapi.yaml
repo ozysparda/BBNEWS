@@ -16,6 +16,10 @@ tags:
     description: Category operations
   - name: auth
     description: Admin authentication
+  - name: storage
+    description: File upload operations
+  - name: users
+    description: Admin user management (owner only)
 paths:
   /healthz:
     get:
@@ -339,6 +343,140 @@ paths:
         "401":
           description: Unauthorized
 
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      tags: [storage]
+      summary: Request presigned upload URL
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestUploadUrlBody"
+      responses:
+        "200":
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestUploadUrlResponse"
+        "401":
+          description: Unauthorized
+
+  /storage/objects/{objectPath}:
+    get:
+      operationId: getObject
+      tags: [storage]
+      summary: Get/redirect to object
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Object content or redirect
+        "404":
+          description: Not found
+
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [users]
+      summary: List all admin users (owner only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of admin users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (owner only)
+    post:
+      operationId: createAdminUser
+      tags: [users]
+      summary: Create admin user (owner only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserCreate"
+      responses:
+        "201":
+          description: Created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (owner only)
+
+  /admin/users/{id}:
+    put:
+      operationId: updateAdminUser
+      tags: [users]
+      summary: Update admin user (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserCreate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (owner only)
+    delete:
+      operationId: deleteAdminUser
+      tags: [users]
+      summary: Delete admin user (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (owner only)
+
 components:
   securitySchemes:
     bearerAuth:
@@ -369,6 +507,8 @@ components:
         content:
           type: string
         imageUrl:
+          type: ["string", "null"]
+        imageCaption:
           type: ["string", "null"]
         categoryId:
           type: ["integer", "null"]
@@ -461,6 +601,8 @@ components:
           type: string
         imageUrl:
           type: ["string", "null"]
+        imageCaption:
+          type: ["string", "null"]
         categoryId:
           type: ["integer", "null"]
         isPublished:
@@ -538,6 +680,58 @@ components:
           type: string
         email:
           type: ["string", "null"]
+        role:
+          type: string
       required:
         - id
         - username
+
+    RequestUploadUrlBody:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+        contentType:
+          type: string
+      required:
+        - name
+        - size
+        - contentType
+
+    RequestUploadUrlResponse:
+      type: object
+      properties:
+        uploadURL:
+          type: string
+        objectPath:
+          type: string
+        metadata:
+          type: object
+          properties:
+            name:
+              type: string
+            size:
+              type: integer
+            contentType:
+              type: string
+      required:
+        - uploadURL
+        - objectPath
+
+    AdminUserCreate:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+      required:
+        - username
+        - password
+        - role

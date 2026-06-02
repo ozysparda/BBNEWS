@@ -15,6 +15,7 @@ import AdminDashboard from "@/pages/admin/dashboard";
 import AdminArticleList from "@/pages/admin/article-list";
 import AdminArticleForm from "@/pages/admin/article-form";
 import AdminCategoryList from "@/pages/admin/category-list";
+import AdminUserManagement from "@/pages/admin/user-management";
 
 setAuthTokenGetter(() => localStorage.getItem("admin_token"));
 
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/admin/artikel/baru" component={AdminArticleForm} />
       <Route path="/admin/artikel/:id/edit" component={AdminArticleForm} />
       <Route path="/admin/kategori" component={AdminCategoryList} />
+      <Route path="/admin/pengguna" component={AdminUserManagement} />
       
       <Route component={NotFound} />
     </Switch>

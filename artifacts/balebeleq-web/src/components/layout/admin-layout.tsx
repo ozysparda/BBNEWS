@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home } from "lucide-react";
+import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users } from "lucide-react";
 import { useState } from "react";
 const logoImg = `${import.meta.env.BASE_URL}logo.png`;
 
@@ -22,10 +22,13 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   if (!user) return null;
 
+  const isOwner = (user as any).role === "owner";
+
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/artikel", label: "Artikel", icon: FileText },
     { href: "/admin/kategori", label: "Kategori", icon: Tags },
+    ...(isOwner ? [{ href: "/admin/pengguna", label: "Pengguna", icon: Users }] : []),
   ];
 
   const NavLinks = () => (
@@ -84,7 +87,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="min-w-0">
               <div className="text-sm font-semibold text-sidebar-foreground truncate">{user.username}</div>
-              <div className="text-[10px] text-muted-foreground">Administrator</div>
+              <div className="text-[10px] text-muted-foreground capitalize">{(user as any).role ?? "editor"}</div>
             </div>
           </div>
           <button
@@ -133,7 +136,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-sidebar-foreground truncate">{user.username}</div>
-                  <div className="text-[10px] text-muted-foreground">Administrator</div>
+                  <div className="text-[10px] text-muted-foreground capitalize">{(user as any).role ?? "editor"}</div>
                 </div>
               </div>
               <button

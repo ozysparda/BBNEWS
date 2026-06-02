@@ -38,7 +38,7 @@ router.post("/auth/login", async (req, res) => {
   const token = jwt.sign({ id: admin.id, username: admin.username }, getJwtSecret(), { expiresIn: "7d" });
   res.json({
     token,
-    user: { id: admin.id, username: admin.username, email: admin.email }
+    user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role }
   });
 });
 
@@ -48,7 +48,7 @@ router.get("/auth/me", requireAuth, async (req: AuthRequest, res) => {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  res.json({ id: admin.id, username: admin.username, email: admin.email });
+  res.json({ id: admin.id, username: admin.username, email: admin.email, role: admin.role });
 });
 
 export default router;

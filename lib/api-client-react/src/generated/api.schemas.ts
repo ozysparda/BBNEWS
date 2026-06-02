@@ -26,6 +26,8 @@ export interface Article {
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */
+  imageCaption?: string | null;
+  /** @nullable */
   categoryId?: number | null;
   category?: Category | null;
   isPublished: boolean;
@@ -63,6 +65,8 @@ export interface ArticleInput {
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */
+  imageCaption?: string | null;
+  /** @nullable */
   categoryId?: number | null;
   isPublished: boolean;
   isFeatured: boolean;
@@ -84,11 +88,37 @@ export interface AdminUser {
   username: string;
   /** @nullable */
   email?: string | null;
+  role?: string;
 }
 
 export interface LoginResponse {
   token: string;
   user: AdminUser;
+}
+
+export interface RequestUploadUrlBody {
+  name: string;
+  size: number;
+  contentType: string;
+}
+
+export type RequestUploadUrlResponseMetadata = {
+  name?: string;
+  size?: number;
+  contentType?: string;
+};
+
+export interface RequestUploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: RequestUploadUrlResponseMetadata;
+}
+
+export interface AdminUserCreate {
+  username: string;
+  password: string;
+  email?: string;
+  role: string;
 }
 
 export type ListArticlesParams = {

@@ -1,3 +1,3 @@
-- [BaleBeleq DB schema](db-schema.md) — admins table uses `password` column (NOT `password_hash`); articles/categories/admins tables created
-- [BaleBeleq admin users](admin-users.md) — three admin accounts seeded; JWT_SECRET must be set as a secret
-- [BaleBeleq API client](api-client.md) — generated hooks in lib/api-client-react/src/generated/api.ts; useListAllArticles for admin endpoint
+- [BaleBeleqNews Stack](balebeleq-stack.md) — React 19+Vite 7+Tailwind 4+wouter+Express 5+Drizzle ORM+PostgreSQL+JWT; codegen via orval
+- [Orval api-zod config pitfall](orval-api-zod-index.md) — removing `schemas` from orval zod config leaves index.ts broken; fix by echoing only `export * from "./generated/api"` AFTER codegen runs
+- [BaleBeleqNews Auth Accounts](balebeleq-auth.md) — admin/owner, hendra/owner, toni/owner; JWT in localStorage as admin_token

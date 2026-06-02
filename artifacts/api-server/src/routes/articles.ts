@@ -15,6 +15,7 @@ function buildArticleWithCategory() {
     excerpt: articlesTable.excerpt,
     content: articlesTable.content,
     imageUrl: articlesTable.imageUrl,
+    imageCaption: articlesTable.imageCaption,
     categoryId: articlesTable.categoryId,
     isPublished: articlesTable.isPublished,
     isFeatured: articlesTable.isFeatured,
@@ -224,7 +225,7 @@ router.post("/articles/:id/views", async (req, res) => {
 
 // Admin: create article
 router.post("/articles", requireAuth, async (req: AuthRequest, res) => {
-  const { title, excerpt, content, imageUrl, categoryId, isPublished, isFeatured } = req.body;
+  const { title, excerpt, content, imageUrl, imageCaption, categoryId, isPublished, isFeatured } = req.body;
   if (!title || !excerpt || !content) {
     res.status(400).json({ error: "title, excerpt and content are required" });
     return;
@@ -241,6 +242,7 @@ router.post("/articles", requireAuth, async (req: AuthRequest, res) => {
       excerpt,
       content,
       imageUrl: imageUrl || null,
+      imageCaption: imageCaption || null,
       categoryId: categoryId || null,
       isPublished: !!isPublished,
       isFeatured: !!isFeatured,
@@ -264,7 +266,7 @@ router.put("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
     return;
   }
 
-  const { title, excerpt, content, imageUrl, categoryId, isPublished, isFeatured } = req.body;
+  const { title, excerpt, content, imageUrl, imageCaption, categoryId, isPublished, isFeatured } = req.body;
 
   await db
     .update(articlesTable)
@@ -273,6 +275,7 @@ router.put("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
       excerpt,
       content,
       imageUrl: imageUrl || null,
+      imageCaption: imageCaption || null,
       categoryId: categoryId || null,
       isPublished: !!isPublished,
       isFeatured: !!isFeatured,

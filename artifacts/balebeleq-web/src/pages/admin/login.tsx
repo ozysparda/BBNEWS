@@ -57,10 +57,10 @@ export default function AdminLogin() {
         <div className="text-center mb-8">
           <img
             src={logoImg}
-            alt="BaleBeleqNews Logo"
+            alt="BerugakNews Logo"
             className="h-24 w-24 object-contain mx-auto mb-4 drop-shadow-md"
           />
-          <h1 className="text-3xl font-serif font-bold text-foreground">Bale Beleq News</h1>
+          <h1 className="text-3xl font-serif font-bold text-foreground">Berugak News</h1>
           <p className="text-muted-foreground mt-1 font-medium tracking-widest uppercase text-xs">
             Administration Portal
           </p>

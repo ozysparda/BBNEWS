@@ -3,7 +3,6 @@ import { useListCategories } from "@workspace/api-client-react";
 import { Search, X, Menu } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 const logoImg = `${import.meta.env.BASE_URL}logo.png`;
-const bannerImg = `${import.meta.env.BASE_URL}banner.png`;
 
 function SearchBar() {
   const [, navigate] = useLocation();
@@ -78,9 +77,9 @@ function MobileMenu({ categories }: { categories: { id: number; name: string; sl
           <div className="fixed top-0 right-0 bottom-0 w-72 bg-background z-50 shadow-xl flex flex-col animate-in slide-in-from-right duration-200">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <Link href="/" className="flex items-center gap-2">
-                <img src={logoImg} alt="BaleBeleqNews" className="h-8 w-8 object-contain" />
+                <img src={logoImg} alt="BerugakNews" className="h-8 w-8 object-contain" />
                 <span className="font-serif font-black text-lg">
-                  <span className="text-primary">BaleBeleq</span><span>News</span>
+                  <span className="text-primary">Berugak</span><span>News</span>
                 </span>
               </Link>
               <button onClick={() => setOpen(false)} className="p-1.5 rounded-full hover:bg-muted">
@@ -129,9 +128,9 @@ export function PublicHeader() {
       <div className="container mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <img src={logoImg} alt="BaleBeleqNews Logo" className="h-9 w-9 sm:h-11 sm:w-11 object-contain" />
+          <img src={logoImg} alt="BerugakNews Logo" className="h-9 w-9 sm:h-11 sm:w-11 object-contain" />
           <span className="font-serif text-lg sm:text-xl font-black tracking-tight leading-none">
-            <span className="text-primary">Bale</span><span className="text-green-700">Beleq</span>
+            <span className="text-green-700">Berugak</span>
             <span className="text-red-600 text-xs font-bold ml-1 bg-red-600 text-white px-1 rounded-sm">NEWS</span>
           </span>
         </Link>
@@ -167,19 +166,14 @@ export function PublicHeader() {
 export function PublicFooter() {
   return (
     <footer className="bg-gray-900 text-gray-300 mt-16">
-      {/* Banner strip */}
-      <div className="w-full overflow-hidden max-h-36">
-        <img src={bannerImg} alt="BaleBeleqNews Banner" className="w-full object-cover object-center opacity-70" />
-      </div>
-
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
           <div className="sm:col-span-2">
             <div className="flex items-center gap-3 mb-3">
-              <img src={logoImg} alt="BaleBeleqNews Logo" className="h-12 w-12 object-contain" />
+              <img src={logoImg} alt="BerugakNews Logo" className="h-12 w-12 object-contain" />
               <div>
-                <h2 className="font-serif text-xl font-bold text-white">BaleBeleqNews</h2>
-                <p className="text-xs text-gray-400 italic">Dari Bale Beleq, Untuk Publik</p>
+                <h2 className="font-serif text-xl font-bold text-white">BerugakNews</h2>
+                <p className="text-xs text-gray-400 italic">Dari Berugak, Untuk Publik</p>
               </div>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
@@ -202,13 +196,13 @@ export function PublicFooter() {
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
-              Facebook BaleBeleqNews
+              Facebook BerugakNews
             </a>
           </div>
         </div>
         <div className="border-t border-gray-700 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-gray-500">
-            &copy; {new Date().getFullYear()} BaleBeleqNews. Hak cipta dilindungi.
+            &copy; {new Date().getFullYear()} BerugakNews. Hak cipta dilindungi.
           </p>
           <p className="text-xs text-gray-600 uppercase tracking-widest">
             Informasi · Budaya · Aspirasi

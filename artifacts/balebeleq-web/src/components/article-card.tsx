@@ -23,7 +23,7 @@ export function ArticleCard({ article, featured = false, featuredSmall = false }
             />
           ) : (
             <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-              <span className="text-primary/30 font-serif text-2xl font-bold">BaleBeleqNews</span>
+              <span className="text-primary/30 font-serif text-2xl font-bold">BerugakNews</span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
@@ -68,7 +68,7 @@ export function ArticleCard({ article, featured = false, featuredSmall = false }
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-              <span className="text-primary/30 font-serif text-sm">BaleBeleqNews</span>
+              <span className="text-primary/30 font-serif text-sm">BerugakNews</span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
@@ -107,7 +107,7 @@ export function ArticleCard({ article, featured = false, featuredSmall = false }
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-              <span className="text-primary/30 font-serif text-sm">BaleBeleqNews</span>
+              <span className="text-primary/30 font-serif text-sm">BerugakNews</span>
             </div>
           )}
           {article.category && (

@@ -5,8 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { ChevronRight, Flame } from "lucide-react";
 import { NewsTicker } from "@/components/news-ticker";
-const bannerImg = `${import.meta.env.BASE_URL}banner.png`;
-
 export default function Home() {
   const { data: featuredArticles, isLoading: loadingFeatured } = useGetFeaturedArticles();
   const { data: recentArticlesData, isLoading: loadingRecent } = useListArticles({ limit: 12 });
@@ -16,16 +14,6 @@ export default function Home() {
     <PublicLayout>
       {/* News Ticker */}
       <NewsTicker />
-
-      {/* Hero Banner */}
-      <div className="w-full overflow-hidden max-h-48 sm:max-h-64 relative">
-        <img
-          src={bannerImg}
-          alt="BaleBeleqNews Banner"
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
-      </div>
 
       {/* Category Quick Links */}
       {categories && categories.length > 0 && (

@@ -58,7 +58,7 @@ export default function AdminSitePages() {
     <AdminLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Daftar Halaman</h1>
-        <p className="text-muted-foreground mt-1">Semua halaman yang tersedia di website BaleBeleqNews</p>
+        <p className="text-muted-foreground mt-1">Semua halaman yang tersedia di website BerugakNews</p>
       </div>
 
       {/* Site URL info */}

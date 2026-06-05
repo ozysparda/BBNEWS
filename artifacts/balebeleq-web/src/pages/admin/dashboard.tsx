@@ -29,7 +29,7 @@ export default function AdminDashboard() {
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Ringkasan & analitik konten BaleBeleqNews.</p>
+          <p className="text-muted-foreground mt-1">Ringkasan & analitik konten BerugakNews.</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <Link href="/admin/kategori" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">

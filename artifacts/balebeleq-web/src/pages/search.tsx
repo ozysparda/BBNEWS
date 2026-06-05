@@ -44,7 +44,7 @@ export default function SearchPage() {
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <ShieldCheck className="w-16 h-16 mb-6 text-primary" />
             <h2 className="text-xl font-semibold mb-2">Panel Administrasi</h2>
-            <p className="text-muted-foreground text-sm mb-6">Hanya untuk pengelola resmi BaleBeleqNews</p>
+            <p className="text-muted-foreground text-sm mb-6">Hanya untuk pengelola resmi BerugakNews</p>
             <button
               onClick={() => navigate("/admin")}
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-3 rounded-full text-sm font-semibold shadow-md hover:bg-primary/90 transition-colors"

@@ -66,7 +66,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="h-16 flex items-center px-4 border-b border-sidebar-border gap-2.5">
           <img src={logoImg} alt="Logo" className="h-9 w-9 object-contain" />
           <div>
-            <div className="font-serif font-bold text-sm text-sidebar-primary leading-tight">Bale Beleq</div>
+            <div className="font-serif font-bold text-sm text-sidebar-primary leading-tight">Berugak</div>
             <div className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Admin Panel</div>
           </div>
         </div>
@@ -131,7 +131,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
               <div className="flex items-center gap-2.5">
                 <img src={logoImg} alt="Logo" className="h-8 w-8 object-contain" />
-                <span className="font-serif font-bold text-sm text-sidebar-primary">Admin Panel</span>
+                <span className="font-serif font-bold text-sm text-sidebar-primary">Berugak Admin</span>
               </div>
               <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-md hover:bg-muted">
                 <X className="w-5 h-5" />
@@ -193,7 +193,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <Menu className="w-5 h-5" />
           </button>
           <img src={logoImg} alt="Logo" className="h-7 w-7 object-contain" />
-          <span className="font-serif font-bold text-base text-primary">Bale Beleq Admin</span>
+          <span className="font-serif font-bold text-base text-primary">Berugak Admin</span>
           <div className="ml-auto">
             <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
               {user.username.charAt(0).toUpperCase()}

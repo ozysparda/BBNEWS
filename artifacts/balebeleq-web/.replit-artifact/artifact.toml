@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "BaleBeleqNews"
+title = "BerugakNews"
 version = "1.0.0"
 id = "artifacts/balebeleq-web"
 router = "path"

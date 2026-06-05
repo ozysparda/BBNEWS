@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useListCategories } from "@workspace/api-client-react";
 import { Search, X, Menu } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-const logoImg = `${import.meta.env.BASE_URL}logo.png`;
+const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
 function SearchBar() {
   const [, navigate] = useLocation();

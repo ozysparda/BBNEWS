@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, User } from "lucide-react";
-const logoImg = `${import.meta.env.BASE_URL}logo.png`;
+const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
 const formSchema = z.object({
   username: z.string().min(1, "Username wajib diisi"),

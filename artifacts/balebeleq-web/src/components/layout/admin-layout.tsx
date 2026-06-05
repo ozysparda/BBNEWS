@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users, User, Activity, Globe } from "lucide-react";
 import { useState } from "react";
-const logoImg = `${import.meta.env.BASE_URL}logo.png`;
+const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, logout } = useAuth();

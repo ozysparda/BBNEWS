@@ -1,6 +1,7 @@
 import { useParams } from "wouter";
 import { useListCategories, useListArticles, getListArticlesQueryKey } from "@workspace/api-client-react";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { SEO } from "@/components/seo";
 import { ArticleCard } from "@/components/article-card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -19,7 +20,14 @@ export default function CategoryPage() {
   );
 
   return (
-    <PublicLayout>
+    <>
+      <SEO
+        title={category ? `Berita ${category.name}` : "Kategori"}
+        description={category ? `Kumpulan berita ${category.name} terkini dari BerugakNews.` : "Jelajahi kategori berita di BerugakNews."}
+        url={category ? `/kategori/${category.slug}` : `/kategori/${slug}`}
+        keywords={category ? `${category.name}, berita ${category.name}, lombok` : "kategori, berita, lombok"}
+      />
+      <PublicLayout>
       <div className="bg-muted/30 border-b border-border py-12">
         <div className="container mx-auto px-4 text-center">
           {loadingCategories ? (
@@ -71,5 +79,6 @@ export default function CategoryPage() {
         )}
       </div>
     </PublicLayout>
-  );
+  </>
+);
 }

@@ -1,4 +1,5 @@
 import { PublicLayout } from "@/components/layout/public-layout";
+import { SEO } from "@/components/seo";
 import { useGetFeaturedArticles, useListArticles, useListCategories } from "@workspace/api-client-react";
 import { ArticleCard } from "@/components/article-card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,9 +12,16 @@ export default function Home() {
   const { data: categories } = useListCategories();
 
   return (
-    <PublicLayout>
-      {/* News Ticker */}
-      <NewsTicker />
+    <>
+      <SEO
+        title="Portal Berita Lombok Terkini"
+        description="BerugakNews — Portal Berita Lombok yang menyajikan informasi terkini, budaya, dan aspirasi masyarakat secara cepat, akurat, berimbang, dan terpercaya."
+        url="/"
+        keywords="berita lombok, berita terkini, portal berita, budaya lombok, berugak"
+      />
+      <PublicLayout>
+        {/* News Ticker */}
+        <NewsTicker />
 
       {/* Category Quick Links */}
       {categories && categories.length > 0 && (
@@ -134,5 +142,6 @@ export default function Home() {
         </section>
       )}
     </PublicLayout>
-  );
+  </>
+);
 }

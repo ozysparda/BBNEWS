@@ -1,6 +1,7 @@
 import { useSearch, useLocation } from "wouter";
 import { useListArticles } from "@workspace/api-client-react";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { SEO } from "@/components/seo";
 import { ArticleCard } from "@/components/article-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchX, Search, ShieldCheck } from "lucide-react";
@@ -24,7 +25,14 @@ export default function SearchPage() {
   const total = data?.total ?? 0;
 
   return (
-    <PublicLayout>
+    <>
+      <SEO
+        title={q ? `Pencarian: ${q}` : "Cari Artikel"}
+        description={q ? `Hasil pencarian artikel untuk "${q}" di BerugakNews.` : "Cari artikel terkini dari BerugakNews."}
+        url={`/cari?q=${encodeURIComponent(q)}`}
+        keywords={q ? `${q}, berita, pencarian` : "pencarian, berita, lombok"}
+      />
+      <PublicLayout>
       <div className="container mx-auto px-4 py-10 max-w-4xl">
         <div className="mb-8 flex items-center gap-3">
           <Search className="w-6 h-6 text-primary shrink-0" />
@@ -87,5 +95,6 @@ export default function SearchPage() {
         )}
       </div>
     </PublicLayout>
-  );
+  </>
+);
 }

@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "BCZ3Du8TZLTZ6fk9-czPt"
+uri = "file://BERUGAKNEWS_STRUCTURE.md"
+type = "text"
+title = "BerugakNews - Struktur Website Lengkap"

@@ -1,5 +1,7 @@
 function App() {
-  return <h1>Hello BBNEWS</h1>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <h1>Query OK</h1>
+    </QueryClientProvider>
+  );
 }
-
-export default App;

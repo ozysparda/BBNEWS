@@ -2,18 +2,7 @@
   "version": 2,
   "framework": null,
   "buildCommand": "pnpm run vercel-build",
-  "outputDirectory": "artifacts/balebeleq-web/dist/public",
   "env": {
     "BASE_PATH": "/"
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.mjs"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  }
 }

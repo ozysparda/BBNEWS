@@ -48,6 +48,9 @@ Thumbs.db
 .cache/
 .local/
 
+# Vercel build output
+.vercel
+
 # Vercel serverless build output
 api/index.mjs
 api/index.mjs.map

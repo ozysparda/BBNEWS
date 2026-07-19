@@ -10,6 +10,10 @@
     "vercel-build": "pnpm --filter @workspace/balebeleq-web run build && pnpm --filter @workspace/api-server run build:vercel"
   },
   "private": true,
+  "packageManager": "pnpm@10.26.1",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "devDependencies": {
     "prettier": "^3.8.3",
     "typescript": "~5.9.3"

@@ -47,3 +47,14 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Vercel serverless build output
+api/index.mjs
+api/index.mjs.map
+api/pino-*.mjs
+api/pino-*.mjs.map
+api/thread-stream-worker.mjs
+api/thread-stream-worker.mjs.map
+# legacy js build artifacts (if any)
+api/*.js
+api/*.js.map

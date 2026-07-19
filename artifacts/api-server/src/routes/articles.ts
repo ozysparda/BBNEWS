@@ -186,7 +186,7 @@ router.get("/articles/:id", async (req, res) => {
 
 // Admin: get any article by ID (including drafts)
 router.get("/admin/articles/:id", requireAuth, async (req: AuthRequest, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   if (isNaN(id)) {
     res.status(404).json({ error: "Not found" });
     return;
@@ -274,7 +274,7 @@ router.post("/articles", requireAuth, async (req: AuthRequest, res) => {
 
 // Admin: update article
 router.put("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   if (isNaN(id)) {
     res.status(404).json({ error: "Not found" });
     return;
@@ -307,13 +307,13 @@ router.put("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
     res.status(404).json({ error: "Article not found" });
     return;
   }
-  await logActivity(req.adminId!, "Edit artikel", id, title ?? row?.article?.title);
+  await logActivity(req.adminId!, "Edit artikel", id, title ?? row?.title);
   res.json(formatArticleRow(row));
 });
 
 // Admin: delete article
 router.delete("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   if (isNaN(id)) {
     res.status(404).json({ error: "Not found" });
     return;

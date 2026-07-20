@@ -3,3 +3,8 @@ export * from "./categories";
 export * from "./articles";
 export * from "./comments";
 export * from "./activity-log";
+export * from "./complaints";
+export * from "./comment-replies";
+export * from "./comment-reactions";
+export * from "./blocked-users";
+export * from "./device-views";

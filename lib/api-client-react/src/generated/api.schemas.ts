@@ -121,6 +121,21 @@ export interface AdminUserCreate {
   role: string;
 }
 
+export interface Comment {
+  id: number;
+  articleId: number;
+  email: string;
+  content: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommentInput {
+  email: string;
+  content: string;
+}
+
 export type ListArticlesParams = {
 page?: number;
 limit?: number;

@@ -310,6 +310,38 @@ export const IncrementArticleViewsParams = zod.object({
 
 
 /**
+ * @summary List comments for an article
+ */
+export const ListCommentsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListCommentsResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListCommentsResponse = zod.array(ListCommentsResponseItem)
+
+
+/**
+ * @summary Create a comment on an article
+ */
+export const CreateCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CreateCommentBody = zod.object({
+  "email": zod.string(),
+  "content": zod.string()
+})
+
+
+/**
  * @summary List all categories
  */
 export const ListCategoriesResponseItem = zod.object({

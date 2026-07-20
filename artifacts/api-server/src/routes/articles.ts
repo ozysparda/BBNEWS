@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { articlesTable, categoriesTable, activityLogTable, adminsTable } from "@workspace/db/schema";
+import { articlesTable, categoriesTable, activityLogTable, adminsTable, commentsTable } from "@workspace/db/schema";
 import { eq, desc, ilike, sql, and, count } from "drizzle-orm";
 import { requireAuth, type AuthRequest } from "../middlewares/auth";
 import slugify from "slugify";
@@ -16,6 +16,25 @@ async function logActivity(adminId: number, action: string, articleId?: number, 
       articleTitle: articleTitle ?? null,
     });
   } catch (_) {}
+}
+
+const VIEWS_COOKIE_NAME = "berugak_views";
+const VIEWS_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
+
+function parseViewedIds(cookieHeader: string | undefined): number[] {
+  if (!cookieHeader) return [];
+  const match = cookieHeader.match(new RegExp(`${VIEWS_COOKIE_NAME}=([^;]+)`));
+  if (!match) return [];
+  return decodeURIComponent(match[1])
+    .split(",")
+    .map((s) => parseInt(s.trim(), 10))
+    .filter((n) => !Number.isNaN(n));
+}
+
+function buildViewsCookie(viewedIds: number[]): string {
+  const value = viewedIds.join(",");
+  const secure = process.env.NODE_ENV === "production" ? "Secure; " : "";
+  return `${VIEWS_COOKIE_NAME}=${encodeURIComponent(value)}; Max-Age=${VIEWS_COOKIE_MAX_AGE}; Path=/; SameSite=Lax; ${secure}HttpOnly`;
 }
 
 const router = Router();
@@ -222,18 +241,91 @@ router.get("/articles/:slug/slug", async (req, res) => {
   res.json(formatArticleRow(row));
 });
 
-// Public: increment view count
+// Public: increment view count (once per device/browser via cookie)
 router.post("/articles/:id/views", async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
     res.status(404).json({ error: "Not found" });
     return;
   }
-  await db
-    .update(articlesTable)
-    .set({ viewCount: sql`${articlesTable.viewCount} + 1` })
-    .where(eq(articlesTable.id, id));
+  const viewedIds = parseViewedIds(req.headers.cookie);
+  if (!viewedIds.includes(id)) {
+    await db
+      .update(articlesTable)
+      .set({ viewCount: sql`${articlesTable.viewCount} + 1` })
+      .where(eq(articlesTable.id, id));
+    viewedIds.push(id);
+  }
+  res.setHeader("Set-Cookie", buildViewsCookie(viewedIds));
   res.status(204).send();
+});
+
+// Public: list comments for an article
+router.get("/articles/:id/comments", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  const rows = await db
+    .select()
+    .from(commentsTable)
+    .where(and(eq(commentsTable.articleId, id), eq(commentsTable.status, "approved")))
+    .orderBy(desc(commentsTable.createdAt));
+  res.json(
+    rows.map((c) => ({
+      ...c,
+      createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : c.createdAt,
+      updatedAt: c.updatedAt instanceof Date ? c.updatedAt.toISOString() : c.updatedAt,
+    })),
+  );
+});
+
+// Public: create a comment on an article
+router.post("/articles/:id/comments", async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  const { email, content } = req.body;
+  if (!email || !content) {
+    res.status(400).json({ error: "email and content are required" });
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    res.status(400).json({ error: "Invalid email format" });
+    return;
+  }
+  const trimmedContent = content.trim();
+  if (trimmedContent.length === 0) {
+    res.status(400).json({ error: "Content cannot be empty" });
+    return;
+  }
+  const [article] = await db
+    .select({ id: articlesTable.id })
+    .from(articlesTable)
+    .where(and(eq(articlesTable.id, id), eq(articlesTable.isPublished, true)))
+    .limit(1);
+  if (!article) {
+    res.status(404).json({ error: "Article not found" });
+    return;
+  }
+  const [comment] = await db
+    .insert(commentsTable)
+    .values({
+      articleId: id,
+      email: email.trim().toLowerCase(),
+      content: trimmedContent,
+      status: "approved",
+    })
+    .returning();
+  res.status(201).json({
+    ...comment,
+    createdAt: comment.createdAt instanceof Date ? comment.createdAt.toISOString() : comment.createdAt,
+    updatedAt: comment.updatedAt instanceof Date ? comment.updatedAt.toISOString() : comment.updatedAt,
+  });
 });
 
 // Admin: create article

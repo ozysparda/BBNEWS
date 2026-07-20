@@ -271,6 +271,54 @@ paths:
         "204":
           description: View incremented
 
+  /articles/{id}/comments:
+    get:
+      operationId: listComments
+      tags: [articles]
+      summary: List comments for an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+    post:
+      operationId: createComment
+      tags: [articles]
+      summary: Create a comment on an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Invalid input
+        "404":
+          description: Article not found
+
   /categories:
     get:
       operationId: listCategories
@@ -735,3 +783,40 @@ components:
         - username
         - password
         - role
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        articleId:
+          type: integer
+        email:
+          type: string
+        content:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - articleId
+        - email
+        - content
+        - status
+        - createdAt
+        - updatedAt
+
+    CommentInput:
+      type: object
+      properties:
+        email:
+          type: string
+        content:
+          type: string
+      required:
+        - email
+        - content

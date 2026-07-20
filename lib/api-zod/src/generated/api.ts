@@ -342,6 +342,32 @@ export const CreateCommentBody = zod.object({
 
 
 /**
+ * @summary List all comments with sender details (admin only)
+ */
+export const ListAdminCommentsResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "articleTitle": zod.string(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListAdminCommentsResponse = zod.array(ListAdminCommentsResponseItem)
+
+
+/**
+ * @summary Delete a comment (admin only)
+ */
+export const DeleteAdminCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
  * @summary List all categories
  */
 export const ListCategoriesResponseItem = zod.object({

@@ -9,6 +9,8 @@ export const commentsTable = pgTable("comments", {
   articleId: integer("article_id").notNull().references(() => articlesTable.id, { onDelete: "cascade" }),
   email: text("email").notNull(),
   content: text("content").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
   status: text("status").notNull().default("approved"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -24,6 +26,8 @@ export const commentsRelations = relations(commentsTable, ({ one }) => ({
 export const insertCommentSchema = createInsertSchema(commentsTable).omit({
   id: true,
   status: true,
+  ipAddress: true,
+  userAgent: true,
   createdAt: true,
   updatedAt: true,
 });

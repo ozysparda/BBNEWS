@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminComment,
   AdminUser,
   AdminUserCreate,
   Article,
@@ -1111,6 +1112,153 @@ export const useCreateComment = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getCreateCommentMutationOptions(options));
+    }
+
+export const getListAdminCommentsUrl = () => {
+
+
+
+
+  return `/api/admin/comments`
+}
+
+/**
+ * @summary List all comments with sender details (admin only)
+ */
+export const listAdminComments = async ( options?: RequestInit): Promise<AdminComment[]> => {
+
+  return customFetch<AdminComment[]>(getListAdminCommentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminCommentsQueryKey = () => {
+    return [
+    `/api/admin/comments`
+    ] as const;
+    }
+
+
+export const getListAdminCommentsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminComments>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminCommentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminComments>>> = ({ signal }) => listAdminComments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminComments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminCommentsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminComments>>>
+export type ListAdminCommentsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all comments with sender details (admin only)
+ */
+
+export function useListAdminComments<TData = Awaited<ReturnType<typeof listAdminComments>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminCommentsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getDeleteAdminCommentUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/comments/${id}`
+}
+
+/**
+ * @summary Delete a comment (admin only)
+ */
+export const deleteAdminComment = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAdminCommentUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdminCommentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComment>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAdminComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminComment>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdminComment(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminCommentMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminComment>>>
+
+    export type DeleteAdminCommentMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete a comment (admin only)
+ */
+export const useDeleteAdminComment = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminComment>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAdminCommentMutationOptions(options));
     }
 
 export const getListCategoriesUrl = () => {

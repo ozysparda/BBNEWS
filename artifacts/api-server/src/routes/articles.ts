@@ -4,6 +4,7 @@ import { articlesTable, categoriesTable, activityLogTable, adminsTable, comments
 import { eq, desc, ilike, sql, and, count } from "drizzle-orm";
 import { requireAuth, type AuthRequest } from "../middlewares/auth";
 import slugify from "slugify";
+import type { Request } from "express";
 
 async function logActivity(adminId: number, action: string, articleId?: number, articleTitle?: string) {
   try {
@@ -35,6 +36,20 @@ function buildViewsCookie(viewedIds: number[]): string {
   const value = viewedIds.join(",");
   const secure = process.env.NODE_ENV === "production" ? "Secure; " : "";
   return `${VIEWS_COOKIE_NAME}=${encodeURIComponent(value)}; Max-Age=${VIEWS_COOKIE_MAX_AGE}; Path=/; SameSite=Lax; ${secure}HttpOnly`;
+}
+
+function getClientIp(req: Request): string {
+  const forwarded = req.headers["x-forwarded-for"] as string | undefined;
+  if (forwarded) return forwarded.split(",")[0].trim();
+  return req.ip || "unknown";
+}
+
+function formatCommentDates(comment: any) {
+  return {
+    ...comment,
+    createdAt: comment.createdAt instanceof Date ? comment.createdAt.toISOString() : comment.createdAt,
+    updatedAt: comment.updatedAt instanceof Date ? comment.updatedAt.toISOString() : comment.updatedAt,
+  };
 }
 
 const router = Router();
@@ -268,17 +283,19 @@ router.get("/articles/:id/comments", async (req, res) => {
     return;
   }
   const rows = await db
-    .select()
+    .select({
+      id: commentsTable.id,
+      articleId: commentsTable.articleId,
+      email: commentsTable.email,
+      content: commentsTable.content,
+      status: commentsTable.status,
+      createdAt: commentsTable.createdAt,
+      updatedAt: commentsTable.updatedAt,
+    })
     .from(commentsTable)
     .where(and(eq(commentsTable.articleId, id), eq(commentsTable.status, "approved")))
     .orderBy(desc(commentsTable.createdAt));
-  res.json(
-    rows.map((c) => ({
-      ...c,
-      createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : c.createdAt,
-      updatedAt: c.updatedAt instanceof Date ? c.updatedAt.toISOString() : c.updatedAt,
-    })),
-  );
+  res.json(rows.map(formatCommentDates));
 });
 
 // Public: create a comment on an article
@@ -319,13 +336,19 @@ router.post("/articles/:id/comments", async (req, res) => {
       email: email.trim().toLowerCase(),
       content: trimmedContent,
       status: "approved",
+      ipAddress: getClientIp(req),
+      userAgent: req.headers["user-agent"] || null,
     })
-    .returning();
-  res.status(201).json({
-    ...comment,
-    createdAt: comment.createdAt instanceof Date ? comment.createdAt.toISOString() : comment.createdAt,
-    updatedAt: comment.updatedAt instanceof Date ? comment.updatedAt.toISOString() : comment.updatedAt,
-  });
+    .returning({
+      id: commentsTable.id,
+      articleId: commentsTable.articleId,
+      email: commentsTable.email,
+      content: commentsTable.content,
+      status: commentsTable.status,
+      createdAt: commentsTable.createdAt,
+      updatedAt: commentsTable.updatedAt,
+    });
+  res.status(201).json(formatCommentDates(comment));
 });
 
 // Admin: create article
@@ -413,6 +436,39 @@ router.delete("/articles/:id", requireAuth, async (req: AuthRequest, res) => {
   const [toDelete] = await db.select({ title: articlesTable.title }).from(articlesTable).where(eq(articlesTable.id, id)).limit(1);
   await db.delete(articlesTable).where(eq(articlesTable.id, id));
   await logActivity(req.adminId!, "Hapus artikel", id, toDelete?.title);
+  res.status(204).send();
+});
+
+// Admin: list all comments with article title and sender details
+router.get("/admin/comments", requireAuth, async (req: AuthRequest, res) => {
+  const rows = await db
+    .select({
+      id: commentsTable.id,
+      articleId: commentsTable.articleId,
+      articleTitle: articlesTable.title,
+      email: commentsTable.email,
+      content: commentsTable.content,
+      ipAddress: commentsTable.ipAddress,
+      userAgent: commentsTable.userAgent,
+      status: commentsTable.status,
+      createdAt: commentsTable.createdAt,
+      updatedAt: commentsTable.updatedAt,
+    })
+    .from(commentsTable)
+    .leftJoin(articlesTable, eq(commentsTable.articleId, articlesTable.id))
+    .orderBy(desc(commentsTable.createdAt));
+  res.json(rows.map(formatCommentDates));
+});
+
+// Admin: delete a comment
+router.delete("/admin/comments/:id", requireAuth, async (req: AuthRequest, res) => {
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  await db.delete(commentsTable).where(eq(commentsTable.id, id));
+  await logActivity(req.adminId!, "Hapus komentar", undefined, undefined);
   res.status(204).send();
 });
 

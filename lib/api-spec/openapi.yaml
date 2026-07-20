@@ -319,6 +319,46 @@ paths:
         "404":
           description: Article not found
 
+  /admin/comments:
+    get:
+      operationId: listAdminComments
+      tags: [articles]
+      summary: List all comments with sender details (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of admin comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminComment"
+        "401":
+          description: Unauthorized
+
+  /admin/comments/{id}:
+    delete:
+      operationId: deleteAdminComment
+      tags: [articles]
+      summary: Delete a comment (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
   /categories:
     get:
       operationId: listCategories
@@ -806,6 +846,41 @@ components:
         - articleId
         - email
         - content
+        - status
+        - createdAt
+        - updatedAt
+
+    AdminComment:
+      type: object
+      properties:
+        id:
+          type: integer
+        articleId:
+          type: integer
+        articleTitle:
+          type: string
+        email:
+          type: string
+        content:
+          type: string
+        ipAddress:
+          type: ["string", "null"]
+        userAgent:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - articleId
+        - articleTitle
+        - email
+        - content
+        - ipAddress
+        - userAgent
         - status
         - createdAt
         - updatedAt

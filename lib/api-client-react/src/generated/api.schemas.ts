@@ -131,6 +131,21 @@ export interface Comment {
   updatedAt: string;
 }
 
+export interface AdminComment {
+  id: number;
+  articleId: number;
+  articleTitle: string;
+  email: string;
+  content: string;
+  /** @nullable */
+  ipAddress: string | null;
+  /** @nullable */
+  userAgent: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CommentInput {
   email: string;
   content: string;

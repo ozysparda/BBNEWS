@@ -21,6 +21,8 @@ import type {
 
 import type {
   AdminComment,
+  AdminComplaint,
+  AdminComplaintList,
   AdminUser,
   AdminUserCreate,
   Article,
@@ -31,7 +33,6 @@ import type {
   CategoryInput,
   Comment,
   CommentInput,
-  Complaint,
   ComplaintInput,
   ComplaintStatusUpdate,
   HealthStatus,
@@ -39,6 +40,7 @@ import type {
   ListArticlesParams,
   LoginCredentials,
   LoginResponse,
+  PublicComplaint,
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
   UpdateAdminCommentBody
@@ -1348,9 +1350,9 @@ export const getCreateComplaintUrl = () => {
 /**
  * @summary Submit a public complaint/report
  */
-export const createComplaint = async (complaintInput: ComplaintInput, options?: RequestInit): Promise<Complaint> => {
+export const createComplaint = async (complaintInput: ComplaintInput, options?: RequestInit): Promise<PublicComplaint> => {
 
-  return customFetch<Complaint>(getCreateComplaintUrl(),
+  return customFetch<PublicComplaint>(getCreateComplaintUrl(),
   {
     ...options,
     method: 'POST',
@@ -1419,9 +1421,9 @@ export const getListAdminComplaintsUrl = () => {
 /**
  * @summary List all complaints (admin only)
  */
-export const listAdminComplaints = async ( options?: RequestInit): Promise<Complaint[]> => {
+export const listAdminComplaints = async ( options?: RequestInit): Promise<AdminComplaintList> => {
 
-  return customFetch<Complaint[]>(getListAdminComplaintsUrl(),
+  return customFetch<AdminComplaintList>(getListAdminComplaintsUrl(),
   {
     ...options,
     method: 'GET'
@@ -1485,7 +1487,7 @@ export function useListAdminComplaints<TData = Awaited<ReturnType<typeof listAdm
 
 
 
-export const getUpdateComplaintStatusUrl = (id: number,) => {
+export const getGetAdminComplaintUrl = (id: number,) => {
 
 
 
@@ -1494,68 +1496,73 @@ export const getUpdateComplaintStatusUrl = (id: number,) => {
 }
 
 /**
- * @summary Update complaint status (admin only)
+ * @summary Get a complaint (admin only)
  */
-export const updateComplaintStatus = async (id: number,
-    complaintStatusUpdate: ComplaintStatusUpdate, options?: RequestInit): Promise<Complaint> => {
+export const getAdminComplaint = async (id: number, options?: RequestInit): Promise<AdminComplaint> => {
 
-  return customFetch<Complaint>(getUpdateComplaintStatusUrl(id),
+  return customFetch<AdminComplaint>(getGetAdminComplaintUrl(id),
   {
     ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      complaintStatusUpdate,)
+    method: 'GET'
+
+
   }
 );}
 
 
 
 
-export const getUpdateComplaintStatusMutationOptions = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext> => {
 
-const mutationKey = ['updateComplaintStatus'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateComplaintStatus>>, {id: number;data: BodyType<ComplaintStatusUpdate>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  updateComplaintStatus(id,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateComplaintStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateComplaintStatus>>>
-    export type UpdateComplaintStatusMutationBody = BodyType<ComplaintStatusUpdate>
-    export type UpdateComplaintStatusMutationError = ErrorType<void>
-
-    /**
- * @summary Update complaint status (admin only)
- */
-export const useUpdateComplaintStatus = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof updateComplaintStatus>>,
-        TError,
-        {id: number;data: BodyType<ComplaintStatusUpdate>},
-        TContext
-      > => {
-      return useMutation(getUpdateComplaintStatusMutationOptions(options));
+export const getGetAdminComplaintQueryKey = (id: number,) => {
+    return [
+    `/api/admin/complaints/${id}`
+    ] as const;
     }
+
+
+export const getGetAdminComplaintQueryOptions = <TData = Awaited<ReturnType<typeof getAdminComplaint>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminComplaintQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminComplaint>>> = ({ signal }) => getAdminComplaint(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminComplaint>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminComplaintQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminComplaint>>>
+export type GetAdminComplaintQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a complaint (admin only)
+ */
+
+export function useGetAdminComplaint<TData = Awaited<ReturnType<typeof getAdminComplaint>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminComplaintQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getDeleteAdminComplaintUrl = (id: number,) => {
 
@@ -1625,6 +1632,78 @@ export const useDeleteAdminComplaint = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getDeleteAdminComplaintMutationOptions(options));
+    }
+
+export const getUpdateComplaintStatusUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/complaints/${id}/status`
+}
+
+/**
+ * @summary Update complaint status (admin only)
+ */
+export const updateComplaintStatus = async (id: number,
+    complaintStatusUpdate: ComplaintStatusUpdate, options?: RequestInit): Promise<AdminComplaint> => {
+
+  return customFetch<AdminComplaint>(getUpdateComplaintStatusUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      complaintStatusUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateComplaintStatusMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext> => {
+
+const mutationKey = ['updateComplaintStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateComplaintStatus>>, {id: number;data: BodyType<ComplaintStatusUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateComplaintStatus(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateComplaintStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateComplaintStatus>>>
+    export type UpdateComplaintStatusMutationBody = BodyType<ComplaintStatusUpdate>
+    export type UpdateComplaintStatusMutationError = ErrorType<void>
+
+    /**
+ * @summary Update complaint status (admin only)
+ */
+export const useUpdateComplaintStatus = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateComplaintStatus>>,
+        TError,
+        {id: number;data: BodyType<ComplaintStatusUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateComplaintStatusMutationOptions(options));
     }
 
 export const getListCategoriesUrl = () => {

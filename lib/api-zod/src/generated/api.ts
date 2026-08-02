@@ -399,51 +399,115 @@ export const DeleteAdminCommentParams = zod.object({
  * @summary Submit a public complaint/report
  */
 export const CreateComplaintBody = zod.object({
+  "fullName": zod.string().optional(),
   "email": zod.string(),
-  "content": zod.string(),
+  "phoneNumber": zod.string().optional(),
+  "category": zod.string().optional(),
+  "title": zod.string().optional(),
+  "description": zod.string().optional(),
+  "content": zod.string().optional(),
+  "agreementAccepted": zod.enum(['true']).optional(),
+  "terms": zod.boolean(),
+  "latitude": zod.number().optional(),
+  "longitude": zod.number().optional(),
   "location": zod.string().nullish(),
-  "terms": zod.boolean()
+  "address": zod.string().optional(),
+  "city": zod.string().optional(),
+  "province": zod.string().optional(),
+  "country": zod.string().optional(),
+  "photoUrl": zod.string().optional(),
+  "videoUrl": zod.string().optional(),
+  "pdfUrl": zod.string().optional()
 })
 
 
 /**
  * @summary List all complaints (admin only)
  */
-export const ListAdminComplaintsResponseItem = zod.object({
+export const ListAdminComplaintsResponse = zod.object({
+  "complaints": zod.array(zod.object({
   "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
   "email": zod.string(),
-  "content": zod.string(),
-  "terms": zod.boolean(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
   "status": zod.string(),
-  "ipAddress": zod.string().nullable(),
-  "userAgent": zod.string().nullable(),
-  "location": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
 })
-export const ListAdminComplaintsResponse = zod.array(ListAdminComplaintsResponseItem)
 
 
 /**
- * @summary Update complaint status (admin only)
+ * @summary Get a complaint (admin only)
  */
-export const UpdateComplaintStatusParams = zod.object({
+export const GetAdminComplaintParams = zod.object({
   "id": zod.coerce.number()
 })
 
-export const UpdateComplaintStatusBody = zod.object({
-  "status": zod.string()
-})
-
-export const UpdateComplaintStatusResponse = zod.object({
+export const GetAdminComplaintResponse = zod.object({
   "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
   "email": zod.string(),
-  "content": zod.string(),
-  "terms": zod.boolean(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
   "status": zod.string(),
-  "ipAddress": zod.string().nullable(),
-  "userAgent": zod.string().nullable(),
-  "location": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -454,6 +518,56 @@ export const UpdateComplaintStatusResponse = zod.object({
  */
 export const DeleteAdminComplaintParams = zod.object({
   "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Update complaint status (admin only)
+ */
+export const UpdateComplaintStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateComplaintStatusBody = zod.object({
+  "status": zod.string(),
+  "assignedOfficer": zod.string().nullish()
+})
+
+export const UpdateComplaintStatusResponse = zod.object({
+  "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
 })
 
 

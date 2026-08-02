@@ -155,32 +155,115 @@ export interface CommentInput {
   location?: string | null;
 }
 
-export interface Complaint {
+export interface PublicComplaint {
   id: number;
-  email: string;
-  content: string;
-  terms: boolean;
+  complaintNumber: string;
   status: string;
-  /** @nullable */
-  ipAddress: string | null;
-  /** @nullable */
-  userAgent: string | null;
-  /** @nullable */
-  location: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface ComplaintInput {
+export interface AdminComplaint {
+  id: number;
+  complaintNumber: string;
+  fullName: string;
   email: string;
-  content: string;
+  phoneNumber: string;
+  category: string;
+  title: string;
+  description: string;
+  /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
+  videoUrl?: string | null;
+  /** @nullable */
+  pdfUrl?: string | null;
+  status: string;
+  /** @nullable */
+  assignedOfficer?: string | null;
+  /** @nullable */
+  latitude?: number | null;
+  /** @nullable */
+  longitude?: number | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  province?: string | null;
+  /** @nullable */
+  country?: string | null;
+  /** @nullable */
+  deviceName?: string | null;
+  /** @nullable */
+  deviceType?: string | null;
+  /** @nullable */
+  operatingSystem?: string | null;
+  /** @nullable */
+  browser?: string | null;
+  /** @nullable */
+  browserVersion?: string | null;
+  /** @nullable */
+  screenResolution?: string | null;
+  /** @nullable */
+  timezone?: string | null;
+  /** @nullable */
+  localTime?: string | null;
+  /** @nullable */
+  ipAddress?: string | null;
+  /** @nullable */
+  userAgent?: string | null;
+  /** @nullable */
+  language?: string | null;
+  /** @nullable */
+  deviceFingerprint?: string | null;
+  agreementAccepted: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminComplaintList {
+  complaints: AdminComplaint[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export type ComplaintInputAgreementAccepted = typeof ComplaintInputAgreementAccepted[keyof typeof ComplaintInputAgreementAccepted];
+
+
+export const ComplaintInputAgreementAccepted = {
+  true: 'true',
+} as const;
+
+export interface ComplaintInput {
+  fullName?: string;
+  email: string;
+  phoneNumber?: string;
+  category?: string;
+  title?: string;
+  description?: string;
+  content?: string;
+  agreementAccepted?: ComplaintInputAgreementAccepted;
+  terms: boolean;
+  latitude?: number;
+  longitude?: number;
   /** @nullable */
   location?: string | null;
-  terms: boolean;
+  address?: string;
+  city?: string;
+  province?: string;
+  country?: string;
+  photoUrl?: string;
+  videoUrl?: string;
+  pdfUrl?: string;
 }
 
 export interface ComplaintStatusUpdate {
   status: string;
+  /** @nullable */
+  assignedOfficer?: string | null;
 }
 
 export type ListArticlesParams = {

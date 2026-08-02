@@ -4,3 +4,7 @@ export * from "./articles";
 export * from "./comments";
 export * from "./complaints";
 export * from "./activity-log";
+export * from "./comment-replies";
+export * from "./comment-reactions";
+export * from "./blocked-users";
+export * from "./device-views";

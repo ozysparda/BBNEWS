@@ -339,10 +339,134 @@ paths:
           description: Unauthorized
 
   /admin/comments/{id}:
+    put:
+      operationId: updateAdminComment
+      tags: [articles]
+      summary: Update a comment (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+              required:
+                - content
+      responses:
+        "200":
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminComment"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
     delete:
       operationId: deleteAdminComment
       tags: [articles]
       summary: Delete a comment (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /complaints:
+    post:
+      operationId: createComplaint
+      tags: [complaints]
+      summary: Submit a public complaint/report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplaintInput"
+      responses:
+        "201":
+          description: Complaint submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Complaint"
+        "400":
+          description: Invalid input
+
+  /admin/complaints:
+    get:
+      operationId: listAdminComplaints
+      tags: [complaints]
+      summary: List all complaints (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of complaints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Complaint"
+        "401":
+          description: Unauthorized
+
+  /admin/complaints/{id}:
+    put:
+      operationId: updateComplaintStatus
+      tags: [complaints]
+      summary: Update complaint status (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplaintStatusUpdate"
+      responses:
+        "200":
+          description: Complaint updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Complaint"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteAdminComplaint
+      tags: [complaints]
+      summary: Delete a complaint (admin only)
       security:
         - bearerAuth: []
       parameters:
@@ -867,6 +991,8 @@ components:
           type: ["string", "null"]
         userAgent:
           type: ["string", "null"]
+        location:
+          type: ["string", "null"]
         status:
           type: string
         createdAt:
@@ -881,6 +1007,7 @@ components:
         - content
         - ipAddress
         - userAgent
+        - location
         - status
         - createdAt
         - updatedAt
@@ -892,6 +1019,67 @@ components:
           type: string
         content:
           type: string
+        location:
+          type: ["string", "null"]
       required:
         - email
         - content
+
+    Complaint:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        content:
+          type: string
+        terms:
+          type: boolean
+        status:
+          type: string
+        ipAddress:
+          type: ["string", "null"]
+        userAgent:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - email
+        - content
+        - terms
+        - status
+        - ipAddress
+        - userAgent
+        - location
+        - createdAt
+        - updatedAt
+
+    ComplaintInput:
+      type: object
+      properties:
+        email:
+          type: string
+        content:
+          type: string
+        location:
+          type: ["string", "null"]
+        terms:
+          type: boolean
+      required:
+        - email
+        - content
+        - terms
+
+    ComplaintStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status

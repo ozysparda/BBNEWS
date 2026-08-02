@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { MessageSquare, User } from "lucide-react";
+import { MapPin, MessageSquare, User } from "lucide-react";
 import { useListComments, useCreateComment, getListCommentsQueryKey } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,32 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  const [location, setLocation] = useState("");
+  const [locationMessage, setLocationMessage] = useState("");
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  function requestLocation() {
+    if (!navigator.geolocation) {
+      setLocationMessage("Browser ini tidak mendukung lokasi.");
+      return;
+    }
+    setLocationLoading(true);
+    setLocationMessage("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation(
+          `${position.coords.latitude.toFixed(3)}, ${position.coords.longitude.toFixed(3)}`,
+        );
+        setLocationMessage("Lokasi perkiraan siap disertakan.");
+        setLocationLoading(false);
+      },
+      () => {
+        setLocationMessage("Lokasi tidak diizinkan. Komentar tetap bisa dikirim.");
+        setLocationLoading(false);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+    );
+  }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -38,11 +64,20 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
     }
 
     createComment.mutate(
-      { id: articleId, data: { email: trimmedEmail, content: trimmedContent } },
+      {
+        id: articleId,
+        data: {
+          email: trimmedEmail,
+          content: trimmedContent,
+          location: location || undefined,
+        },
+      },
       {
         onSuccess: () => {
           setEmail("");
           setContent("");
+          setLocation("");
+          setLocationMessage("");
           queryClient.invalidateQueries({ queryKey: getListCommentsQueryKey(articleId) });
         },
         onError: (err: any) => {
@@ -70,6 +105,25 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+        </div>
+        <div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={requestLocation}
+            disabled={locationLoading}
+          >
+            <MapPin className="mr-2 h-4 w-4" />
+            {locationLoading
+              ? "Meminta izin lokasi..."
+              : location
+                ? "Lokasi terlampir"
+                : "Sertakan lokasi (opsional)"}
+          </Button>
+          {locationMessage && (
+            <p className="mt-1 text-xs text-muted-foreground">{locationMessage}</p>
+          )}
         </div>
         <div>
           <Label htmlFor="comment-content">Komentar</Label>

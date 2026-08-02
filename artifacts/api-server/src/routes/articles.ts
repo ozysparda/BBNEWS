@@ -338,6 +338,7 @@ router.post("/articles/:id/comments", async (req, res) => {
       status: "approved",
       ipAddress: getClientIp(req),
       userAgent: req.headers["user-agent"] || null,
+      location: req.body.location || null,
     })
     .returning({
       id: commentsTable.id,
@@ -450,6 +451,7 @@ router.get("/admin/comments", requireAuth, async (req: AuthRequest, res) => {
       content: commentsTable.content,
       ipAddress: commentsTable.ipAddress,
       userAgent: commentsTable.userAgent,
+      location: commentsTable.location,
       status: commentsTable.status,
       createdAt: commentsTable.createdAt,
       updatedAt: commentsTable.updatedAt,
@@ -458,6 +460,49 @@ router.get("/admin/comments", requireAuth, async (req: AuthRequest, res) => {
     .leftJoin(articlesTable, eq(commentsTable.articleId, articlesTable.id))
     .orderBy(desc(commentsTable.createdAt));
   res.json(rows.map(formatCommentDates));
+});
+
+// Admin: update a comment
+router.put("/admin/comments/:id", requireAuth, async (req: AuthRequest, res) => {
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  const { content } = req.body;
+  const trimmedContent = typeof content === "string" ? content.trim() : "";
+  if (trimmedContent.length === 0) {
+    res.status(400).json({ error: "Content cannot be empty" });
+    return;
+  }
+  await db
+    .update(commentsTable)
+    .set({ content: trimmedContent, updatedAt: new Date() })
+    .where(eq(commentsTable.id, id));
+  const [row] = await db
+    .select({
+      id: commentsTable.id,
+      articleId: commentsTable.articleId,
+      articleTitle: articlesTable.title,
+      email: commentsTable.email,
+      content: commentsTable.content,
+      ipAddress: commentsTable.ipAddress,
+      userAgent: commentsTable.userAgent,
+      location: commentsTable.location,
+      status: commentsTable.status,
+      createdAt: commentsTable.createdAt,
+      updatedAt: commentsTable.updatedAt,
+    })
+    .from(commentsTable)
+    .leftJoin(articlesTable, eq(commentsTable.articleId, articlesTable.id))
+    .where(eq(commentsTable.id, id))
+    .limit(1);
+  if (!row) {
+    res.status(404).json({ error: "Comment not found" });
+    return;
+  }
+  await logActivity(req.adminId!, "Edit komentar", undefined, undefined);
+  res.json(formatCommentDates(row));
 });
 
 // Admin: delete a comment

@@ -141,6 +141,8 @@ export interface AdminComment {
   ipAddress: string | null;
   /** @nullable */
   userAgent: string | null;
+  /** @nullable */
+  location: string | null;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -149,6 +151,36 @@ export interface AdminComment {
 export interface CommentInput {
   email: string;
   content: string;
+  /** @nullable */
+  location?: string | null;
+}
+
+export interface Complaint {
+  id: number;
+  email: string;
+  content: string;
+  terms: boolean;
+  status: string;
+  /** @nullable */
+  ipAddress: string | null;
+  /** @nullable */
+  userAgent: string | null;
+  /** @nullable */
+  location: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ComplaintInput {
+  email: string;
+  content: string;
+  /** @nullable */
+  location?: string | null;
+  terms: boolean;
+}
+
+export interface ComplaintStatusUpdate {
+  status: string;
 }
 
 export type ListArticlesParams = {
@@ -161,5 +193,9 @@ search?: string;
 export type ListAllArticlesParams = {
 page?: number;
 limit?: number;
+};
+
+export type UpdateAdminCommentBody = {
+  content: string;
 };
 

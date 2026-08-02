@@ -337,7 +337,8 @@ export const CreateCommentParams = zod.object({
 
 export const CreateCommentBody = zod.object({
   "email": zod.string(),
-  "content": zod.string()
+  "content": zod.string(),
+  "location": zod.string().nullish()
 })
 
 
@@ -352,6 +353,7 @@ export const ListAdminCommentsResponseItem = zod.object({
   "content": zod.string(),
   "ipAddress": zod.string().nullable(),
   "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
   "status": zod.string(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -360,9 +362,97 @@ export const ListAdminCommentsResponse = zod.array(ListAdminCommentsResponseItem
 
 
 /**
+ * @summary Update a comment (admin only)
+ */
+export const UpdateAdminCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminCommentBody = zod.object({
+  "content": zod.string()
+})
+
+export const UpdateAdminCommentResponse = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "articleTitle": zod.string(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
  * @summary Delete a comment (admin only)
  */
 export const DeleteAdminCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Submit a public complaint/report
+ */
+export const CreateComplaintBody = zod.object({
+  "email": zod.string(),
+  "content": zod.string(),
+  "location": zod.string().nullish(),
+  "terms": zod.boolean()
+})
+
+
+/**
+ * @summary List all complaints (admin only)
+ */
+export const ListAdminComplaintsResponseItem = zod.object({
+  "id": zod.number(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "terms": zod.boolean(),
+  "status": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListAdminComplaintsResponse = zod.array(ListAdminComplaintsResponseItem)
+
+
+/**
+ * @summary Update complaint status (admin only)
+ */
+export const UpdateComplaintStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateComplaintStatusBody = zod.object({
+  "status": zod.string()
+})
+
+export const UpdateComplaintStatusResponse = zod.object({
+  "id": zod.number(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "terms": zod.boolean(),
+  "status": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a complaint (admin only)
+ */
+export const DeleteAdminComplaintParams = zod.object({
   "id": zod.coerce.number()
 })
 

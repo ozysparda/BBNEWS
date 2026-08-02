@@ -5,6 +5,7 @@ import { id } from "date-fns/locale";
 import {
   useListAdminComments,
   useDeleteAdminComment,
+  useUpdateAdminComment,
   getListAdminCommentsQueryKey,
 } from "@workspace/api-client-react";
 import type { AdminComment } from "@workspace/api-client-react";
@@ -13,7 +14,7 @@ import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Eye, MessageSquare } from "lucide-react";
+import { Trash2, Eye, MessageSquare, Pencil } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +44,8 @@ export default function AdminCommentList() {
 
   const { data: comments, isLoading } = useListAdminComments();
   const deleteMutation = useDeleteAdminComment();
+  const updateMutation = useUpdateAdminComment();
+  const [editContent, setEditContent] = useState("");
 
   const handleDelete = () => {
     if (!deleteId) return;
@@ -59,6 +62,22 @@ export default function AdminCommentList() {
           setDeleteId(null);
         },
       }
+    );
+  };
+
+  const handleEdit = () => {
+    if (!detailComment || !editContent.trim()) return;
+    updateMutation.mutate(
+      { id: detailComment.id, data: { content: editContent.trim() } },
+      {
+        onSuccess: (updated) => {
+          toast({ title: "Komentar berhasil diedit" });
+          setDetailComment(updated);
+          setEditContent(updated.content);
+          queryClient.invalidateQueries({ queryKey: getListAdminCommentsQueryKey() });
+        },
+        onError: () => toast({ title: "Gagal mengedit komentar", variant: "destructive" }),
+      },
     );
   };
 
@@ -141,7 +160,10 @@ export default function AdminCommentList() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-foreground font-medium">{comment.email}</div>
-                      <div className="text-muted-foreground text-xs">{comment.ipAddress || "IP tidak tercatat"}</div>
+                      <div className="text-muted-foreground text-xs">
+                        {comment.ipAddress || "IP tidak tercatat"}
+                        {comment.location ? ` · ${comment.location}` : ""}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <p className="text-foreground line-clamp-2 max-w-sm">{comment.content}</p>
@@ -155,7 +177,10 @@ export default function AdminCommentList() {
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => setDetailComment(comment)}
+                          onClick={() => {
+                            setDetailComment(comment);
+                            setEditContent(comment.content);
+                          }}
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </Button>
@@ -226,6 +251,12 @@ export default function AdminCommentList() {
                 </div>
               </div>
               <div>
+                <div className="text-muted-foreground">Lokasi yang dibagikan</div>
+                <div className="font-medium text-foreground">
+                  {detailComment.location || "Tidak dibagikan"}
+                </div>
+              </div>
+              <div>
                 <div className="text-muted-foreground">Waktu</div>
                 <div className="font-medium text-foreground">
                   {format(new Date(detailComment.createdAt), "dd MMMM yyyy HH:mm", { locale: id })}
@@ -233,7 +264,16 @@ export default function AdminCommentList() {
               </div>
               <div>
                 <div className="text-muted-foreground">Isi Komentar</div>
-                <div className="bg-muted p-3 rounded-md text-foreground whitespace-pre-wrap">{detailComment.content}</div>
+                <textarea
+                  value={editContent}
+                  onChange={(event) => setEditContent(event.target.value)}
+                  className="mt-1 min-h-28 w-full rounded-md border border-input bg-background p-3 text-foreground"
+                  aria-label="Edit isi komentar"
+                />
+                <Button className="mt-2" size="sm" onClick={handleEdit} disabled={updateMutation.isPending}>
+                  <Pencil className="mr-2 h-3.5 w-3.5" />
+                  {updateMutation.isPending ? "Menyimpan..." : "Simpan Edit"}
+                </Button>
               </div>
             </div>
           )}

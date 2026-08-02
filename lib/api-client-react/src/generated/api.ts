@@ -31,13 +31,17 @@ import type {
   CategoryInput,
   Comment,
   CommentInput,
+  Complaint,
+  ComplaintInput,
+  ComplaintStatusUpdate,
   HealthStatus,
   ListAllArticlesParams,
   ListArticlesParams,
   LoginCredentials,
   LoginResponse,
   RequestUploadUrlBody,
-  RequestUploadUrlResponse
+  RequestUploadUrlResponse,
+  UpdateAdminCommentBody
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1191,6 +1195,78 @@ export function useListAdminComments<TData = Awaited<ReturnType<typeof listAdmin
 
 
 
+export const getUpdateAdminCommentUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/comments/${id}`
+}
+
+/**
+ * @summary Update a comment (admin only)
+ */
+export const updateAdminComment = async (id: number,
+    updateAdminCommentBody: UpdateAdminCommentBody, options?: RequestInit): Promise<AdminComment> => {
+
+  return customFetch<AdminComment>(getUpdateAdminCommentUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAdminCommentBody,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminCommentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminComment>>, TError,{id: number;data: BodyType<UpdateAdminCommentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminComment>>, TError,{id: number;data: BodyType<UpdateAdminCommentBody>}, TContext> => {
+
+const mutationKey = ['updateAdminComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminComment>>, {id: number;data: BodyType<UpdateAdminCommentBody>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminComment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminCommentMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminComment>>>
+    export type UpdateAdminCommentMutationBody = BodyType<UpdateAdminCommentBody>
+    export type UpdateAdminCommentMutationError = ErrorType<void>
+
+    /**
+ * @summary Update a comment (admin only)
+ */
+export const useUpdateAdminComment = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminComment>>, TError,{id: number;data: BodyType<UpdateAdminCommentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminComment>>,
+        TError,
+        {id: number;data: BodyType<UpdateAdminCommentBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminCommentMutationOptions(options));
+    }
+
 export const getDeleteAdminCommentUrl = (id: number,) => {
 
 
@@ -1259,6 +1335,296 @@ export const useDeleteAdminComment = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getDeleteAdminCommentMutationOptions(options));
+    }
+
+export const getCreateComplaintUrl = () => {
+
+
+
+
+  return `/api/complaints`
+}
+
+/**
+ * @summary Submit a public complaint/report
+ */
+export const createComplaint = async (complaintInput: ComplaintInput, options?: RequestInit): Promise<Complaint> => {
+
+  return customFetch<Complaint>(getCreateComplaintUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      complaintInput,)
+  }
+);}
+
+
+
+
+export const getCreateComplaintMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createComplaint>>, TError,{data: BodyType<ComplaintInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createComplaint>>, TError,{data: BodyType<ComplaintInput>}, TContext> => {
+
+const mutationKey = ['createComplaint'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createComplaint>>, {data: BodyType<ComplaintInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createComplaint(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateComplaintMutationResult = NonNullable<Awaited<ReturnType<typeof createComplaint>>>
+    export type CreateComplaintMutationBody = BodyType<ComplaintInput>
+    export type CreateComplaintMutationError = ErrorType<void>
+
+    /**
+ * @summary Submit a public complaint/report
+ */
+export const useCreateComplaint = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createComplaint>>, TError,{data: BodyType<ComplaintInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createComplaint>>,
+        TError,
+        {data: BodyType<ComplaintInput>},
+        TContext
+      > => {
+      return useMutation(getCreateComplaintMutationOptions(options));
+    }
+
+export const getListAdminComplaintsUrl = () => {
+
+
+
+
+  return `/api/admin/complaints`
+}
+
+/**
+ * @summary List all complaints (admin only)
+ */
+export const listAdminComplaints = async ( options?: RequestInit): Promise<Complaint[]> => {
+
+  return customFetch<Complaint[]>(getListAdminComplaintsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminComplaintsQueryKey = () => {
+    return [
+    `/api/admin/complaints`
+    ] as const;
+    }
+
+
+export const getListAdminComplaintsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminComplaints>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComplaints>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminComplaintsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminComplaints>>> = ({ signal }) => listAdminComplaints({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminComplaints>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminComplaintsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminComplaints>>>
+export type ListAdminComplaintsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all complaints (admin only)
+ */
+
+export function useListAdminComplaints<TData = Awaited<ReturnType<typeof listAdminComplaints>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComplaints>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminComplaintsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateComplaintStatusUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/complaints/${id}`
+}
+
+/**
+ * @summary Update complaint status (admin only)
+ */
+export const updateComplaintStatus = async (id: number,
+    complaintStatusUpdate: ComplaintStatusUpdate, options?: RequestInit): Promise<Complaint> => {
+
+  return customFetch<Complaint>(getUpdateComplaintStatusUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      complaintStatusUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateComplaintStatusMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext> => {
+
+const mutationKey = ['updateComplaintStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateComplaintStatus>>, {id: number;data: BodyType<ComplaintStatusUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateComplaintStatus(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateComplaintStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateComplaintStatus>>>
+    export type UpdateComplaintStatusMutationBody = BodyType<ComplaintStatusUpdate>
+    export type UpdateComplaintStatusMutationError = ErrorType<void>
+
+    /**
+ * @summary Update complaint status (admin only)
+ */
+export const useUpdateComplaintStatus = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateComplaintStatus>>,
+        TError,
+        {id: number;data: BodyType<ComplaintStatusUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateComplaintStatusMutationOptions(options));
+    }
+
+export const getDeleteAdminComplaintUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/complaints/${id}`
+}
+
+/**
+ * @summary Delete a complaint (admin only)
+ */
+export const deleteAdminComplaint = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAdminComplaintUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdminComplaintMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComplaint>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComplaint>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAdminComplaint'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminComplaint>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdminComplaint(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminComplaintMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminComplaint>>>
+
+    export type DeleteAdminComplaintMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete a complaint (admin only)
+ */
+export const useDeleteAdminComplaint = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComplaint>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminComplaint>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAdminComplaintMutationOptions(options));
     }
 
 export const getListCategoriesUrl = () => {

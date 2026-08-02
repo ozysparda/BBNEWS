@@ -26,6 +26,7 @@ import AdminUserManagement from "@/pages/admin/user-management";
 import AdminProfile from "@/pages/admin/profile";
 import AdminSitePages from "@/pages/admin/site-pages";
 import AdminCommentList from "@/pages/admin/comment-list";
+import AdminComplaintList from "@/pages/admin/complaint-list";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/admin/profil" component={AdminProfile} />
       <Route path="/admin/halaman" component={AdminSitePages} />
       <Route path="/admin/komentar" component={AdminCommentList} />
+      <Route path="/admin/aduan" component={AdminComplaintList} />
       
       <Route component={NotFound} />
     </Switch>

@@ -11,6 +11,7 @@ export const commentsTable = pgTable("comments", {
   content: text("content").notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
+  location: text("location"),
   status: text("status").notNull().default("approved"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -28,6 +29,7 @@ export const insertCommentSchema = createInsertSchema(commentsTable).omit({
   status: true,
   ipAddress: true,
   userAgent: true,
+  location: true,
   createdAt: true,
   updatedAt: true,
 });

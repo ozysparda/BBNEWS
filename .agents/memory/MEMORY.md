@@ -3,3 +3,4 @@
 - [BaleBeleqNews Auth Accounts](balebeleq-auth.md) — admin/owner, hendra/owner, toni/owner; JWT in localStorage as admin_token
 - [Vercel API build](vercel-api-build.md) — Express backend exported directly as Vercel function; built to `api/index.mjs` by `build-vercel.mjs`
 - [Vercel Blob frontend upload](vercel-blob-upload.md) — server generates client token; browser uses `put` from `@vercel/blob/client`
+- [External database schema](external-database-schema.md) — POSTGRES_URL may lag the Drizzle schema; use additive migrations and never force-push schema changes

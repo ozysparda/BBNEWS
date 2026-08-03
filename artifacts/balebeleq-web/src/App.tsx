@@ -27,6 +27,7 @@ import AdminProfile from "@/pages/admin/profile";
 import AdminSitePages from "@/pages/admin/site-pages";
 import AdminCommentList from "@/pages/admin/comment-list";
 import AdminComplaintList from "@/pages/admin/complaint-list";
+import ComplaintTracking from "@/pages/complaint-tracking";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/berita/:slug" component={ArticleDetail} />
       <Route path="/kategori/:slug" component={CategoryPage} />
       <Route path="/cari" component={SearchPage} />
+      <Route path="/aduan/lacak" component={ComplaintTracking} />
       
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />

@@ -422,6 +422,24 @@ export const CreateComplaintBody = zod.object({
 
 
 /**
+ * @summary Track a complaint using complaint number and email
+ */
+export const TrackComplaintQueryParams = zod.object({
+  "complaintNumber": zod.coerce.string(),
+  "email": zod.coerce.string().email()
+})
+
+export const TrackComplaintResponse = zod.object({
+  "complaintNumber": zod.string(),
+  "status": zod.string(),
+  "title": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
  * @summary List all complaints (admin only)
  */
 export const ListAdminComplaintsResponse = zod.object({
@@ -438,6 +456,7 @@ export const ListAdminComplaintsResponse = zod.object({
   "videoUrl": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
   "assignedOfficer": zod.string().nullish(),
   "latitude": zod.number().nullish(),
   "longitude": zod.number().nullish(),
@@ -488,6 +507,7 @@ export const GetAdminComplaintResponse = zod.object({
   "videoUrl": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
   "assignedOfficer": zod.string().nullish(),
   "latitude": zod.number().nullish(),
   "longitude": zod.number().nullish(),
@@ -530,6 +550,7 @@ export const UpdateComplaintStatusParams = zod.object({
 
 export const UpdateComplaintStatusBody = zod.object({
   "status": zod.string(),
+  "adminResponse": zod.string().nullish(),
   "assignedOfficer": zod.string().nullish()
 })
 
@@ -546,6 +567,7 @@ export const UpdateComplaintStatusResponse = zod.object({
   "videoUrl": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
   "assignedOfficer": zod.string().nullish(),
   "latitude": zod.number().nullish(),
   "longitude": zod.number().nullish(),

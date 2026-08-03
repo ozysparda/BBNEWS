@@ -1,11 +1,23 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "wouter";
 import { AlertTriangle, Check, ChevronDown, MapPin, Send } from "lucide-react";
 import { useCreateComplaint } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+
+const COMPLAINT_CATEGORIES = [
+  "Jalan Rusak",
+  "Saluran Air",
+  "Kebersihan",
+  "Lampu Jalan",
+  "Keamanan",
+  "Parkir",
+  "Lainnya",
+];
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Aduan gagal dikirim. Silakan coba lagi.";
@@ -14,8 +26,16 @@ function getErrorMessage(error: unknown) {
 export default function ComplaintWidget() {
   const createComplaint = useCreateComplaint();
   const [open, setOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
+  const [country, setCountry] = useState("Indonesia");
   const [truthful, setTruthful] = useState(false);
   const [respectful, setRespectful] = useState(false);
   const [processingConsent, setProcessingConsent] = useState(false);
@@ -24,10 +44,19 @@ export default function ComplaintWidget() {
   const [locationMessage, setLocationMessage] = useState("");
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+  const [sentComplaintNumber, setSentComplaintNumber] = useState("");
 
   function resetForm() {
+    setFullName("");
     setEmail("");
+    setPhoneNumber("");
+    setCategory("");
+    setTitle("");
     setContent("");
+    setAddress("");
+    setCity("");
+    setProvince("");
+    setCountry("Indonesia");
     setTruthful(false);
     setRespectful(false);
     setProcessingConsent(false);
@@ -68,8 +97,8 @@ export default function ComplaintWidget() {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    if (!email.trim() || !content.trim()) {
-      setError("Email dan isi laporan wajib diisi.");
+    if (!fullName.trim() || !email.trim() || !phoneNumber.trim() || !category || !title.trim() || !content.trim()) {
+      setError("Nama, email, nomor telepon, kategori, judul, dan isi laporan wajib diisi.");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
@@ -85,14 +114,25 @@ export default function ComplaintWidget() {
       {
         data: {
           email: email.trim().toLowerCase(),
+          fullName: fullName.trim(),
+          phoneNumber: phoneNumber.trim(),
+          category,
+          title: title.trim(),
+          description: content.trim(),
           content: content.trim(),
+          agreementAccepted: "true",
           terms: true,
           location: location || undefined,
+          address: address.trim() || undefined,
+          city: city.trim() || undefined,
+          province: province.trim() || undefined,
+          country: country.trim() || undefined,
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: (complaint) => {
           resetForm();
+          setSentComplaintNumber(complaint.complaintNumber);
           setSent(true);
         },
         onError: (requestError) => setError(getErrorMessage(requestError)),
@@ -146,8 +186,15 @@ export default function ComplaintWidget() {
           </div>
           <h3 className="font-semibold text-foreground">Aduan berhasil dikirim</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Terima kasih. Tim kami akan meninjau laporan Anda.
+            Terima kasih. Tim kami akan meninjau laporan Anda. Simpan nomor aduan berikut untuk melihat
+            perkembangan dan balasan petugas.
           </p>
+          <div className="mt-4 rounded-lg bg-muted px-3 py-2 font-mono text-sm font-semibold">
+            {sentComplaintNumber}
+          </div>
+          <Link href="/aduan/lacak" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
+            Lacak status dan balasan aduan
+          </Link>
           <Button className="mt-5" onClick={() => setSent(false)}>
             Kirim Aduan Lain
           </Button>
@@ -155,18 +202,67 @@ export default function ComplaintWidget() {
       ) : (
         <form onSubmit={handleSubmit} className="max-h-[min(75vh,680px)] space-y-4 overflow-y-auto p-4">
           <div className="rounded-lg bg-muted/50 p-3 text-xs leading-relaxed text-muted-foreground">
-            Email digunakan bila tim perlu menghubungi Anda. IP, perangkat, dan lokasi hanya dapat
-            dilihat admin untuk verifikasi dan penanganan penyalahgunaan.
+            Isi data kontak dan lokasi laporan agar tim dapat menindaklanjuti dengan tepat. IP, perangkat,
+            dan lokasi browser hanya dapat dilihat admin.
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="complaint-full-name">Nama Lengkap</Label>
+              <Input
+                id="complaint-full-name"
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
+                placeholder="Nama pelapor"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="complaint-email">Email</Label>
+              <Input
+                id="complaint-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="nama@email.com"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="complaint-phone">Nomor Telepon</Label>
+              <Input
+                id="complaint-phone"
+                type="tel"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
+                placeholder="08xxxxxxxxxx"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="complaint-category">Kategori Aduan</Label>
+              <Select value={category || undefined} onValueChange={setCategory}>
+                <SelectTrigger id="complaint-category">
+                  <SelectValue placeholder="Pilih kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COMPLAINT_CATEGORIES.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="complaint-email">Email</Label>
+            <Label htmlFor="complaint-title">Judul Aduan</Label>
             <Input
-              id="complaint-email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="nama@email.com"
+              id="complaint-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Contoh: Jalan berlubang di depan pasar"
               required
             />
           </div>
@@ -181,6 +277,41 @@ export default function ComplaintWidget() {
               rows={5}
               required
             />
+          </div>
+
+          <div className="space-y-3 rounded-lg border border-border p-3">
+            <p className="text-sm font-semibold text-foreground">Alamat Kejadian (opsional)</p>
+            <div className="space-y-2">
+              <Label htmlFor="complaint-address">Alamat</Label>
+              <Input
+                id="complaint-address"
+                value={address}
+                onChange={(event) => setAddress(event.target.value)}
+                placeholder="Nama jalan, dusun, atau patokan"
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="complaint-city">Kota/Kabupaten</Label>
+                <Input id="complaint-city" value={city} onChange={(event) => setCity(event.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="complaint-province">Provinsi</Label>
+                <Input
+                  id="complaint-province"
+                  value={province}
+                  onChange={(event) => setProvince(event.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="complaint-country">Negara</Label>
+                <Input
+                  id="complaint-country"
+                  value={country}
+                  onChange={(event) => setCountry(event.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="rounded-lg border border-border p-3">

@@ -18,6 +18,7 @@ export const complaintsTable = pgTable("complaints", {
   videoUrl: text("video_url"),
   pdfUrl: text("pdf_url"),
   status: text("status").notNull().default("pending"),
+  adminResponse: text("admin_response"),
   assignedOfficer: text("assigned_officer"),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),

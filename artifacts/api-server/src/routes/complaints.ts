@@ -36,6 +36,18 @@ function formatPublicComplaint(complaint: any) {
   };
 }
 
+function formatTrackedComplaint(complaint: any) {
+  const formatted = formatComplaintDates(complaint);
+  return {
+    complaintNumber: formatted.complaintNumber,
+    status: formatted.status,
+    title: formatted.title,
+    adminResponse: formatted.adminResponse || null,
+    createdAt: formatted.createdAt,
+    updatedAt: formatted.updatedAt,
+  };
+}
+
 async function isUserBlocked(ipAddress: string, email: string, deviceFingerprint?: string): Promise<boolean> {
   const blocked = await db
     .select()
@@ -174,6 +186,35 @@ router.post("/complaints", async (req, res) => {
   }
 });
 
+// Public: Track a complaint. Email verification prevents exposing complaint details.
+router.get("/complaints/track", async (req, res) => {
+  try {
+    const complaintNumber = String(req.query.complaintNumber || "").trim();
+    const email = String(req.query.email || "").trim().toLowerCase();
+
+    if (!complaintNumber || !email) {
+      res.status(400).json({ error: "Nomor aduan dan email wajib diisi" });
+      return;
+    }
+
+    const [complaint] = await db
+      .select()
+      .from(complaintsTable)
+      .where(and(eq(complaintsTable.complaintNumber, complaintNumber), eq(complaintsTable.email, email)))
+      .limit(1);
+
+    if (!complaint) {
+      res.status(404).json({ error: "Nomor aduan atau email tidak ditemukan" });
+      return;
+    }
+
+    res.json(formatTrackedComplaint(complaint));
+  } catch (error) {
+    console.error("Error tracking complaint:", error);
+    res.status(500).json({ error: "Gagal memuat status aduan" });
+  }
+});
+
 // Admin: Get all complaints
 router.get("/admin/complaints", requireAuth, async (req: AuthRequest, res) => {
   try {
@@ -261,7 +302,7 @@ router.patch("/admin/complaints/:id/status", requireAuth, async (req: AuthReques
       return;
     }
 
-    const { status, assignedOfficer } = req.body;
+    const { status, adminResponse, assignedOfficer } = req.body;
     if (!status) {
       res.status(400).json({ error: "status is required" });
       return;
@@ -271,6 +312,7 @@ router.patch("/admin/complaints/:id/status", requireAuth, async (req: AuthReques
       .update(complaintsTable)
       .set({
         status,
+        adminResponse: typeof adminResponse === "string" && adminResponse.trim() ? adminResponse.trim() : null,
         assignedOfficer: assignedOfficer || null,
         updatedAt: new Date(),
       })

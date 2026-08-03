@@ -180,6 +180,8 @@ export interface AdminComplaint {
   pdfUrl?: string | null;
   status: string;
   /** @nullable */
+  adminResponse: string | null;
+  /** @nullable */
   assignedOfficer?: string | null;
   /** @nullable */
   latitude?: number | null;
@@ -263,7 +265,19 @@ export interface ComplaintInput {
 export interface ComplaintStatusUpdate {
   status: string;
   /** @nullable */
+  adminResponse?: string | null;
+  /** @nullable */
   assignedOfficer?: string | null;
+}
+
+export interface TrackedComplaint {
+  complaintNumber: string;
+  status: string;
+  title: string;
+  /** @nullable */
+  adminResponse: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type ListArticlesParams = {
@@ -280,5 +294,10 @@ limit?: number;
 
 export type UpdateAdminCommentBody = {
   content: string;
+};
+
+export type TrackComplaintParams = {
+complaintNumber: string;
+email: string;
 };
 

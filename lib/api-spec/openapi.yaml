@@ -414,6 +414,35 @@ paths:
         "400":
           description: Invalid input
 
+  /complaints/track:
+    get:
+      operationId: trackComplaint
+      tags: [complaints]
+      summary: Track a complaint using complaint number and email
+      parameters:
+        - name: complaintNumber
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: Complaint tracking result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrackedComplaint"
+        "400":
+          description: Missing tracking fields
+        "404":
+          description: Complaint not found
+
   /admin/complaints:
     get:
       operationId: listAdminComplaints
@@ -1095,6 +1124,8 @@ components:
           type: ["string", "null"]
         status:
           type: string
+        adminResponse:
+          type: ["string", "null"]
         assignedOfficer:
           type: ["string", "null"]
         latitude:
@@ -1149,6 +1180,7 @@ components:
         - title
         - description
         - status
+        - adminResponse
         - agreementAccepted
         - createdAt
         - updatedAt
@@ -1221,7 +1253,32 @@ components:
       properties:
         status:
           type: string
+        adminResponse:
+          type: ["string", "null"]
         assignedOfficer:
           type: ["string", "null"]
       required:
         - status
+
+    TrackedComplaint:
+      type: object
+      properties:
+        complaintNumber:
+          type: string
+        status:
+          type: string
+        title:
+          type: string
+        adminResponse:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - complaintNumber
+        - status
+        - title
+        - adminResponse
+        - createdAt
+        - updatedAt

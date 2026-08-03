@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Loader2, Eye, Trash2, Download } from 'lucide-react';
 
@@ -18,6 +19,7 @@ interface Complaint {
   category: string;
   title: string;
   status: string;
+  adminResponse?: string | null;
   createdAt: string;
   city: string;
   phoneNumber: string;
@@ -57,6 +59,7 @@ export default function ComplaintManagement() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [assignedOfficer, setAssignedOfficer] = useState('');
+  const [adminResponse, setAdminResponse] = useState('');
 
   function handleUnauthorized(response: Response) {
     if (response.status === 401) {
@@ -103,7 +106,11 @@ export default function ComplaintManagement() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('admin_token')}`,
         },
-        body: JSON.stringify({ status: newStatus, assignedOfficer: assignedOfficer || null }),
+        body: JSON.stringify({
+          status: newStatus,
+          adminResponse: adminResponse.trim() || null,
+          assignedOfficer: assignedOfficer || null,
+        }),
       });
 
       if (!response.ok) {
@@ -263,6 +270,7 @@ export default function ComplaintManagement() {
                         setSelectedComplaint(complaint);
                         setNewStatus(complaint.status);
                         setAssignedOfficer(complaint.assignedOfficer || '');
+                        setAdminResponse(complaint.adminResponse || '');
                         setIsDetailOpen(true);
                       }}
                     >
@@ -374,6 +382,15 @@ export default function ComplaintManagement() {
                 <p className="whitespace-pre-wrap">{selectedComplaint.description}</p>
               </div>
 
+              {selectedComplaint.adminResponse && (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                  <p className="text-sm font-semibold text-blue-800">Balasan terakhir untuk pelapor</p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-blue-900">
+                    {selectedComplaint.adminResponse}
+                  </p>
+                </div>
+              )}
+
               {/* Files */}
               {(selectedComplaint.photoUrl || selectedComplaint.videoUrl || selectedComplaint.pdfUrl) && (
                 <div className="space-y-2">
@@ -434,6 +451,21 @@ export default function ComplaintManagement() {
                     onChange={(e) => setAssignedOfficer(e.target.value)}
                     placeholder="Nama petugas"
                   />
+                </div>
+                <div>
+                  <label htmlFor="admin-response" className="text-sm font-semibold">
+                    Balasan untuk Pelapor
+                  </label>
+                  <Textarea
+                    id="admin-response"
+                    value={adminResponse}
+                    onChange={(event) => setAdminResponse(event.target.value)}
+                    placeholder="Jelaskan tindakan, perkembangan, atau hasil penanganan aduan..."
+                    rows={4}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Balasan ini akan terlihat ketika pelapor melacak nomor aduannya.
+                  </p>
                 </div>
                 <Button onClick={handleStatusUpdate} disabled={isUpdating} className="w-full">
                   {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Perbarui'}

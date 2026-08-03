@@ -43,6 +43,8 @@ import type {
   PublicComplaint,
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
+  TrackComplaintParams,
+  TrackedComplaint,
   UpdateAdminCommentBody
 } from './api.schemas';
 
@@ -1409,6 +1411,90 @@ export const useCreateComplaint = <TError = ErrorType<void>,
       > => {
       return useMutation(getCreateComplaintMutationOptions(options));
     }
+
+export const getTrackComplaintUrl = (params: TrackComplaintParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/complaints/track?${stringifiedParams}` : `/api/complaints/track`
+}
+
+/**
+ * @summary Track a complaint using complaint number and email
+ */
+export const trackComplaint = async (params: TrackComplaintParams, options?: RequestInit): Promise<TrackedComplaint> => {
+
+  return customFetch<TrackedComplaint>(getTrackComplaintUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getTrackComplaintQueryKey = (params?: TrackComplaintParams,) => {
+    return [
+    `/api/complaints/track`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getTrackComplaintQueryOptions = <TData = Awaited<ReturnType<typeof trackComplaint>>, TError = ErrorType<void>>(params: TrackComplaintParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTrackComplaintQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof trackComplaint>>> = ({ signal }) => trackComplaint(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof trackComplaint>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type TrackComplaintQueryResult = NonNullable<Awaited<ReturnType<typeof trackComplaint>>>
+export type TrackComplaintQueryError = ErrorType<void>
+
+
+/**
+ * @summary Track a complaint using complaint number and email
+ */
+
+export function useTrackComplaint<TData = Awaited<ReturnType<typeof trackComplaint>>, TError = ErrorType<void>>(
+ params: TrackComplaintParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getTrackComplaintQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getListAdminComplaintsUrl = () => {
 

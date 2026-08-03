@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -47,6 +48,7 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUSES = ['pending', 'verified', 'in_progress', 'completed'];
 
 export default function ComplaintManagement() {
+  const [, setLocation] = useLocation();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -56,7 +58,16 @@ export default function ComplaintManagement() {
   const [newStatus, setNewStatus] = useState('');
   const [assignedOfficer, setAssignedOfficer] = useState('');
 
-  const { data, isLoading, refetch } = useQuery({
+  function handleUnauthorized(response: Response) {
+    if (response.status === 401) {
+      localStorage.removeItem('admin_token');
+      setLocation('/admin');
+      return true;
+    }
+    return false;
+  }
+
+  const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: ['complaints', page, search, statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams({ page: String(page), limit: '20' });
@@ -65,8 +76,16 @@ export default function ComplaintManagement() {
       const response = await fetch(`/api/admin/complaints?${params}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
       });
-      if (!response.ok) throw new Error('Failed to fetch');
-      return response.json();
+      if (!response.ok) {
+        handleUnauthorized(response);
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || `Gagal memuat aduan (${response.status})`);
+      }
+      const result = await response.json();
+      if (!result || !Array.isArray(result.complaints)) {
+        throw new Error('Format data aduan dari server tidak valid.');
+      }
+      return result;
     },
   });
 
@@ -87,7 +106,10 @@ export default function ComplaintManagement() {
         body: JSON.stringify({ status: newStatus, assignedOfficer: assignedOfficer || null }),
       });
 
-      if (!response.ok) throw new Error('Update failed');
+      if (!response.ok) {
+        handleUnauthorized(response);
+        throw new Error('Update failed');
+      }
 
       toast.success('Status diperbarui');
       setIsDetailOpen(false);
@@ -108,7 +130,10 @@ export default function ComplaintManagement() {
         headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
       });
 
-      if (!response.ok) throw new Error('Delete failed');
+      if (!response.ok) {
+        handleUnauthorized(response);
+        throw new Error('Delete failed');
+      }
 
       toast.success('Aduan dihapus');
       refetch();
@@ -159,12 +184,18 @@ export default function ComplaintManagement() {
           }}
           className="flex-1 min-w-[200px]"
         />
-        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
+        <Select
+          value={statusFilter || 'all'}
+          onValueChange={(value) => {
+            setStatusFilter(value === 'all' ? '' : value);
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Semua Status</SelectItem>
+            <SelectItem value="all">Semua Status</SelectItem>
             {STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
                 {s.replace(/_/g, ' ').charAt(0).toUpperCase() + s.replace(/_/g, ' ').slice(1)}
@@ -192,6 +223,18 @@ export default function ComplaintManagement() {
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+                </TableCell>
+              </TableRow>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-8 text-center">
+                  <p className="font-medium text-red-600">Aduan tidak dapat dimuat.</p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {error instanceof Error ? error.message : 'Periksa sesi login dan koneksi server.'}
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-3" onClick={() => refetch()}>
+                    Coba lagi
+                  </Button>
                 </TableCell>
               </TableRow>
             ) : data?.complaints?.length === 0 ? (

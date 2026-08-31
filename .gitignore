@@ -61,3 +61,4 @@ api/thread-stream-worker.mjs.map
 # legacy js build artifacts (if any)
 api/*.js
 api/*.js.map
+.env*

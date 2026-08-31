@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { getTrackComplaintQueryKey, useTrackComplaint } from "@workspace/api-client-react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,26 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function ComplaintTracking() {
-  const [complaintNumber, setComplaintNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [submittedParams, setSubmittedParams] = useState({ complaintNumber: "", email: "" });
+  const [location] = useLocation();
+  const initialParams = (() => {
+    const query = new URLSearchParams(location.split("?")[1] || "");
+    return {
+      complaintNumber: query.get("complaintNumber") || "",
+      email: query.get("email") || "",
+    };
+  })();
+
+  const [complaintNumber, setComplaintNumber] = useState(initialParams.complaintNumber);
+  const [email, setEmail] = useState(initialParams.email);
+  const [submittedParams, setSubmittedParams] = useState(
+    () =>
+      initialParams.complaintNumber && initialParams.email
+        ? {
+            complaintNumber: initialParams.complaintNumber.trim().toUpperCase(),
+            email: initialParams.email.trim().toLowerCase(),
+          }
+        : { complaintNumber: "", email: "" },
+  );
   const tracking = useTrackComplaint(submittedParams, {
     query: {
       queryKey: getTrackComplaintQueryKey(submittedParams),

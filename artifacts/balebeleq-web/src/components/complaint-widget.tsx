@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { Link } from "wouter";
 import { AlertTriangle, Check, ChevronDown, MapPin, Send } from "lucide-react";
 import { useCreateComplaint } from "@workspace/api-client-react";
@@ -45,6 +46,8 @@ export default function ComplaintWidget() {
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const [sentComplaintNumber, setSentComplaintNumber] = useState("");
+  const [sentEmail, setSentEmail] = useState("");
+  const [trackUrl, setTrackUrl] = useState("");
 
   function resetForm() {
     setFullName("");
@@ -133,6 +136,12 @@ export default function ComplaintWidget() {
         onSuccess: (complaint) => {
           resetForm();
           setSentComplaintNumber(complaint.complaintNumber);
+          setSentEmail(email.trim().toLowerCase());
+          const params = new URLSearchParams({
+            complaintNumber: complaint.complaintNumber,
+            email: email.trim().toLowerCase(),
+          });
+          setTrackUrl(`${window.location.origin}/aduan/lacak?${params.toString()}`);
           setSent(true);
         },
         onError: (requestError) => setError(getErrorMessage(requestError)),
@@ -192,6 +201,16 @@ export default function ComplaintWidget() {
           <div className="mt-4 rounded-lg bg-muted px-3 py-2 font-mono text-sm font-semibold">
             {sentComplaintNumber}
           </div>
+          {trackUrl && (
+            <div className="mt-4 flex flex-col items-center">
+              <div className="rounded-lg border border-border bg-white p-3">
+                <QRCodeSVG value={trackUrl} size={120} />
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Pindai kode untuk melacak status aduan Anda
+              </p>
+            </div>
+          )}
           <Link href="/aduan/lacak" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
             Lacak status dan balasan aduan
           </Link>

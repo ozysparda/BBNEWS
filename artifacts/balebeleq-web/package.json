@@ -96,6 +96,7 @@
     "@uppy/react": "^5.2.0",
     "@vercel/blob": "^2.6.1",
     "@workspace/object-storage-web": "workspace:*",
+    "qrcode.react": "^4.2.0",
     "react-helmet-async": "^3.0.0"
   }
 }

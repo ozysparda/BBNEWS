@@ -310,6 +310,290 @@ export const IncrementArticleViewsParams = zod.object({
 
 
 /**
+ * @summary List comments for an article
+ */
+export const ListCommentsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListCommentsResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListCommentsResponse = zod.array(ListCommentsResponseItem)
+
+
+/**
+ * @summary Create a comment on an article
+ */
+export const CreateCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CreateCommentBody = zod.object({
+  "email": zod.string(),
+  "content": zod.string(),
+  "location": zod.string().nullish()
+})
+
+
+/**
+ * @summary List all comments with sender details (admin only)
+ */
+export const ListAdminCommentsResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "articleTitle": zod.string(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListAdminCommentsResponse = zod.array(ListAdminCommentsResponseItem)
+
+
+/**
+ * @summary Update a comment (admin only)
+ */
+export const UpdateAdminCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminCommentBody = zod.object({
+  "content": zod.string()
+})
+
+export const UpdateAdminCommentResponse = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "articleTitle": zod.string(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a comment (admin only)
+ */
+export const DeleteAdminCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Submit a public complaint/report
+ */
+export const CreateComplaintBody = zod.object({
+  "fullName": zod.string().optional(),
+  "email": zod.string(),
+  "phoneNumber": zod.string().optional(),
+  "category": zod.string().optional(),
+  "title": zod.string().optional(),
+  "description": zod.string().optional(),
+  "content": zod.string().optional(),
+  "agreementAccepted": zod.enum(['true']).optional(),
+  "terms": zod.boolean(),
+  "latitude": zod.number().optional(),
+  "longitude": zod.number().optional(),
+  "location": zod.string().nullish(),
+  "address": zod.string().optional(),
+  "city": zod.string().optional(),
+  "province": zod.string().optional(),
+  "country": zod.string().optional(),
+  "photoUrl": zod.string().optional(),
+  "videoUrl": zod.string().optional(),
+  "pdfUrl": zod.string().optional()
+})
+
+
+/**
+ * @summary Track a complaint using complaint number and email
+ */
+export const TrackComplaintQueryParams = zod.object({
+  "complaintNumber": zod.coerce.string(),
+  "email": zod.coerce.string().email()
+})
+
+export const TrackComplaintResponse = zod.object({
+  "complaintNumber": zod.string(),
+  "status": zod.string(),
+  "title": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List all complaints (admin only)
+ */
+export const ListAdminComplaintsResponse = zod.object({
+  "complaints": zod.array(zod.object({
+  "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Get a complaint (admin only)
+ */
+export const GetAdminComplaintParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminComplaintResponse = zod.object({
+  "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a complaint (admin only)
+ */
+export const DeleteAdminComplaintParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Update complaint status (admin only)
+ */
+export const UpdateComplaintStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateComplaintStatusBody = zod.object({
+  "status": zod.string(),
+  "adminResponse": zod.string().nullish(),
+  "assignedOfficer": zod.string().nullish()
+})
+
+export const UpdateComplaintStatusResponse = zod.object({
+  "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
  * @summary List all categories
  */
 export const ListCategoriesResponseItem = zod.object({

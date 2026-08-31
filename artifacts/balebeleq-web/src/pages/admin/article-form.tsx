@@ -17,6 +17,7 @@ import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import { put } from "@vercel/blob/client";
 
 const formSchema = z.object({
   title: z.string().min(3, "Judul minimal 3 karakter"),
@@ -29,31 +30,28 @@ const formSchema = z.object({
   isFeatured: z.boolean().default(false),
 });
 
-async function uploadImage(file: File, token: string): Promise<string> {
+async function uploadImage(file: File, authToken: string): Promise<string> {
   const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-  const res = await fetch(`${baseUrl}/api/storage/uploads/request-url`, {
+  const res = await fetch(`${baseUrl}/api/storage/upload-token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
-    body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+    body: JSON.stringify({ name: file.name }),
   });
 
-  if (!res.ok) throw new Error("Gagal mendapatkan URL upload");
+  if (!res.ok) throw new Error("Gagal mendapatkan token upload");
 
-  const { uploadURL, objectPath } = await res.json();
+  const { token: clientToken } = await res.json();
 
-  const uploadRes = await fetch(uploadURL, {
-    method: "PUT",
-    headers: { "Content-Type": file.type },
-    body: file,
+  const blob = await put(file.name, file, {
+    access: "public",
+    token: clientToken,
   });
 
-  if (!uploadRes.ok) throw new Error("Gagal mengunggah file");
-
-  return `${baseUrl}/api/storage/objects/${objectPath}`;
+  return blob.url;
 }
 
 export default function AdminArticleForm() {
@@ -75,7 +73,7 @@ export default function AdminArticleForm() {
   const updateMutation = useUpdateArticle();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       title: "",
       excerpt: "",

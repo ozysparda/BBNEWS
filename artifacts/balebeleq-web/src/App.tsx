@@ -25,6 +25,9 @@ import AdminCategoryList from "@/pages/admin/category-list";
 import AdminUserManagement from "@/pages/admin/user-management";
 import AdminProfile from "@/pages/admin/profile";
 import AdminSitePages from "@/pages/admin/site-pages";
+import AdminCommentList from "@/pages/admin/comment-list";
+import AdminComplaintList from "@/pages/admin/complaint-list";
+import ComplaintTracking from "@/pages/complaint-tracking";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +38,7 @@ function Router() {
       <Route path="/berita/:slug" component={ArticleDetail} />
       <Route path="/kategori/:slug" component={CategoryPage} />
       <Route path="/cari" component={SearchPage} />
+      <Route path="/aduan/lacak" component={ComplaintTracking} />
       
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
@@ -45,6 +49,8 @@ function Router() {
       <Route path="/admin/pengguna" component={AdminUserManagement} />
       <Route path="/admin/profil" component={AdminProfile} />
       <Route path="/admin/halaman" component={AdminSitePages} />
+      <Route path="/admin/komentar" component={AdminCommentList} />
+      <Route path="/admin/aduan" component={AdminComplaintList} />
       
       <Route component={NotFound} />
     </Switch>

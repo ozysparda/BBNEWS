@@ -15,6 +15,7 @@ async function seed() {
       username: "admin",
       password: hashed,
       email: "admin@balebeleq.local",
+      role: "owner",
     });
     console.log("✅ Admin user created: admin / admin123");
   } else {

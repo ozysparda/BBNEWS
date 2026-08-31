@@ -50,7 +50,7 @@ export default function AdminUserManagement() {
   const deleteMutation = useDeleteAdminUser();
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: { username: "", password: "", email: "", role: "editor" },
   });
 

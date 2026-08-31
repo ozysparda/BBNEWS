@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "framework": null,
+  "buildCommand": "pnpm run vercel-build",
+  "env": {
+    "BASE_PATH": "/"
+  }
+}

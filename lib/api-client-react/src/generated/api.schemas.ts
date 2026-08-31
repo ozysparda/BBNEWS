@@ -121,6 +121,165 @@ export interface AdminUserCreate {
   role: string;
 }
 
+export interface Comment {
+  id: number;
+  articleId: number;
+  email: string;
+  content: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminComment {
+  id: number;
+  articleId: number;
+  articleTitle: string;
+  email: string;
+  content: string;
+  /** @nullable */
+  ipAddress: string | null;
+  /** @nullable */
+  userAgent: string | null;
+  /** @nullable */
+  location: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommentInput {
+  email: string;
+  content: string;
+  /** @nullable */
+  location?: string | null;
+}
+
+export interface PublicComplaint {
+  id: number;
+  complaintNumber: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminComplaint {
+  id: number;
+  complaintNumber: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  category: string;
+  title: string;
+  description: string;
+  /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
+  videoUrl?: string | null;
+  /** @nullable */
+  pdfUrl?: string | null;
+  status: string;
+  /** @nullable */
+  adminResponse: string | null;
+  /** @nullable */
+  assignedOfficer?: string | null;
+  /** @nullable */
+  latitude?: number | null;
+  /** @nullable */
+  longitude?: number | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  province?: string | null;
+  /** @nullable */
+  country?: string | null;
+  /** @nullable */
+  deviceName?: string | null;
+  /** @nullable */
+  deviceType?: string | null;
+  /** @nullable */
+  operatingSystem?: string | null;
+  /** @nullable */
+  browser?: string | null;
+  /** @nullable */
+  browserVersion?: string | null;
+  /** @nullable */
+  screenResolution?: string | null;
+  /** @nullable */
+  timezone?: string | null;
+  /** @nullable */
+  localTime?: string | null;
+  /** @nullable */
+  ipAddress?: string | null;
+  /** @nullable */
+  userAgent?: string | null;
+  /** @nullable */
+  language?: string | null;
+  /** @nullable */
+  deviceFingerprint?: string | null;
+  agreementAccepted: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminComplaintList {
+  complaints: AdminComplaint[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export type ComplaintInputAgreementAccepted = typeof ComplaintInputAgreementAccepted[keyof typeof ComplaintInputAgreementAccepted];
+
+
+export const ComplaintInputAgreementAccepted = {
+  true: 'true',
+} as const;
+
+export interface ComplaintInput {
+  fullName?: string;
+  email: string;
+  phoneNumber?: string;
+  category?: string;
+  title?: string;
+  description?: string;
+  content?: string;
+  agreementAccepted?: ComplaintInputAgreementAccepted;
+  terms: boolean;
+  latitude?: number;
+  longitude?: number;
+  /** @nullable */
+  location?: string | null;
+  address?: string;
+  city?: string;
+  province?: string;
+  country?: string;
+  photoUrl?: string;
+  videoUrl?: string;
+  pdfUrl?: string;
+}
+
+export interface ComplaintStatusUpdate {
+  status: string;
+  /** @nullable */
+  adminResponse?: string | null;
+  /** @nullable */
+  assignedOfficer?: string | null;
+}
+
+export interface TrackedComplaint {
+  complaintNumber: string;
+  status: string;
+  title: string;
+  /** @nullable */
+  adminResponse: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type ListArticlesParams = {
 page?: number;
 limit?: number;
@@ -131,5 +290,14 @@ search?: string;
 export type ListAllArticlesParams = {
 page?: number;
 limit?: number;
+};
+
+export type UpdateAdminCommentBody = {
+  content: string;
+};
+
+export type TrackComplaintParams = {
+complaintNumber: string;
+email: string;
 };
 

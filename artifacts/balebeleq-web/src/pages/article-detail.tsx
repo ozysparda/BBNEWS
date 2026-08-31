@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Eye, Calendar, Copy, Check } from "lucide-react";
 import { FaFacebook, FaWhatsapp, FaTwitter } from "react-icons/fa";
 import { useState } from "react";
+import CommentSection from "@/components/comment-section";
 
 function ShareButtons({ title, url }: { title: string; url: string }) {
   const [copied, setCopied] = useState(false);
@@ -181,6 +182,8 @@ export default function ArticleDetail() {
           </div>
 
           <ShareButtons title={article.title} url={articleUrl} />
+
+          <CommentSection articleId={article.id} />
         </article>
       </PublicLayout>
     </>

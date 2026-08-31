@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useListCategories } from "@workspace/api-client-react";
 import { Search, X, Menu } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import ComplaintWidget from "@/components/complaint-widget";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
 function SearchBar() {
@@ -221,6 +222,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <PublicFooter />
+      <ComplaintWidget />
     </div>
   );
 }

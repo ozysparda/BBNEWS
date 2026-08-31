@@ -348,6 +348,9 @@ export default function ComplaintWidget() {
             <Send className="mr-2 h-4 w-4" />
             {createComplaint.isPending ? "Mengirim..." : "Kirim Aduan"}
           </Button>
+          <Button type="button" variant="outline" className="w-full" asChild>
+            <Link href="/aduan/lacak">Cek Status Aduan</Link>
+          </Button>
           <p className="text-center text-[11px] text-muted-foreground">
             Menutup panel hanya memindahkannya ke tepi layar.
           </p>

@@ -17,25 +17,25 @@ async function main() {
   await mkdir(funcDir, { recursive: true });
 
   // 1. Build frontend
-  console.log("\n▶ Building frontend...");
+  console.log("\nBuilding frontend...");
   execSync("pnpm --filter @workspace/balebeleq-web run build", {
     cwd: root,
     stdio: "inherit",
   });
 
   // 2. Build API function
-  console.log("\n▶ Building API function...");
+  console.log("\nBuilding API function...");
   execSync("pnpm --filter @workspace/api-server run build:vercel", {
     cwd: root,
     stdio: "inherit",
   });
 
   // 3. Copy static files into Build Output API static directory
-  console.log("\n▶ Copying static files...");
+  console.log("\nCopying static files...");
   await cp(webDist, staticDir, { recursive: true, force: true });
 
   // 4. Copy API function bundle into Build Output API function directory
-  console.log("\n▶ Copying API function...");
+  console.log("\nCopying API function...");
   await cp(apiDist, funcDir, { recursive: true, force: true });
 
   // 5. Write function config
@@ -43,7 +43,7 @@ async function main() {
     path.join(funcDir, ".vc-config.json"),
     JSON.stringify(
       {
-        runtime: "nodejs20.x",
+        runtime: "nodejs22.x",
         handler: "index.mjs",
         launcherType: "Nodejs",
       },
@@ -69,7 +69,7 @@ async function main() {
     ),
   );
 
-  console.log("\n✅ Vercel Build Output API ready at .vercel/output");
+  console.log("\nVercel Build Output API ready at .vercel/output");
   console.log("   Static files:", staticDir);
   console.log("   API function:", funcDir);
 }

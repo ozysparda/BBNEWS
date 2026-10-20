@@ -382,7 +382,7 @@ export default function AdminArticleForm() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="isFeatured"
@@ -408,7 +408,7 @@ export default function AdminArticleForm() {
                 <div className="pt-6">
                   <Button type="submit" className="w-full h-12 text-md font-bold" disabled={isPending || uploading}>
                     <Save className="w-5 h-5 mr-2" />
-                    {isPending ? "Menyimpan..." : "Simpan Artikel"
+                    {isPending ? "Menyimpan..." : "Simpan Artikel"}
                   </Button>
                 </div>
               </div>

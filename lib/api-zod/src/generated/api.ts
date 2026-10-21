@@ -727,3 +727,494 @@ export const DeleteAdminUserParams = zod.object({
 })
 
 
+/**
+ * @summary Public donation settings (hero text, default QRIS/rekening)
+ */
+export const GetDonationSettingsResponse = zod.object({
+  "id": zod.number().optional(),
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "isOpen": zod.boolean(),
+  "updatedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary List active donation campaigns
+ */
+export const ListDonationCampaignsResponseItem = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+export const ListDonationCampaignsResponse = zod.array(ListDonationCampaignsResponseItem)
+
+
+/**
+ * @summary Get a donation campaign by slug
+ */
+export const GetDonationCampaignParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetDonationCampaignResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+
+
+/**
+ * @summary Submit a donation
+ */
+export const CreateDonationTransactionBody = zod.object({
+  "campaignId": zod.number().optional(),
+  "campaignSlug": zod.string().optional(),
+  "donorName": zod.string(),
+  "donorEmail": zod.string().optional(),
+  "donorPhone": zod.string().optional(),
+  "amount": zod.number().optional(),
+  "cryptoAmount": zod.string().optional(),
+  "txHash": zod.string().optional(),
+  "method": zod.enum(['qris', 'bank', 'crypto']).optional(),
+  "message": zod.string().optional(),
+  "proofUrl": zod.string().optional(),
+  "isAnonymous": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Track donation status by reference number
+ */
+export const TrackDonationTransactionParams = zod.object({
+  "reference": zod.coerce.string()
+})
+
+export const TrackDonationTransactionQueryParams = zod.object({
+  "email": zod.coerce.string().optional()
+})
+
+export const TrackDonationTransactionResponse = zod.object({
+  "referenceNumber": zod.string(),
+  "status": zod.string(),
+  "amount": zod.number().optional(),
+  "cryptoAmount": zod.string().nullish(),
+  "method": zod.string().optional(),
+  "message": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "autoVerified": zod.boolean().optional(),
+  "campaignTitle": zod.string().nullish(),
+  "campaignSlug": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "verifiedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary List all donation campaigns (admin only)
+ */
+export const listAdminDonationCampaignsQueryPageDefault = 1;
+export const listAdminDonationCampaignsQueryLimitDefault = 20;
+
+export const ListAdminDonationCampaignsQueryParams = zod.object({
+  "page": zod.coerce.number().default(listAdminDonationCampaignsQueryPageDefault),
+  "limit": zod.coerce.number().default(listAdminDonationCampaignsQueryLimitDefault),
+  "search": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListAdminDonationCampaignsResponse = zod.object({
+  "campaigns": zod.array(zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Create a donation campaign (admin only)
+ */
+export const CreateDonationCampaignBody = zod.object({
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.enum(['draft', 'active', 'closed', 'archived']).optional(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get a donation campaign (admin only)
+ */
+export const GetAdminDonationCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminDonationCampaignResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+
+
+/**
+ * @summary Update a donation campaign (admin only)
+ */
+export const UpdateDonationCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateDonationCampaignBody = zod.object({
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.enum(['draft', 'active', 'closed', 'archived']).optional(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish()
+})
+
+export const UpdateDonationCampaignResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+
+
+/**
+ * @summary Delete a donation campaign (admin only)
+ */
+export const DeleteDonationCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List donation transactions (admin only)
+ */
+export const listAdminDonationTransactionsQueryPageDefault = 1;
+export const listAdminDonationTransactionsQueryLimitDefault = 20;
+
+export const ListAdminDonationTransactionsQueryParams = zod.object({
+  "page": zod.coerce.number().default(listAdminDonationTransactionsQueryPageDefault),
+  "limit": zod.coerce.number().default(listAdminDonationTransactionsQueryLimitDefault),
+  "status": zod.coerce.string().optional(),
+  "campaignId": zod.coerce.number().optional(),
+  "search": zod.coerce.string().optional()
+})
+
+export const ListAdminDonationTransactionsResponse = zod.object({
+  "transactions": zod.array(zod.object({
+  "id": zod.number(),
+  "referenceNumber": zod.string(),
+  "campaignId": zod.number(),
+  "donorName": zod.string(),
+  "donorEmail": zod.string().nullish(),
+  "donorPhone": zod.string().nullish(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "cryptoAmount": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "txHash": zod.string().nullish(),
+  "method": zod.string(),
+  "message": zod.string().nullish(),
+  "proofUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminNote": zod.string().nullish(),
+  "verifiedBy": zod.string().nullish(),
+  "verifiedAt": zod.string().nullish(),
+  "autoVerified": zod.boolean().optional(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Verify or reject a donation transaction (admin only)
+ */
+export const UpdateDonationTransactionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateDonationTransactionBody = zod.object({
+  "status": zod.enum(['pending', 'verified', 'rejected']),
+  "adminNote": zod.string().nullish()
+})
+
+export const UpdateDonationTransactionResponse = zod.object({
+  "id": zod.number(),
+  "referenceNumber": zod.string(),
+  "campaignId": zod.number(),
+  "donorName": zod.string(),
+  "donorEmail": zod.string().nullish(),
+  "donorPhone": zod.string().nullish(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "cryptoAmount": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "txHash": zod.string().nullish(),
+  "method": zod.string(),
+  "message": zod.string().nullish(),
+  "proofUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminNote": zod.string().nullish(),
+  "verifiedBy": zod.string().nullish(),
+  "verifiedAt": zod.string().nullish(),
+  "autoVerified": zod.boolean().optional(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Donation summary for admin dashboard (admin only)
+ */
+export const GetDonationStatsResponse = zod.object({
+  "activeCampaigns": zod.number(),
+  "totalCampaigns": zod.number(),
+  "collectedAmount": zod.number(),
+  "pendingCount": zod.number(),
+  "verifiedCount": zod.number(),
+  "donorCount": zod.number()
+})
+
+
+/**
+ * @summary Get donation settings (admin only)
+ */
+export const GetAdminDonationSettingsResponse = zod.object({
+  "id": zod.number().optional(),
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "isOpen": zod.boolean(),
+  "updatedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update donation settings (admin only)
+ */
+export const UpdateDonationSettingsBody = zod.object({
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "isOpen": zod.boolean().optional()
+})
+
+export const UpdateDonationSettingsResponse = zod.object({
+  "id": zod.number().optional(),
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "isOpen": zod.boolean(),
+  "updatedAt": zod.string().nullish()
+})
+
+

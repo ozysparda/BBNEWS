@@ -7,6 +7,7 @@ import complaintsRouter from "./complaints";
 import storageRouter from "./storage";
 import usersRouter from "./users";
 import profileRouter from "./profile";
+import donationsRouter from "./donations";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(complaintsRouter);
 router.use(storageRouter);
 router.use(usersRouter);
 router.use(profileRouter);
+router.use(donationsRouter);
 
 export default router;

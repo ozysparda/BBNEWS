@@ -30,15 +30,22 @@ async function main() {
     stdio: "inherit",
   });
 
-  // 3. Copy static files into Build Output API static directory
+  // 3. Apply donations schema (idempotent, additive only)
+  console.log("\nApplying Berugak Donasi schema...");
+  execSync("node lib/db/scripts/apply-donations-schema.mjs", {
+    cwd: root,
+    stdio: "inherit",
+  });
+
+  // 4. Copy static files into Build Output API static directory
   console.log("\nCopying static files...");
   await cp(webDist, staticDir, { recursive: true, force: true });
 
-  // 4. Copy API function bundle into Build Output API function directory
+  // 5. Copy API function bundle into Build Output API function directory
   console.log("\nCopying API function...");
   await cp(apiDist, funcDir, { recursive: true, force: true });
 
-  // 5. Write function config
+  // 6. Write function config
   await writeFile(
     path.join(funcDir, ".vc-config.json"),
     JSON.stringify(
@@ -52,7 +59,7 @@ async function main() {
     ),
   );
 
-  // 6. Write Build Output API config with routes
+  // 7. Write Build Output API config with routes
   await writeFile(
     path.join(outputDir, "config.json"),
     JSON.stringify(

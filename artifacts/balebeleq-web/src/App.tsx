@@ -28,6 +28,13 @@ import AdminSitePages from "@/pages/admin/site-pages";
 import AdminCommentList from "@/pages/admin/comment-list";
 import AdminComplaintList from "@/pages/admin/complaint-list";
 import ComplaintTracking from "@/pages/complaint-tracking";
+import DonationListPage from "@/pages/donation-list";
+import DonationDetailPage from "@/pages/donation-detail";
+import DonationTrackingPage from "@/pages/donation-tracking";
+import AdminDonationCampaignList from "@/pages/admin/donation-campaign-list";
+import AdminDonationCampaignForm from "@/pages/admin/donation-campaign-form";
+import AdminDonationTransactionList from "@/pages/admin/donation-transaction-list";
+import AdminDonationSettingsPage from "@/pages/admin/donation-settings";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +46,9 @@ function Router() {
       <Route path="/kategori/:slug" component={CategoryPage} />
       <Route path="/cari" component={SearchPage} />
       <Route path="/aduan/lacak" component={ComplaintTracking} />
+      <Route path="/donasi" component={DonationListPage} />
+      <Route path="/donasi/lacak" component={DonationTrackingPage} />
+      <Route path="/donasi/:slug" component={DonationDetailPage} />
       
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
@@ -51,6 +61,11 @@ function Router() {
       <Route path="/admin/halaman" component={AdminSitePages} />
       <Route path="/admin/komentar" component={AdminCommentList} />
       <Route path="/admin/aduan" component={AdminComplaintList} />
+      <Route path="/admin/donasi" component={AdminDonationCampaignList} />
+      <Route path="/admin/donasi/baru" component={AdminDonationCampaignForm} />
+      <Route path="/admin/donasi/transaksi" component={AdminDonationTransactionList} />
+      <Route path="/admin/donasi/pengaturan" component={AdminDonationSettingsPage} />
+      <Route path="/admin/donasi/:id/edit" component={AdminDonationCampaignForm} />
       
       <Route component={NotFound} />
     </Switch>

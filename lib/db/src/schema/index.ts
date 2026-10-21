@@ -8,3 +8,4 @@ export * from "./comment-replies";
 export * from "./comment-reactions";
 export * from "./blocked-users";
 export * from "./device-views";
+export * from "./donations";

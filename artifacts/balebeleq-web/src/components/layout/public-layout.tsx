@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useListCategories } from "@workspace/api-client-react";
-import { Search, X, Menu } from "lucide-react";
+import { Search, X, Menu, Heart } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ComplaintWidget from "@/components/complaint-widget";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
@@ -107,6 +107,10 @@ function MobileMenu({ categories }: { categories: { id: number; name: string; sl
                 <Search className="w-4 h-4" />
                 Cari Artikel
               </Link>
+              <Link href="/donasi" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+                <Heart className="w-4 h-4" />
+                Berugak Donasi
+              </Link>
             </nav>
           </div>
         </>
@@ -150,6 +154,9 @@ export function PublicHeader() {
               {category.name}
             </Link>
           ))}
+          <Link href="/donasi" className="px-3 py-1.5 rounded-md text-primary hover:bg-muted transition-colors whitespace-nowrap font-semibold">
+            Donasi
+          </Link>
         </nav>
 
         {/* Right side */}
@@ -186,6 +193,7 @@ export function PublicFooter() {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/" className="hover:text-white transition-colors">Beranda</Link></li>
               <li><Link href="/cari" className="hover:text-white transition-colors">Pencarian</Link></li>
+              <li><Link href="/donasi" className="hover:text-white transition-colors">Berugak Donasi</Link></li>
             </ul>
             <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-3 mt-5">Ikuti Kami</h3>
             <a

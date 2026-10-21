@@ -20,6 +20,8 @@ tags:
     description: File upload operations
   - name: users
     description: Admin user management (owner only)
+  - name: donations
+    description: Berugak Donasi - campaign donasi & transaksi donatur
 paths:
   /healthz:
     get:
@@ -741,6 +743,357 @@ paths:
         "403":
           description: Forbidden (owner only)
 
+  /donations/settings:
+    get:
+      operationId: getDonationSettings
+      tags: [donations]
+      summary: Public donation settings (hero text, default QRIS/rekening)
+      responses:
+        "200":
+          description: Donation settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationSettings"
+
+  /donations/campaigns:
+    get:
+      operationId: listDonationCampaigns
+      tags: [donations]
+      summary: List active donation campaigns
+      responses:
+        "200":
+          description: List of active campaigns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DonationCampaign"
+
+  /donations/campaigns/{slug}:
+    get:
+      operationId: getDonationCampaign
+      tags: [donations]
+      summary: Get a donation campaign by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Campaign found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "404":
+          description: Not found
+
+  /donations/transactions:
+    post:
+      operationId: createDonationTransaction
+      tags: [donations]
+      summary: Submit a donation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationTransactionInput"
+      responses:
+        "201":
+          description: Donation submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransactionCreated"
+        "400":
+          description: Invalid payload
+        "404":
+          description: Campaign not found
+
+  /donations/transactions/{reference}:
+    get:
+      operationId: trackDonationTransaction
+      tags: [donations]
+      summary: Track donation status by reference number
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Donation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransactionStatus"
+        "404":
+          description: Not found
+
+  /admin/donations/campaigns:
+    get:
+      operationId: listAdminDonationCampaigns
+      tags: [donations]
+      summary: List all donation campaigns (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated campaigns
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaignListResponse"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createDonationCampaign
+      tags: [donations]
+      summary: Create a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationCampaignInput"
+      responses:
+        "201":
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/campaigns/{id}:
+    get:
+      operationId: getAdminDonationCampaign
+      tags: [donations]
+      summary: Get a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    put:
+      operationId: updateDonationCampaign
+      tags: [donations]
+      summary: Update a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationCampaignInput"
+      responses:
+        "200":
+          description: Campaign updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteDonationCampaign
+      tags: [donations]
+      summary: Delete a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+
+  /admin/donations/transactions:
+    get:
+      operationId: listAdminDonationTransactions
+      tags: [donations]
+      summary: List donation transactions (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: campaignId
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransactionListResponse"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/transactions/{id}:
+    patch:
+      operationId: updateDonationTransaction
+      tags: [donations]
+      summary: Verify or reject a donation transaction (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationTransactionUpdate"
+      responses:
+        "200":
+          description: Transaction updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransaction"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /admin/donations/stats:
+    get:
+      operationId: getDonationStats
+      tags: [donations]
+      summary: Donation summary for admin dashboard (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Donation stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationStats"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/settings:
+    get:
+      operationId: getAdminDonationSettings
+      tags: [donations]
+      summary: Get donation settings (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Donation settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationSettings"
+        "401":
+          description: Unauthorized
+    put:
+      operationId: updateDonationSettings
+      tags: [donations]
+      summary: Update donation settings (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationSettingsInput"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationSettings"
+        "401":
+          description: Unauthorized
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1282,3 +1635,384 @@ components:
         - adminResponse
         - createdAt
         - updatedAt
+
+    DonationCampaign:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        coverImageUrl:
+          type: ["string", "null"]
+        targetAmount:
+          type: integer
+        collectedAmount:
+          type: integer
+        donorCount:
+          type: integer
+        pendingCount:
+          type: integer
+        progress:
+          type: integer
+        qrisImageUrl:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+        bankAccountNumber:
+          type: ["string", "null"]
+        bankAccountHolder:
+          type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        cryptoSymbol:
+          type: ["string", "null"]
+        cryptoAddress:
+          type: ["string", "null"]
+        autoConfirm:
+          type: boolean
+        minAmount:
+          type: integer
+        status:
+          type: string
+        startAt:
+          type: ["string", "null"]
+        deadline:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+        updatedAt:
+          type: ["string", "null"]
+        recentDonations:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationRecentDonation"
+      required:
+        - id
+        - slug
+        - title
+        - status
+
+    DonationRecentDonation:
+      type: object
+      properties:
+        id:
+          type: integer
+        donorName:
+          type: string
+        isAnonymous:
+          type: boolean
+        amount:
+          type: integer
+        message:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - donorName
+        - amount
+
+    DonationCampaignInput:
+      type: object
+      properties:
+        title:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        coverImageUrl:
+          type: ["string", "null"]
+        targetAmount:
+          type: integer
+        qrisImageUrl:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+        bankAccountNumber:
+          type: ["string", "null"]
+        bankAccountHolder:
+          type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        cryptoSymbol:
+          type: ["string", "null"]
+        cryptoAddress:
+          type: ["string", "null"]
+        autoConfirm:
+          type: boolean
+        minAmount:
+          type: integer
+        status:
+          type: string
+          enum: ["draft", "active", "closed", "archived"]
+        startAt:
+          type: ["string", "null"]
+        deadline:
+          type: ["string", "null"]
+      required:
+        - title
+
+    DonationCampaignListResponse:
+      type: object
+      properties:
+        campaigns:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationCampaign"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [campaigns, total, page, limit, totalPages]
+
+    DonationTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        referenceNumber:
+          type: string
+        campaignId:
+          type: integer
+        donorName:
+          type: string
+        donorEmail:
+          type: ["string", "null"]
+        donorPhone:
+          type: ["string", "null"]
+        isAnonymous:
+          type: boolean
+        amount:
+          type: integer
+        cryptoAmount:
+          type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        txHash:
+          type: ["string", "null"]
+        method:
+          type: string
+        message:
+          type: ["string", "null"]
+        proofUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+        adminNote:
+          type: ["string", "null"]
+        verifiedBy:
+          type: ["string", "null"]
+        verifiedAt:
+          type: ["string", "null"]
+        autoVerified:
+          type: boolean
+        createdAt:
+          type: ["string", "null"]
+        updatedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - referenceNumber
+        - campaignId
+        - donorName
+        - amount
+        - method
+        - status
+
+    DonationTransactionInput:
+      type: object
+      properties:
+        campaignId:
+          type: integer
+        campaignSlug:
+          type: string
+        donorName:
+          type: string
+        donorEmail:
+          type: string
+        donorPhone:
+          type: string
+        amount:
+          type: number
+        cryptoAmount:
+          type: string
+        txHash:
+          type: string
+        method:
+          type: string
+          enum: ["qris", "bank", "crypto"]
+        message:
+          type: string
+        proofUrl:
+          type: string
+        isAnonymous:
+          type: boolean
+      required:
+        - donorName
+
+    DonationTransactionCreated:
+      type: object
+      properties:
+        referenceNumber:
+          type: string
+        status:
+          type: string
+        autoVerified:
+          type: boolean
+        note:
+          type: ["string", "null"]
+        message:
+          type: string
+        donorName:
+          type: string
+      required:
+        - referenceNumber
+        - status
+        - message
+
+    DonationTransactionStatus:
+      type: object
+      properties:
+        referenceNumber:
+          type: string
+        status:
+          type: string
+        amount:
+          type: integer
+        cryptoAmount:
+          type: ["string", "null"]
+        method:
+          type: string
+        message:
+          type: ["string", "null"]
+        adminNote:
+          type: ["string", "null"]
+        autoVerified:
+          type: boolean
+        campaignTitle:
+          type: ["string", "null"]
+        campaignSlug:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+        verifiedAt:
+          type: ["string", "null"]
+      required:
+        - referenceNumber
+        - status
+
+    DonationTransactionUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["pending", "verified", "rejected"]
+        adminNote:
+          type: ["string", "null"]
+      required:
+        - status
+
+    DonationTransactionListResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationTransaction"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [transactions, total, page, limit, totalPages]
+
+    DonationStats:
+      type: object
+      properties:
+        activeCampaigns:
+          type: integer
+        totalCampaigns:
+          type: integer
+        collectedAmount:
+          type: integer
+        pendingCount:
+          type: integer
+        verifiedCount:
+          type: integer
+        donorCount:
+          type: integer
+      required:
+        - activeCampaigns
+        - totalCampaigns
+        - collectedAmount
+        - pendingCount
+        - verifiedCount
+        - donorCount
+
+    DonationSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        heroTitle:
+          type: string
+        heroDescription:
+          type: string
+        qrisImageUrl:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+        bankAccountNumber:
+          type: ["string", "null"]
+        bankAccountHolder:
+          type: ["string", "null"]
+        isOpen:
+          type: boolean
+        updatedAt:
+          type: ["string", "null"]
+      required:
+        - heroTitle
+        - isOpen
+
+    DonationSettingsInput:
+      type: object
+      properties:
+        heroTitle:
+          type: string
+        heroDescription:
+          type: string
+        qrisImageUrl:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+        bankAccountNumber:
+          type: ["string", "null"]
+        bankAccountHolder:
+          type: ["string", "null"]
+        isOpen:
+          type: boolean
+      required:
+        - heroTitle

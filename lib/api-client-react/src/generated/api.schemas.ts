@@ -280,6 +280,269 @@ export interface TrackedComplaint {
   updatedAt: string;
 }
 
+export interface DonationRecentDonation {
+  id: number;
+  donorName: string;
+  isAnonymous?: boolean;
+  amount: number;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+}
+
+export interface DonationCampaign {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  content?: string;
+  /** @nullable */
+  coverImageUrl?: string | null;
+  targetAmount?: number;
+  collectedAmount?: number;
+  donorCount?: number;
+  pendingCount?: number;
+  progress?: number;
+  /** @nullable */
+  qrisImageUrl?: string | null;
+  /** @nullable */
+  qrisPayload?: string | null;
+  /** @nullable */
+  bankName?: string | null;
+  /** @nullable */
+  bankAccountNumber?: string | null;
+  /** @nullable */
+  bankAccountHolder?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  cryptoSymbol?: string | null;
+  /** @nullable */
+  cryptoAddress?: string | null;
+  autoConfirm?: boolean;
+  minAmount?: number;
+  status: string;
+  /** @nullable */
+  startAt?: string | null;
+  /** @nullable */
+  deadline?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  recentDonations?: DonationRecentDonation[];
+}
+
+export type DonationCampaignInputStatus = typeof DonationCampaignInputStatus[keyof typeof DonationCampaignInputStatus];
+
+
+export const DonationCampaignInputStatus = {
+  draft: 'draft',
+  active: 'active',
+  closed: 'closed',
+  archived: 'archived',
+} as const;
+
+export interface DonationCampaignInput {
+  title: string;
+  excerpt?: string;
+  content?: string;
+  /** @nullable */
+  coverImageUrl?: string | null;
+  targetAmount?: number;
+  /** @nullable */
+  qrisImageUrl?: string | null;
+  /** @nullable */
+  qrisPayload?: string | null;
+  /** @nullable */
+  bankName?: string | null;
+  /** @nullable */
+  bankAccountNumber?: string | null;
+  /** @nullable */
+  bankAccountHolder?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  cryptoSymbol?: string | null;
+  /** @nullable */
+  cryptoAddress?: string | null;
+  autoConfirm?: boolean;
+  minAmount?: number;
+  status?: DonationCampaignInputStatus;
+  /** @nullable */
+  startAt?: string | null;
+  /** @nullable */
+  deadline?: string | null;
+}
+
+export interface DonationCampaignListResponse {
+  campaigns: DonationCampaign[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface DonationTransaction {
+  id: number;
+  referenceNumber: string;
+  campaignId: number;
+  donorName: string;
+  /** @nullable */
+  donorEmail?: string | null;
+  /** @nullable */
+  donorPhone?: string | null;
+  isAnonymous?: boolean;
+  amount: number;
+  /** @nullable */
+  cryptoAmount?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  txHash?: string | null;
+  method: string;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  proofUrl?: string | null;
+  status: string;
+  /** @nullable */
+  adminNote?: string | null;
+  /** @nullable */
+  verifiedBy?: string | null;
+  /** @nullable */
+  verifiedAt?: string | null;
+  autoVerified?: boolean;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export type DonationTransactionInputMethod = typeof DonationTransactionInputMethod[keyof typeof DonationTransactionInputMethod];
+
+
+export const DonationTransactionInputMethod = {
+  qris: 'qris',
+  bank: 'bank',
+  crypto: 'crypto',
+} as const;
+
+export interface DonationTransactionInput {
+  campaignId?: number;
+  campaignSlug?: string;
+  donorName: string;
+  donorEmail?: string;
+  donorPhone?: string;
+  amount?: number;
+  cryptoAmount?: string;
+  txHash?: string;
+  method?: DonationTransactionInputMethod;
+  message?: string;
+  proofUrl?: string;
+  isAnonymous?: boolean;
+}
+
+export interface DonationTransactionCreated {
+  referenceNumber: string;
+  status: string;
+  autoVerified?: boolean;
+  /** @nullable */
+  note?: string | null;
+  message: string;
+  donorName?: string;
+}
+
+export interface DonationTransactionStatus {
+  referenceNumber: string;
+  status: string;
+  amount?: number;
+  /** @nullable */
+  cryptoAmount?: string | null;
+  method?: string;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  adminNote?: string | null;
+  autoVerified?: boolean;
+  /** @nullable */
+  campaignTitle?: string | null;
+  /** @nullable */
+  campaignSlug?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  verifiedAt?: string | null;
+}
+
+export type DonationTransactionUpdateStatus = typeof DonationTransactionUpdateStatus[keyof typeof DonationTransactionUpdateStatus];
+
+
+export const DonationTransactionUpdateStatus = {
+  pending: 'pending',
+  verified: 'verified',
+  rejected: 'rejected',
+} as const;
+
+export interface DonationTransactionUpdate {
+  status: DonationTransactionUpdateStatus;
+  /** @nullable */
+  adminNote?: string | null;
+}
+
+export interface DonationTransactionListResponse {
+  transactions: DonationTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface DonationStats {
+  activeCampaigns: number;
+  totalCampaigns: number;
+  collectedAmount: number;
+  pendingCount: number;
+  verifiedCount: number;
+  donorCount: number;
+}
+
+export interface DonationSettings {
+  id?: number;
+  heroTitle: string;
+  heroDescription?: string;
+  /** @nullable */
+  qrisImageUrl?: string | null;
+  /** @nullable */
+  qrisPayload?: string | null;
+  /** @nullable */
+  bankName?: string | null;
+  /** @nullable */
+  bankAccountNumber?: string | null;
+  /** @nullable */
+  bankAccountHolder?: string | null;
+  isOpen: boolean;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export interface DonationSettingsInput {
+  heroTitle: string;
+  heroDescription?: string;
+  /** @nullable */
+  qrisImageUrl?: string | null;
+  /** @nullable */
+  qrisPayload?: string | null;
+  /** @nullable */
+  bankName?: string | null;
+  /** @nullable */
+  bankAccountNumber?: string | null;
+  /** @nullable */
+  bankAccountHolder?: string | null;
+  isOpen?: boolean;
+}
+
 export type ListArticlesParams = {
 page?: number;
 limit?: number;
@@ -299,5 +562,24 @@ export type UpdateAdminCommentBody = {
 export type TrackComplaintParams = {
 complaintNumber: string;
 email: string;
+};
+
+export type TrackDonationTransactionParams = {
+email?: string;
+};
+
+export type ListAdminDonationCampaignsParams = {
+page?: number;
+limit?: number;
+search?: string;
+status?: string;
+};
+
+export type ListAdminDonationTransactionsParams = {
+page?: number;
+limit?: number;
+status?: string;
+campaignId?: number;
+search?: string;
 };
 

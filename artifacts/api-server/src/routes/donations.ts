@@ -321,7 +321,7 @@ router.post("/donations/transactions", async (req, res) => {
     // Email & WhatsApp selalu opsional. Kalau mode anonim, data kontak
     // TIDAK disimpan sama sekali (anonymitas penuh).
     const email = toNullableString(donorEmail)?.toLowerCase() ?? null;
-    if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       res.status(400).json({ error: "Format email tidak valid" });
       return;
     }

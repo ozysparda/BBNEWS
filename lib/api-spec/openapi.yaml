@@ -1989,6 +1989,17 @@ components:
           type: ["string", "null"]
         isOpen:
           type: boolean
+        popupEnabled:
+          type: boolean
+        popupCampaignId:
+          type: ["integer", "null"]
+        popupPlacement:
+          type: string
+          enum: ["floating", "article-top", "article-middle", "article-bottom", "home-banner"]
+        popupDelay:
+          type: integer
+        popupDismissable:
+          type: boolean
         updatedAt:
           type: ["string", "null"]
       required:
@@ -2013,6 +2024,17 @@ components:
         bankAccountHolder:
           type: ["string", "null"]
         isOpen:
+          type: boolean
+        popupEnabled:
+          type: boolean
+        popupCampaignId:
+          type: ["integer", "null"]
+        popupPlacement:
+          type: string
+          enum: ["floating", "article-top", "article-middle", "article-bottom", "home-banner"]
+        popupDelay:
+          type: integer
+        popupDismissable:
           type: boolean
       required:
         - heroTitle

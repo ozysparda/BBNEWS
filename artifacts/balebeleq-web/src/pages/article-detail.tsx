@@ -11,6 +11,7 @@ import { Eye, Calendar, Copy, Check } from "lucide-react";
 import { FaFacebook, FaWhatsapp, FaTwitter } from "react-icons/fa";
 import { useState } from "react";
 import CommentSection from "@/components/comment-section";
+import { DonationPopup } from "@/components/donation-popup";
 
 function ShareButtons({ title, url }: { title: string; url: string }) {
   const [copied, setCopied] = useState(false);
@@ -177,9 +178,14 @@ export default function ArticleDetail() {
             </div>
           )}
 
+          <DonationPopup filterPlacement="article-top" />
+
           <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-a:text-primary hover:prose-a:text-primary/80">
             <div dangerouslySetInnerHTML={{ __html: article.content }} />
           </div>
+
+          <DonationPopup filterPlacement="article-middle" />
+          <DonationPopup filterPlacement="article-bottom" />
 
           <ShareButtons title={article.title} url={articleUrl} />
 

@@ -110,6 +110,16 @@ export const donationSettingsTable = pgTable("donation_settings", {
   bankAccountNumber: text("bank_account_number"),
   bankAccountHolder: text("bank_account_holder"),
   isOpen: boolean("is_open").notNull().default(true),
+
+  // Popup donasi (opsional) - tampilkan campaign donasi sebagai popup/iklan
+  popupEnabled: boolean("popup_enabled").notNull().default(false),
+  popupCampaignId: integer("popup_campaign_id"),
+  // Penempatan: floating, article-top, article-middle, article-bottom, home-banner
+  popupPlacement: text("popup_placement").notNull().default("floating"),
+  // Delay (detik) sebelum popup muncul
+  popupDelay: integer("popup_delay").notNull().default(5),
+  // Bisa ditutup oleh pengunjung
+  popupDismissable: boolean("popup_dismissable").notNull().default(true),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 

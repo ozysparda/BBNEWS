@@ -13,9 +13,16 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiUrl } from "@/lib/api-url";
 import { toast } from "sonner";
-import { ArrowLeft, ImageIcon, Loader2, Save } from "lucide-react";
+import { ArrowLeft, ImageIcon, Loader2, Save, Heart } from "lucide-react";
 
 async function uploadImage(file: File): Promise<string> {
   const token = localStorage.getItem("admin_token");
@@ -51,6 +58,14 @@ export default function AdminDonationSettingsPage() {
   const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [bankAccountHolder, setBankAccountHolder] = useState("");
   const [isOpen, setIsOpen] = useState(true);
+
+  // Popup settings
+  const [popupEnabled, setPopupEnabled] = useState(false);
+  const [popupCampaignId, setPopupCampaignId] = useState("");
+  const [popupPlacement, setPopupPlacement] = useState("floating");
+  const [popupDelay, setPopupDelay] = useState("5");
+  const [popupDismissable, setPopupDismissable] = useState(true);
+
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -63,6 +78,11 @@ export default function AdminDonationSettingsPage() {
     setBankAccountNumber(settings.bankAccountNumber ?? "");
     setBankAccountHolder(settings.bankAccountHolder ?? "");
     setIsOpen(settings.isOpen ?? true);
+    setPopupEnabled(settings.popupEnabled ?? false);
+    setPopupCampaignId(settings.popupCampaignId ? String(settings.popupCampaignId) : "");
+    setPopupPlacement(settings.popupPlacement ?? "floating");
+    setPopupDelay(String(settings.popupDelay ?? 5));
+    setPopupDismissable(settings.popupDismissable ?? true);
   }, [settings]);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -97,6 +117,11 @@ export default function AdminDonationSettingsPage() {
           bankAccountNumber: bankAccountNumber.trim() || null,
           bankAccountHolder: bankAccountHolder.trim() || null,
           isOpen,
+          popupEnabled,
+          popupCampaignId: popupCampaignId ? Number(popupCampaignId) : null,
+          popupPlacement: popupPlacement as any,
+          popupDelay: Number(popupDelay) || 5,
+          popupDismissable,
         },
       });
       toast.success("Pengaturan donasi disimpan");
@@ -115,7 +140,7 @@ export default function AdminDonationSettingsPage() {
           <div>
             <h1 className="text-2xl font-bold">Pengaturan Donasi</h1>
             <p className="text-sm text-muted-foreground">
-              Teks utama halaman donasi dan QRIS/rekening cadangan.
+              Teks utama halaman donasi, QRIS/rekening cadangan, dan pengaturan popup.
             </p>
           </div>
         </div>
@@ -157,6 +182,86 @@ export default function AdminDonationSettingsPage() {
                     </p>
                   </div>
                   <Switch checked={isOpen} onCheckedChange={setIsOpen} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="space-y-4 p-5">
+                <div className="flex items-center gap-2">
+                  <Heart className="h-5 w-5 text-primary" />
+                  <h2 className="font-semibold">Popup Donasi (Iklan)</h2>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Tampilkan campaign donasi sebagai popup di website. Pilih penempatan dan campaign yang ingin ditampilkan.
+                </p>
+
+                <div className="flex items-center justify-between rounded-lg border border-border p-3">
+                  <div>
+                    <p className="text-sm font-medium">Aktifkan popup</p>
+                    <p className="text-xs text-muted-foreground">
+                      Popup hanya muncul jika ada campaign aktif yang dipilih.
+                    </p>
+                  </div>
+                  <Switch checked={popupEnabled} onCheckedChange={setPopupEnabled} />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="popupCampaignId">Campaign yang ditampilkan</Label>
+                    <Input
+                      id="popupCampaignId"
+                      type="number"
+                      value={popupCampaignId}
+                      onChange={(e) => setPopupCampaignId(e.target.value)}
+                      placeholder="ID campaign (kosongkan = tidak ada)"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Masukkan ID campaign aktif. Lihat ID di daftar campaign.
+                    </p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Penempatan popup</Label>
+                    <Select value={popupPlacement} onValueChange={setPopupPlacement}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="floating">Floating (pojok kanan bawah)</SelectItem>
+                        <SelectItem value="home-banner">Banner di halaman utama</SelectItem>
+                        <SelectItem value="article-top">Di atas artikel</SelectItem>
+                        <SelectItem value="article-middle">Di tengah artikel</SelectItem>
+                        <SelectItem value="article-bottom">Di bawah artikel</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="popupDelay">Delay muncul (detik)</Label>
+                    <Input
+                      id="popupDelay"
+                      type="number"
+                      min="0"
+                      max="60"
+                      value={popupDelay}
+                      onChange={(e) => setPopupDelay(e.target.value)}
+                      placeholder="5"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Berlaku untuk floating popup. 0 = langsung muncul.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-border p-3">
+                    <div>
+                      <p className="text-sm font-medium">Bisa ditutup</p>
+                      <p className="text-xs text-muted-foreground">
+                        Pengunjung bisa menutup popup.
+                      </p>
+                    </div>
+                    <Switch checked={popupDismissable} onCheckedChange={setPopupDismissable} />
+                  </div>
                 </div>
               </CardContent>
             </Card>

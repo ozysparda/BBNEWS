@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import ComplaintWidget from "@/components/complaint-widget";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { DonationFab } from "@/components/donation-fab";
+import { DonationPopup } from "@/components/donation-popup";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
 function SearchBar() {
@@ -240,6 +241,9 @@ export function PublicFooter() {
 }
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
+  const isDonationPage = location.startsWith("/donasi");
+
   return (
     <div className="min-h-screen flex flex-col">
       <PublicHeader />
@@ -248,7 +252,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </main>
       <PublicFooter />
       <ComplaintWidget />
-      <DonationFab />
+      {!isDonationPage && <DonationFab />}
+      {!isDonationPage && <DonationPopup filterPlacement="floating" />}
       <ScrollToTop />
     </div>
   );

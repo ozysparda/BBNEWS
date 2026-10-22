@@ -740,6 +740,11 @@ export const GetDonationSettingsResponse = zod.object({
   "bankAccountNumber": zod.string().nullish(),
   "bankAccountHolder": zod.string().nullish(),
   "isOpen": zod.boolean(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional(),
   "updatedAt": zod.string().nullish()
 })
 
@@ -1186,6 +1191,11 @@ export const GetAdminDonationSettingsResponse = zod.object({
   "bankAccountNumber": zod.string().nullish(),
   "bankAccountHolder": zod.string().nullish(),
   "isOpen": zod.boolean(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional(),
   "updatedAt": zod.string().nullish()
 })
 
@@ -1201,7 +1211,12 @@ export const UpdateDonationSettingsBody = zod.object({
   "bankName": zod.string().nullish(),
   "bankAccountNumber": zod.string().nullish(),
   "bankAccountHolder": zod.string().nullish(),
-  "isOpen": zod.boolean().optional()
+  "isOpen": zod.boolean().optional(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional()
 })
 
 export const UpdateDonationSettingsResponse = zod.object({
@@ -1214,6 +1229,11 @@ export const UpdateDonationSettingsResponse = zod.object({
   "bankAccountNumber": zod.string().nullish(),
   "bankAccountHolder": zod.string().nullish(),
   "isOpen": zod.boolean(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional(),
   "updatedAt": zod.string().nullish()
 })
 

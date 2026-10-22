@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { ChevronRight, Flame } from "lucide-react";
 import { NewsTicker } from "@/components/news-ticker";
+import { DonationPopup } from "@/components/donation-popup";
 export default function Home() {
   const { data: featuredArticles, isLoading: loadingFeatured } = useGetFeaturedArticles();
   const { data: recentArticlesData, isLoading: loadingRecent } = useListArticles({ limit: 12 });
@@ -22,6 +23,11 @@ export default function Home() {
       <PublicLayout>
         {/* News Ticker */}
         <NewsTicker />
+
+        {/* Donation Popup (home banner) */}
+        <div className="container mx-auto px-4 pt-4">
+          <DonationPopup filterPlacement="home-banner" />
+        </div>
 
       {/* Category Quick Links */}
       {categories && categories.length > 0 && (

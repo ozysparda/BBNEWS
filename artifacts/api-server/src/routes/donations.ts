@@ -149,7 +149,7 @@ router.get("/donations/settings", async (req, res) => {
       .from(donationSettingsTable)
       .where(eq(donationSettingsTable.id, 1))
       .limit(1);
-    res.json(settings ?? { heroTitle: "Berugak Donasi", isOpen: true });
+    res.json(settings ?? { heroTitle: "Berugak Donasi", isOpen: true, popupEnabled: false, popupPlacement: "floating", popupDelay: 5, popupDismissable: true });
   } catch (error) {
     console.error("Error fetching donation settings:", error);
     res.status(500).json({ error: "Gagal memuat pengaturan donasi" });
@@ -975,7 +975,7 @@ router.get("/admin/donations/settings", requireAuth, async (req: AuthRequest, re
       .from(donationSettingsTable)
       .where(eq(donationSettingsTable.id, 1))
       .limit(1);
-    res.json(settings ?? { id: 1, heroTitle: "Berugak Donasi", isOpen: true });
+    res.json(settings ?? { id: 1, heroTitle: "Berugak Donasi", isOpen: true, popupEnabled: false, popupPlacement: "floating", popupDelay: 5, popupDismissable: true });
   } catch (error) {
     console.error("Error fetching donation settings:", error);
     res.status(500).json({ error: "Gagal memuat pengaturan donasi" });

@@ -508,6 +508,17 @@ export interface DonationStats {
   donorCount: number;
 }
 
+export type DonationSettingsPopupPlacement = typeof DonationSettingsPopupPlacement[keyof typeof DonationSettingsPopupPlacement];
+
+
+export const DonationSettingsPopupPlacement = {
+  floating: 'floating',
+  'article-top': 'article-top',
+  'article-middle': 'article-middle',
+  'article-bottom': 'article-bottom',
+  'home-banner': 'home-banner',
+} as const;
+
 export interface DonationSettings {
   id?: number;
   heroTitle: string;
@@ -523,9 +534,26 @@ export interface DonationSettings {
   /** @nullable */
   bankAccountHolder?: string | null;
   isOpen: boolean;
+  popupEnabled?: boolean;
+  /** @nullable */
+  popupCampaignId?: number | null;
+  popupPlacement?: DonationSettingsPopupPlacement;
+  popupDelay?: number;
+  popupDismissable?: boolean;
   /** @nullable */
   updatedAt?: string | null;
 }
+
+export type DonationSettingsInputPopupPlacement = typeof DonationSettingsInputPopupPlacement[keyof typeof DonationSettingsInputPopupPlacement];
+
+
+export const DonationSettingsInputPopupPlacement = {
+  floating: 'floating',
+  'article-top': 'article-top',
+  'article-middle': 'article-middle',
+  'article-bottom': 'article-bottom',
+  'home-banner': 'home-banner',
+} as const;
 
 export interface DonationSettingsInput {
   heroTitle: string;
@@ -541,6 +569,12 @@ export interface DonationSettingsInput {
   /** @nullable */
   bankAccountHolder?: string | null;
   isOpen?: boolean;
+  popupEnabled?: boolean;
+  /** @nullable */
+  popupCampaignId?: number | null;
+  popupPlacement?: DonationSettingsInputPopupPlacement;
+  popupDelay?: number;
+  popupDismissable?: boolean;
 }
 
 export type ListArticlesParams = {

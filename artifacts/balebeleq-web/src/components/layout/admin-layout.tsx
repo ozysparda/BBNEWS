@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users, User, Activity, Globe, MessageSquare, Flag, Heart } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useState } from "react";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
@@ -107,14 +108,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="p-3 border-t border-sidebar-border">
-          <div className="flex items-center gap-3 px-3 py-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-              {user.username.charAt(0).toUpperCase()}
+          <div className="flex items-center justify-between px-3 py-2 mb-1">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                {user.username.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-sidebar-foreground truncate">{user.username}</div>
+                <div className="text-[10px] text-muted-foreground capitalize">{(user as any).role ?? "editor"}</div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="text-sm font-semibold text-sidebar-foreground truncate">{user.username}</div>
-              <div className="text-[10px] text-muted-foreground capitalize">{(user as any).role ?? "editor"}</div>
-            </div>
+            <ThemeToggle />
           </div>
           <button
             onClick={logout}

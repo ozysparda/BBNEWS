@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useListCategories } from "@workspace/api-client-react";
 import { Search, X, Menu, Heart } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useState, useRef, useEffect } from "react";
 import ComplaintWidget from "@/components/complaint-widget";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
@@ -161,6 +162,7 @@ export function PublicHeader() {
 
         {/* Right side */}
         <div className="flex items-center gap-1.5">
+          <ThemeToggle />
           <SearchBar />
           <div className="flex md:hidden">
             <MobileMenu categories={cats} />

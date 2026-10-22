@@ -23,14 +23,14 @@ export default function DonationListPage() {
         title={settings?.heroTitle || "Berugak Donasi"}
         description={
           settings?.heroDescription ||
-          "Dukung liputan BerugakNews lewat Berugak Donasi. Scan QRIS, transfer bank, atau donasi kripto - terverifikasi otomatis."
+          "Bantu sesama melalui Berugak Donasi. Scan QRIS, transfer bank, atau donasi kripto - terverifikasi otomatis."
         }
         url="/donasi"
         keywords="donasi berugaknews, donasi lombok, qris, donasi berita"
       />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-primary via-primary to-red-800 text-primary-foreground">
+      <section className="bg-gradient-to-br from-primary via-primary to-emerald-900 text-primary-foreground">
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest">
@@ -41,7 +41,7 @@ export default function DonationListPage() {
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-primary-foreground/90 md:text-base">
               {settings?.heroDescription ||
-                "Setiap rupiah yang kamu berikan membantu kami menjaga liputan tetap independen, cepat, dan bisa dipercaya oleh masyarakat Lombok."}
+                "Setiap rupiah yang kamu berikan disalurkan untuk membantu orang yang membutuhkan. BerugakNews hanya sebagai wadah penyaluran."}
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">

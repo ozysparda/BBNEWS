@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useListCategories } from "@workspace/api-client-react";
-import { Search, X, Menu, Heart } from "lucide-react";
+import { Search, X, Menu, Heart, ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useState, useRef, useEffect } from "react";
 import ComplaintWidget from "@/components/complaint-widget";
@@ -134,12 +134,25 @@ export function PublicHeader() {
       </div>
 
       <div className="container mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        {/* Back button (mobile only, not on home) */}
+        {typeof window !== "undefined" && window.location.pathname !== "/" && (
+          <button
+            onClick={() => {
+              if (window.history.length > 1) window.history.back();
+              else window.location.href = "/";
+            }}
+            className="md:hidden p-2 rounded-full hover:bg-muted transition-colors text-foreground shrink-0"
+            aria-label="Kembali"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        )}
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <img src={logoImg} alt="BerugakNews Logo" className="h-9 w-9 sm:h-11 sm:w-11 object-contain" />
           <span className="font-serif text-lg sm:text-xl font-black tracking-tight leading-none">
-            <span className="text-green-700">Berugak</span>
-            <span className="text-red-600 text-xs font-bold ml-1 bg-red-600 text-white px-1 rounded-sm">NEWS</span>
+            <span className="text-primary">Berugak</span>
+            <span className="text-xs font-bold ml-1 bg-primary text-primary-foreground px-1.5 py-0.5 rounded-sm">NEWS</span>
           </span>
         </Link>
 

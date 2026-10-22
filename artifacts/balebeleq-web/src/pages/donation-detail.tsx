@@ -550,7 +550,7 @@ export default function DonationDetailPage() {
                         id="message"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Semoga bermanfaat untuk liputan Lombok."
+                        placeholder="Semoga bermanfaat untuk penerima manfaat."
                         rows={3}
                       />
                     </div>

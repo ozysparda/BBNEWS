@@ -23,26 +23,9 @@ export const donationCampaignsTable = pgTable("donation_campaigns", {
   // Target donasi dalam rupiah penuh (contoh: 5000000 = Rp 5.000.000)
   targetAmount: integer("target_amount").notNull().default(0),
 
-  // QRIS / QR statis
-  qrisImageUrl: text("qris_image_url"),
-  qrisPayload: text("qris_payload"),
-
-  // Transfer bank manual
-  bankName: text("bank_name"),
-  bankAccountNumber: text("bank_account_number"),
-  bankAccountHolder: text("bank_account_holder"),
-
-  // Kripto (opsional, bisa dipakai bersamaan dengan QRIS)
-  cryptoNetwork: text("crypto_network"),
-  cryptoSymbol: text("crypto_symbol"),
-  cryptoAddress: text("crypto_address"),
-
-  // Auto konfirmasi: khusus kripto (cek tx hash ke explorer publik).
-  // Kalau gagal dicek, transaksi tetap "pending" untuk konfirmasi manual admin.
-  autoConfirm: boolean("auto_confirm").notNull().default(false),
-
   // Minimum donasi (rupiah) supaya transaksi di bawahnya ditolak
-  minAmount: integer("min_amount").notNull().default(1000),
+  // (opsional per campaign; jika null pakai global dari donation_settings)
+  minAmount: integer("min_amount"),
 
   status: text("status").notNull().default("draft"),
   startAt: timestamp("start_at"),
@@ -110,6 +93,17 @@ export const donationSettingsTable = pgTable("donation_settings", {
   bankAccountNumber: text("bank_account_number"),
   bankAccountHolder: text("bank_account_holder"),
   isOpen: boolean("is_open").notNull().default(true),
+
+  // Kripto
+  cryptoNetwork: text("crypto_network"),
+  cryptoSymbol: text("crypto_symbol"),
+  cryptoAddress: text("crypto_address"),
+
+  // Auto konfirmasi: khusus kripto (cek tx hash ke explorer publik).
+  autoConfirm: boolean("auto_confirm").notNull().default(false),
+
+  // Minimum donasi global (rupiah)
+  minAmount: integer("min_amount").notNull().default(1000),
 
   // Popup donasi (opsional) - tampilkan campaign donasi sebagai popup/iklan
   popupEnabled: boolean("popup_enabled").notNull().default(false),

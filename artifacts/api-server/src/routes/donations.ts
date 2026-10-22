@@ -116,15 +116,6 @@ function campaignSelect() {
     content: donationCampaignsTable.content,
     coverImageUrl: donationCampaignsTable.coverImageUrl,
     targetAmount: donationCampaignsTable.targetAmount,
-    qrisImageUrl: donationCampaignsTable.qrisImageUrl,
-    qrisPayload: donationCampaignsTable.qrisPayload,
-    bankName: donationCampaignsTable.bankName,
-    bankAccountNumber: donationCampaignsTable.bankAccountNumber,
-    bankAccountHolder: donationCampaignsTable.bankAccountHolder,
-    cryptoNetwork: donationCampaignsTable.cryptoNetwork,
-    cryptoSymbol: donationCampaignsTable.cryptoSymbol,
-    cryptoAddress: donationCampaignsTable.cryptoAddress,
-    autoConfirm: donationCampaignsTable.autoConfirm,
     minAmount: donationCampaignsTable.minAmount,
     status: donationCampaignsTable.status,
     startAt: donationCampaignsTable.startAt,
@@ -222,8 +213,25 @@ router.get("/donations/campaigns/:slug", async (req, res) => {
       .orderBy(desc(donationTransactionsTable.createdAt))
       .limit(20);
 
+    // Merge payment global dari donation_settings
+    const [payment] = await db
+      .select()
+      .from(donationSettingsTable)
+      .where(eq(donationSettingsTable.id, 1))
+      .limit(1);
+
     res.json({
       ...formatCampaign(campaign),
+      qrisImageUrl: payment?.qrisImageUrl ?? null,
+      qrisPayload: payment?.qrisPayload ?? null,
+      bankName: payment?.bankName ?? null,
+      bankAccountNumber: payment?.bankAccountNumber ?? null,
+      bankAccountHolder: payment?.bankAccountHolder ?? null,
+      cryptoNetwork: payment?.cryptoNetwork ?? null,
+      cryptoSymbol: payment?.cryptoSymbol ?? null,
+      cryptoAddress: payment?.cryptoAddress ?? null,
+      autoConfirm: payment?.autoConfirm ?? false,
+      minAmount: campaign.minAmount ?? payment?.minAmount ?? 1000,
       recentDonations: recent.map((item: any) => ({
         ...item,
         donorName: item.isAnonymous ? "Hamba Tuhan" : item.donorName,
@@ -287,6 +295,14 @@ router.post("/donations/transactions", async (req, res) => {
       return;
     }
 
+    // Ambil payment global dari donation_settings (satu konfigurasi untuk semua campaign)
+    const [globalSettings] = await db
+      .select()
+      .from(donationSettingsTable)
+      .where(eq(donationSettingsTable.id, 1))
+      .limit(1);
+    const payment = globalSettings ?? {};
+
     const name = toNullableString(donorName);
     if (!name || name.length < 2) {
       res.status(400).json({ error: "Nama donatur wajib diisi" });
@@ -340,15 +356,19 @@ router.post("/donations/transactions", async (req, res) => {
         res.status(400).json({ error: "tx hash wajib diisi untuk donasi kripto" });
         return;
       }
-      if (!campaign.cryptoAddress) {
-        res.status(400).json({ error: "Campaign ini tidak menerima donasi kripto" });
+      const cryptoAddr = (payment as any).cryptoAddress;
+      if (!cryptoAddr) {
+        res.status(400).json({ error: "Pembayaran kripto belum dikonfigurasi. Hubungi admin." });
         return;
       }
-    } else if (rupiah < (campaign.minAmount || 1000)) {
-      res.status(400).json({
-        error: `Minimal donasi campaign ini Rp ${(campaign.minAmount || 1000).toLocaleString("id-ID")}`,
-      });
-      return;
+    } else {
+      const minAmt = campaign.minAmount ?? (payment as any).minAmount ?? 1000;
+      if (rupiah < minAmt) {
+        res.status(400).json({
+          error: `Minimal donasi campaign ini Rp ${minAmt.toLocaleString("id-ID")}`,
+        });
+        return;
+      }
     }
 
     // Cegah tx hash yang sama dipakai ulang
@@ -381,7 +401,7 @@ router.post("/donations/transactions", async (req, res) => {
             isAnonymous: anonymous,
             amount: rupiah,
             cryptoAmount: crypto,
-            cryptoNetwork: campaign.cryptoNetwork,
+            cryptoNetwork: (payment as any).cryptoNetwork || null,
             txHash: hash,
             method: paymentMethod,
             message: note,
@@ -406,11 +426,14 @@ router.post("/donations/transactions", async (req, res) => {
     // Auto konfirmasi kripto (kalau campaign mengaktifkan & tx-nya valid)
     let autoVerified = false;
     let autoNote: string | undefined;
-    if (paymentMethod === "crypto" && campaign.autoConfirm && hash) {
+    const autoConfirm = (payment as any).autoConfirm === true || (payment as any).autoConfirm === "true";
+    const cryptoNetwork = (payment as any).cryptoNetwork || null;
+    const cryptoAddress = (payment as any).cryptoAddress || null;
+    if (paymentMethod === "crypto" && autoConfirm && hash) {
       const result = await verifyCryptoTransaction(
-        campaign.cryptoNetwork,
+        cryptoNetwork,
         hash,
-        campaign.cryptoAddress,
+        cryptoAddress,
       );
       if (result.confirmed) {
         await db
@@ -707,16 +730,7 @@ router.post("/admin/donations/campaigns", requireAuth, async (req: AuthRequest, 
         content: toNullableString(body.content) ?? "",
         coverImageUrl: toNullableString(body.coverImageUrl),
         targetAmount: parseAmount(body.targetAmount),
-        qrisImageUrl: toNullableString(body.qrisImageUrl),
-        qrisPayload: toNullableString(body.qrisPayload),
-        bankName: toNullableString(body.bankName),
-        bankAccountNumber: toNullableString(body.bankAccountNumber),
-        bankAccountHolder: toNullableString(body.bankAccountHolder),
-        cryptoNetwork: toNullableString(body.cryptoNetwork),
-        cryptoSymbol: toNullableString(body.cryptoSymbol),
-        cryptoAddress: toNullableString(body.cryptoAddress),
-        autoConfirm: body.autoConfirm === true || body.autoConfirm === "true",
-        minAmount: Math.max(0, parseAmount(body.minAmount) || 1000),
+        minAmount: toNullableInt(body.minAmount),
         status,
         startAt: toNullableTimestamp(body.startAt),
         deadline: toNullableTimestamp(body.deadline),
@@ -768,34 +782,9 @@ router.put("/admin/donations/campaigns/:id", requireAuth, async (req: AuthReques
             : existing.coverImageUrl,
         targetAmount:
           body.targetAmount !== undefined ? parseAmount(body.targetAmount) : existing.targetAmount,
-        qrisImageUrl:
-          body.qrisImageUrl !== undefined ? toNullableString(body.qrisImageUrl) : existing.qrisImageUrl,
-        qrisPayload:
-          body.qrisPayload !== undefined ? toNullableString(body.qrisPayload) : existing.qrisPayload,
-        bankName: body.bankName !== undefined ? toNullableString(body.bankName) : existing.bankName,
-        bankAccountNumber:
-          body.bankAccountNumber !== undefined
-            ? toNullableString(body.bankAccountNumber)
-            : existing.bankAccountNumber,
-        bankAccountHolder:
-          body.bankAccountHolder !== undefined
-            ? toNullableString(body.bankAccountHolder)
-            : existing.bankAccountHolder,
-        cryptoNetwork:
-          body.cryptoNetwork !== undefined
-            ? toNullableString(body.cryptoNetwork)
-            : existing.cryptoNetwork,
-        cryptoSymbol:
-          body.cryptoSymbol !== undefined ? toNullableString(body.cryptoSymbol) : existing.cryptoSymbol,
-        cryptoAddress:
-          body.cryptoAddress !== undefined ? toNullableString(body.cryptoAddress) : existing.cryptoAddress,
-        autoConfirm:
-          body.autoConfirm !== undefined
-            ? body.autoConfirm === true || body.autoConfirm === "true"
-            : existing.autoConfirm,
         minAmount:
           body.minAmount !== undefined
-            ? Math.max(0, parseAmount(body.minAmount) || existing.minAmount)
+            ? toNullableInt(body.minAmount)
             : existing.minAmount,
         status,
         startAt: body.startAt !== undefined ? toNullableTimestamp(body.startAt) : existing.startAt,

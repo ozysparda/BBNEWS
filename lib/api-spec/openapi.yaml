@@ -1734,24 +1734,6 @@ components:
           type: ["string", "null"]
         targetAmount:
           type: integer
-        qrisImageUrl:
-          type: ["string", "null"]
-        qrisPayload:
-          type: ["string", "null"]
-        bankName:
-          type: ["string", "null"]
-        bankAccountNumber:
-          type: ["string", "null"]
-        bankAccountHolder:
-          type: ["string", "null"]
-        cryptoNetwork:
-          type: ["string", "null"]
-        cryptoSymbol:
-          type: ["string", "null"]
-        cryptoAddress:
-          type: ["string", "null"]
-        autoConfirm:
-          type: boolean
         minAmount:
           type: integer
         status:
@@ -1987,6 +1969,16 @@ components:
           type: ["string", "null"]
         bankAccountHolder:
           type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        cryptoSymbol:
+          type: ["string", "null"]
+        cryptoAddress:
+          type: ["string", "null"]
+        autoConfirm:
+          type: boolean
+        minAmount:
+          type: integer
         isOpen:
           type: boolean
         popupEnabled:
@@ -2023,6 +2015,16 @@ components:
           type: ["string", "null"]
         bankAccountHolder:
           type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        cryptoSymbol:
+          type: ["string", "null"]
+        cryptoAddress:
+          type: ["string", "null"]
+        autoConfirm:
+          type: boolean
+        minAmount:
+          type: integer
         isOpen:
           type: boolean
         popupEnabled:

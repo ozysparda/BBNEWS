@@ -351,23 +351,6 @@ export interface DonationCampaignInput {
   /** @nullable */
   coverImageUrl?: string | null;
   targetAmount?: number;
-  /** @nullable */
-  qrisImageUrl?: string | null;
-  /** @nullable */
-  qrisPayload?: string | null;
-  /** @nullable */
-  bankName?: string | null;
-  /** @nullable */
-  bankAccountNumber?: string | null;
-  /** @nullable */
-  bankAccountHolder?: string | null;
-  /** @nullable */
-  cryptoNetwork?: string | null;
-  /** @nullable */
-  cryptoSymbol?: string | null;
-  /** @nullable */
-  cryptoAddress?: string | null;
-  autoConfirm?: boolean;
   minAmount?: number;
   status?: DonationCampaignInputStatus;
   /** @nullable */
@@ -533,6 +516,14 @@ export interface DonationSettings {
   bankAccountNumber?: string | null;
   /** @nullable */
   bankAccountHolder?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  cryptoSymbol?: string | null;
+  /** @nullable */
+  cryptoAddress?: string | null;
+  autoConfirm?: boolean;
+  minAmount?: number;
   isOpen: boolean;
   popupEnabled?: boolean;
   /** @nullable */
@@ -568,6 +559,14 @@ export interface DonationSettingsInput {
   bankAccountNumber?: string | null;
   /** @nullable */
   bankAccountHolder?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  cryptoSymbol?: string | null;
+  /** @nullable */
+  cryptoAddress?: string | null;
+  autoConfirm?: boolean;
+  minAmount?: number;
   isOpen?: boolean;
   popupEnabled?: boolean;
   /** @nullable */

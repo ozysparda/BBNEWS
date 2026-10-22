@@ -57,6 +57,11 @@ export default function AdminDonationSettingsPage() {
   const [bankName, setBankName] = useState("");
   const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [bankAccountHolder, setBankAccountHolder] = useState("");
+  const [cryptoNetwork, setCryptoNetwork] = useState("");
+  const [cryptoSymbol, setCryptoSymbol] = useState("");
+  const [cryptoAddress, setCryptoAddress] = useState("");
+  const [autoConfirm, setAutoConfirm] = useState(false);
+  const [minAmount, setMinAmount] = useState("1000");
   const [isOpen, setIsOpen] = useState(true);
 
   // Popup settings
@@ -77,6 +82,11 @@ export default function AdminDonationSettingsPage() {
     setBankName(settings.bankName ?? "");
     setBankAccountNumber(settings.bankAccountNumber ?? "");
     setBankAccountHolder(settings.bankAccountHolder ?? "");
+    setCryptoNetwork(settings.cryptoNetwork ?? "");
+    setCryptoSymbol(settings.cryptoSymbol ?? "");
+    setCryptoAddress(settings.cryptoAddress ?? "");
+    setAutoConfirm(settings.autoConfirm ?? false);
+    setMinAmount(String(settings.minAmount ?? 1000));
     setIsOpen(settings.isOpen ?? true);
     setPopupEnabled(settings.popupEnabled ?? false);
     setPopupCampaignId(settings.popupCampaignId ? String(settings.popupCampaignId) : "");
@@ -116,6 +126,11 @@ export default function AdminDonationSettingsPage() {
           bankName: bankName.trim() || null,
           bankAccountNumber: bankAccountNumber.trim() || null,
           bankAccountHolder: bankAccountHolder.trim() || null,
+          cryptoNetwork: cryptoNetwork.trim() || null,
+          cryptoSymbol: cryptoSymbol.trim() || null,
+          cryptoAddress: cryptoAddress.trim() || null,
+          autoConfirm,
+          minAmount: Number(minAmount) || 1000,
           isOpen,
           popupEnabled,
           popupCampaignId: popupCampaignId ? Number(popupCampaignId) : null,
@@ -140,7 +155,7 @@ export default function AdminDonationSettingsPage() {
           <div>
             <h1 className="text-2xl font-bold">Pengaturan Donasi</h1>
             <p className="text-sm text-muted-foreground">
-              Teks utama halaman donasi, QRIS/rekening cadangan, dan pengaturan popup.
+              Teks utama halaman donasi, QRIS/rekening cadangan, payment kripto, dan pengaturan popup.
             </p>
           </div>
         </div>
@@ -182,6 +197,147 @@ export default function AdminDonationSettingsPage() {
                     </p>
                   </div>
                   <Switch checked={isOpen} onCheckedChange={setIsOpen} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="space-y-4 p-5">
+                <h2 className="font-semibold">Pembayaran QRIS & Bank (Global)</h2>
+                <p className="text-sm text-muted-foreground">
+                  Konfigurasi QRIS dan rekening bank untuk semua campaign.
+                </p>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="qrisPayload">Payload QRIS</Label>
+                    <Textarea
+                      id="qrisPayload"
+                      value={qrisPayload}
+                      onChange={(e) => setQrisPayload(e.target.value)}
+                      rows={3}
+                      className="font-mono text-xs"
+                      placeholder="String QRIS/EMV"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Gambar QRIS</Label>
+                    <input
+                      ref={qrisInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleUpload}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={uploading}
+                      onClick={() => qrisInputRef.current?.click()}
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Mengunggah...
+                        </>
+                      ) : (
+                        <>
+                          <ImageIcon className="mr-2 h-4 w-4" /> Unggah QRIS
+                        </>
+                      )}
+                    </Button>
+                    {qrisImageUrl && (
+                      <img
+                        src={qrisImageUrl}
+                        alt="QRIS"
+                        className="mt-2 h-40 w-40 rounded-lg border border-border bg-white object-contain p-2"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="bankName">Nama Bank</Label>
+                    <Input id="bankName" value={bankName} onChange={(e) => setBankName(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="bankAccountNumber">No. Rekening</Label>
+                    <Input
+                      id="bankAccountNumber"
+                      value={bankAccountNumber}
+                      onChange={(e) => setBankAccountNumber(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="bankAccountHolder">Atas Nama</Label>
+                    <Input
+                      id="bankAccountHolder"
+                      value={bankAccountHolder}
+                      onChange={(e) => setBankAccountHolder(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="space-y-4 p-5">
+                <h2 className="font-semibold">Pembayaran Kripto (Global)</h2>
+                <p className="text-sm text-muted-foreground">
+                  Konfigurasi wallet kripto untuk semua campaign. Donasi kripto diverifikasi otomatis via tx hash.
+                </p>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cryptoNetwork">Jaringan</Label>
+                    <Input
+                      id="cryptoNetwork"
+                      value={cryptoNetwork}
+                      onChange={(e) => setCryptoNetwork(e.target.value)}
+                      placeholder="TRC-20 (TRON)"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cryptoSymbol">Simbol</Label>
+                    <Input
+                      id="cryptoSymbol"
+                      value={cryptoSymbol}
+                      onChange={(e) => setCryptoSymbol(e.target.value)}
+                      placeholder="USDT"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cryptoAddress">Alamat Wallet</Label>
+                    <Input
+                      id="cryptoAddress"
+                      value={cryptoAddress}
+                      onChange={(e) => setCryptoAddress(e.target.value)}
+                      placeholder="T..."
+                      className="font-mono text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="minAmount">Minimal Donasi (Rp)</Label>
+                    <Input
+                      id="minAmount"
+                      type="number"
+                      value={minAmount}
+                      onChange={(e) => setMinAmount(e.target.value)}
+                      placeholder="1000"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-border p-3">
+                    <div>
+                      <p className="text-sm font-medium">Auto konfirmasi kripto</p>
+                      <p className="text-xs text-muted-foreground">
+                        Server mengecek tx hash ke explorer publik.
+                      </p>
+                    </div>
+                    <Switch checked={autoConfirm} onCheckedChange={setAutoConfirm} />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -261,82 +417,6 @@ export default function AdminDonationSettingsPage() {
                       </p>
                     </div>
                     <Switch checked={popupDismissable} onCheckedChange={setPopupDismissable} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="space-y-4 p-5">
-                <h2 className="font-semibold">QRIS & Rekening Cadangan</h2>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="qrisPayload">Payload QRIS</Label>
-                    <Textarea
-                      id="qrisPayload"
-                      value={qrisPayload}
-                      onChange={(e) => setQrisPayload(e.target.value)}
-                      rows={3}
-                      className="font-mono text-xs"
-                      placeholder="String QRIS/EMV"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Gambar QRIS</Label>
-                    <input
-                      ref={qrisInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleUpload}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={uploading}
-                      onClick={() => qrisInputRef.current?.click()}
-                    >
-                      {uploading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Mengunggah...
-                        </>
-                      ) : (
-                        <>
-                          <ImageIcon className="mr-2 h-4 w-4" /> Unggah QRIS
-                        </>
-                      )}
-                    </Button>
-                    {qrisImageUrl && (
-                      <img
-                        src={qrisImageUrl}
-                        alt="QRIS"
-                        className="mt-2 h-40 w-40 rounded-lg border border-border bg-white object-contain p-2"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="bankName">Nama Bank</Label>
-                    <Input id="bankName" value={bankName} onChange={(e) => setBankName(e.target.value)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="bankAccountNumber">No. Rekening</Label>
-                    <Input
-                      id="bankAccountNumber"
-                      value={bankAccountNumber}
-                      onChange={(e) => setBankAccountNumber(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="bankAccountHolder">Atas Nama</Label>
-                    <Input
-                      id="bankAccountHolder"
-                      value={bankAccountHolder}
-                      onChange={(e) => setBankAccountHolder(e.target.value)}
-                    />
                   </div>
                 </div>
               </CardContent>

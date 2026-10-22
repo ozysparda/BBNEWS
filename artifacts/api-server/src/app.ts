@@ -68,4 +68,12 @@ app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 app.use("/api", router);
 
+// Serve sitemap.xml and feed.xml at root (for SEO)
+app.get("/sitemap.xml", (_req, res) => {
+  res.redirect(301, "/api/sitemap.xml");
+});
+app.get("/feed.xml", (_req, res) => {
+  res.redirect(301, "/api/feed.xml");
+});
+
 export default app;

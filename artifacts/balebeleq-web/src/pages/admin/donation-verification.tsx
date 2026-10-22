@@ -57,7 +57,6 @@ export default function AdminDonationVerificationPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [otpHint, setOtpHint] = useState("");
   const [windowMinutes, setWindowMinutes] = useState("60");
   const [lastResult, setLastResult] = useState<string | null>(null);
 
@@ -72,8 +71,7 @@ export default function AdminDonationVerificationPage() {
     }
   }, [status]);
 
-  async function handleRequestOtp(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleRequestOtp() {
     const phone = phoneNumber.trim();
     if (!phone) {
       toast.error("Nomor HP akun GoPay Merchant wajib diisi");
@@ -89,8 +87,7 @@ export default function AdminDonationVerificationPage() {
     }
   }
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleLogin() {
     const code = otp.trim();
     if (!code) {
       toast.error("Kode OTP wajib diisi");
@@ -223,69 +220,71 @@ export default function AdminDonationVerificationPage() {
               </div>
 
               {!connected && (
-                <form onSubmit={otpSent ? handleLogin : handleRequestOtp} className="space-y-3 rounded-lg border border-border p-4">
+                <form className="space-y-3 rounded-lg border border-border p-4">
                   <h3 className="text-sm font-semibold">Hubungkan Akun GoPay Merchant</h3>
                   <p className="text-xs text-muted-foreground">
                     Kode OTP dikirim ke HP akun merchant itu sendiri (tidak pernah lewat
                     server kami). Sesi disimpan terenkripsi di database.
                   </p>
 
-                  {!otpSent ? (
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-                      <div className="flex-1 space-y-1.5">
-                        <Label htmlFor="phoneNumber">Nomor HP GoPay Merchant</Label>
-                        <Input
-                          id="phoneNumber"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          placeholder="081234567890"
-                          inputMode="tel"
-                        />
-                      </div>
-                      <Button type="submit" disabled={requestOtp.isPending}>
-                        {requestOtp.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <LogIn className="mr-2 h-4 w-4" />
-                        )}
-                        Kirim OTP
-                      </Button>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="phoneNumber">Nomor HP GoPay Merchant</Label>
+                      <Input
+                        id="phoneNumber"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="081234567890"
+                        inputMode="tel"
+                        disabled={requestOtp.isPending || login.isPending}
+                      />
                     </div>
-                  ) : (
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-                      <div className="flex-1 space-y-1.5">
-                        <Label htmlFor="otp">Kode OTP (SMS)</Label>
-                        <Input
-                          id="otp"
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
-                          placeholder="1234"
-                          inputMode="numeric"
-                          maxLength={8}
-                        />
-                      </div>
-                      <Button type="submit" disabled={login.isPending}>
-                        {login.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <ShieldCheck className="mr-2 h-4 w-4" />
-                        )}
-                        Verifikasi & Simpan Sesi
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                          setOtpSent(false);
-                          setOtp("");
-                        }}
-                      >
-                        Ganti nomor
-                      </Button>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="otp">Kode OTP (SMS)</Label>
+                      <Input
+                        id="otp"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        placeholder="1234"
+                        inputMode="numeric"
+                        maxLength={8}
+                        disabled={!otpSent || login.isPending}
+                      />
                     </div>
-                  )}
+                  </div>
 
-                  {otpHint && <p className="text-xs text-muted-foreground">{otpHint}</p>}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      onClick={handleRequestOtp}
+                      disabled={requestOtp.isPending || !phoneNumber.trim()}
+                    >
+                      {requestOtp.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <LogIn className="mr-2 h-4 w-4" />
+                      )}
+                      Kirim OTP
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleLogin}
+                      disabled={login.isPending || !otp.trim() || !otpSent}
+                    >
+                      {login.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                      )}
+                      Verifikasi & Simpan Sesi
+                    </Button>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    {otpSent
+                      ? "Kode OTP sudah dikirim. Masukkan kode dari SMS lalu klik Verifikasi."
+                      : "Isi nomor HP lalu klik Kirim OTP."}
+                  </p>
                 </form>
               )}
             </CardContent>

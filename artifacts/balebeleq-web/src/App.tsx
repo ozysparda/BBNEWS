@@ -35,6 +35,7 @@ import AdminDonationCampaignList from "@/pages/admin/donation-campaign-list";
 import AdminDonationCampaignForm from "@/pages/admin/donation-campaign-form";
 import AdminDonationTransactionList from "@/pages/admin/donation-transaction-list";
 import AdminDonationSettingsPage from "@/pages/admin/donation-settings";
+import AdminDonationVerificationPage from "@/pages/admin/donation-verification";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ function Router() {
       <Route path="/admin/donasi/baru" component={AdminDonationCampaignForm} />
       <Route path="/admin/donasi/transaksi" component={AdminDonationTransactionList} />
       <Route path="/admin/donasi/pengaturan" component={AdminDonationSettingsPage} />
+      <Route path="/admin/donasi/verifikasi" component={AdminDonationVerificationPage} />
       <Route path="/admin/donasi/:id/edit" component={AdminDonationCampaignForm} />
       
       <Route component={NotFound} />

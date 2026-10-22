@@ -47,16 +47,28 @@ import type {
   DonationTransactionListResponse,
   DonationTransactionStatus,
   DonationTransactionUpdate,
+  DonationVerificationLoginRequest,
+  DonationVerificationLoginResponse,
+  DonationVerificationOtpRequest,
+  DonationVerificationOtpResponse,
+  DonationVerificationRun,
+  DonationVerificationRunResult,
+  DonationVerificationSettings,
+  DonationVerificationSettingsInput,
+  DonationVerificationStatus,
   HealthStatus,
   ListAdminDonationCampaignsParams,
   ListAdminDonationTransactionsParams,
   ListAllArticlesParams,
   ListArticlesParams,
+  ListDonationVerificationRunsParams,
   LoginCredentials,
   LoginResponse,
+  LogoutDonationVerification200,
   PublicComplaint,
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
+  RunDonationVerificationBody,
   TrackComplaintParams,
   TrackDonationTransactionParams,
   TrackedComplaint,
@@ -3685,5 +3697,592 @@ export const useUpdateDonationSettings = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getUpdateDonationSettingsMutationOptions(options));
+    }
+
+export const getGetDonationVerificationStatusUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/status`
+}
+
+/**
+ * @summary Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+ */
+export const getDonationVerificationStatus = async ( options?: RequestInit): Promise<DonationVerificationStatus> => {
+
+  return customFetch<DonationVerificationStatus>(getGetDonationVerificationStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDonationVerificationStatusQueryKey = () => {
+    return [
+    `/api/admin/donations/verify/status`
+    ] as const;
+    }
+
+
+export const getGetDonationVerificationStatusQueryOptions = <TData = Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDonationVerificationStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDonationVerificationStatus>>> = ({ signal }) => getDonationVerificationStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDonationVerificationStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getDonationVerificationStatus>>>
+export type GetDonationVerificationStatusQueryError = ErrorType<void>
+
+
+/**
+ * @summary Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+ */
+
+export function useGetDonationVerificationStatus<TData = Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDonationVerificationStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRequestDonationVerificationOtpUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/otp`
+}
+
+/**
+ * @summary Minta kode OTP GoPay Merchant ke nomor HP merchant
+ */
+export const requestDonationVerificationOtp = async (donationVerificationOtpRequest: DonationVerificationOtpRequest, options?: RequestInit): Promise<DonationVerificationOtpResponse> => {
+
+  return customFetch<DonationVerificationOtpResponse>(getRequestDonationVerificationOtpUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationVerificationOtpRequest,)
+  }
+);}
+
+
+
+
+export const getRequestDonationVerificationOtpMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, TError,{data: BodyType<DonationVerificationOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, TError,{data: BodyType<DonationVerificationOtpRequest>}, TContext> => {
+
+const mutationKey = ['requestDonationVerificationOtp'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, {data: BodyType<DonationVerificationOtpRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestDonationVerificationOtp(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestDonationVerificationOtpMutationResult = NonNullable<Awaited<ReturnType<typeof requestDonationVerificationOtp>>>
+    export type RequestDonationVerificationOtpMutationBody = BodyType<DonationVerificationOtpRequest>
+    export type RequestDonationVerificationOtpMutationError = ErrorType<void>
+
+    /**
+ * @summary Minta kode OTP GoPay Merchant ke nomor HP merchant
+ */
+export const useRequestDonationVerificationOtp = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, TError,{data: BodyType<DonationVerificationOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestDonationVerificationOtp>>,
+        TError,
+        {data: BodyType<DonationVerificationOtpRequest>},
+        TContext
+      > => {
+      return useMutation(getRequestDonationVerificationOtpMutationOptions(options));
+    }
+
+export const getLoginDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/login`
+}
+
+/**
+ * @summary Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+ */
+export const loginDonationVerification = async (donationVerificationLoginRequest: DonationVerificationLoginRequest, options?: RequestInit): Promise<DonationVerificationLoginResponse> => {
+
+  return customFetch<DonationVerificationLoginResponse>(getLoginDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationVerificationLoginRequest,)
+  }
+);}
+
+
+
+
+export const getLoginDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginDonationVerification>>, TError,{data: BodyType<DonationVerificationLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginDonationVerification>>, TError,{data: BodyType<DonationVerificationLoginRequest>}, TContext> => {
+
+const mutationKey = ['loginDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginDonationVerification>>, {data: BodyType<DonationVerificationLoginRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  loginDonationVerification(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof loginDonationVerification>>>
+    export type LoginDonationVerificationMutationBody = BodyType<DonationVerificationLoginRequest>
+    export type LoginDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+ */
+export const useLoginDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginDonationVerification>>, TError,{data: BodyType<DonationVerificationLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof loginDonationVerification>>,
+        TError,
+        {data: BodyType<DonationVerificationLoginRequest>},
+        TContext
+      > => {
+      return useMutation(getLoginDonationVerificationMutationOptions(options));
+    }
+
+export const getLogoutDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/logout`
+}
+
+/**
+ * @summary Putuskan sesi GoPay Merchant
+ */
+export const logoutDonationVerification = async ( options?: RequestInit): Promise<LogoutDonationVerification200> => {
+
+  return customFetch<LogoutDonationVerification200>(getLogoutDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getLogoutDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof logoutDonationVerification>>, TError,void, TContext> => {
+
+const mutationKey = ['logoutDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutDonationVerification>>, void> = () => {
+
+
+          return  logoutDonationVerification(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogoutDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof logoutDonationVerification>>>
+
+    export type LogoutDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Putuskan sesi GoPay Merchant
+ */
+export const useLogoutDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof logoutDonationVerification>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getLogoutDonationVerificationMutationOptions(options));
+    }
+
+export const getRunDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/run`
+}
+
+/**
+ * @summary Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang
+ */
+export const runDonationVerification = async (runDonationVerificationBody?: RunDonationVerificationBody, options?: RequestInit): Promise<DonationVerificationRunResult> => {
+
+  return customFetch<DonationVerificationRunResult>(getRunDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      runDonationVerificationBody,)
+  }
+);}
+
+
+
+
+export const getRunDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runDonationVerification>>, TError,{data?: BodyType<RunDonationVerificationBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runDonationVerification>>, TError,{data?: BodyType<RunDonationVerificationBody>}, TContext> => {
+
+const mutationKey = ['runDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runDonationVerification>>, {data?: BodyType<RunDonationVerificationBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  runDonationVerification(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof runDonationVerification>>>
+    export type RunDonationVerificationMutationBody = BodyType<RunDonationVerificationBody> | undefined
+    export type RunDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang
+ */
+export const useRunDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runDonationVerification>>, TError,{data?: BodyType<RunDonationVerificationBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof runDonationVerification>>,
+        TError,
+        {data?: BodyType<RunDonationVerificationBody>},
+        TContext
+      > => {
+      return useMutation(getRunDonationVerificationMutationOptions(options));
+    }
+
+export const getListDonationVerificationRunsUrl = (params?: ListDonationVerificationRunsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/donations/verify/runs?${stringifiedParams}` : `/api/admin/donations/verify/runs`
+}
+
+/**
+ * @summary Riwayat pemeriksaan mutasi (manual & otomatis)
+ */
+export const listDonationVerificationRuns = async (params?: ListDonationVerificationRunsParams, options?: RequestInit): Promise<DonationVerificationRun[]> => {
+
+  return customFetch<DonationVerificationRun[]>(getListDonationVerificationRunsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListDonationVerificationRunsQueryKey = (params?: ListDonationVerificationRunsParams,) => {
+    return [
+    `/api/admin/donations/verify/runs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListDonationVerificationRunsQueryOptions = <TData = Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError = ErrorType<void>>(params?: ListDonationVerificationRunsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDonationVerificationRunsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDonationVerificationRuns>>> = ({ signal }) => listDonationVerificationRuns(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListDonationVerificationRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listDonationVerificationRuns>>>
+export type ListDonationVerificationRunsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Riwayat pemeriksaan mutasi (manual & otomatis)
+ */
+
+export function useListDonationVerificationRuns<TData = Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError = ErrorType<void>>(
+ params?: ListDonationVerificationRunsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListDonationVerificationRunsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateDonationVerificationSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/settings`
+}
+
+/**
+ * @summary Setelan auto-verifikasi (nyala/mati + rentang feed)
+ */
+export const updateDonationVerificationSettings = async (donationVerificationSettingsInput: DonationVerificationSettingsInput, options?: RequestInit): Promise<DonationVerificationSettings> => {
+
+  return customFetch<DonationVerificationSettings>(getUpdateDonationVerificationSettingsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationVerificationSettingsInput,)
+  }
+);}
+
+
+
+
+export const getUpdateDonationVerificationSettingsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, TError,{data: BodyType<DonationVerificationSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, TError,{data: BodyType<DonationVerificationSettingsInput>}, TContext> => {
+
+const mutationKey = ['updateDonationVerificationSettings'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, {data: BodyType<DonationVerificationSettingsInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateDonationVerificationSettings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateDonationVerificationSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updateDonationVerificationSettings>>>
+    export type UpdateDonationVerificationSettingsMutationBody = BodyType<DonationVerificationSettingsInput>
+    export type UpdateDonationVerificationSettingsMutationError = ErrorType<void>
+
+    /**
+ * @summary Setelan auto-verifikasi (nyala/mati + rentang feed)
+ */
+export const useUpdateDonationVerificationSettings = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, TError,{data: BodyType<DonationVerificationSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateDonationVerificationSettings>>,
+        TError,
+        {data: BodyType<DonationVerificationSettingsInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateDonationVerificationSettingsMutationOptions(options));
+    }
+
+export const getRunInternalDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/internal/donations/verify/run`
+}
+
+/**
+ * Dipanggil oleh pemicu eksternal (GitHub Actions cron atau worker di host gratis). Memerlukan header `x-cron-secret` yang sama dengan env `CRON_SECRET` di server. Kalau auto-verifikasi dimatikan, endpoint ini hanya melaporkan "skipped".
+
+ * @summary Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+ */
+export const runInternalDonationVerification = async ( options?: RequestInit): Promise<DonationVerificationRunResult> => {
+
+  return customFetch<DonationVerificationRunResult>(getRunInternalDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRunInternalDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runInternalDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runInternalDonationVerification>>, TError,void, TContext> => {
+
+const mutationKey = ['runInternalDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runInternalDonationVerification>>, void> = () => {
+
+
+          return  runInternalDonationVerification(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunInternalDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof runInternalDonationVerification>>>
+
+    export type RunInternalDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+ */
+export const useRunInternalDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runInternalDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof runInternalDonationVerification>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRunInternalDonationVerificationMutationOptions(options));
     }
 

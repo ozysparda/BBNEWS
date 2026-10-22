@@ -8,6 +8,7 @@ import storageRouter from "./storage";
 import usersRouter from "./users";
 import profileRouter from "./profile";
 import donationsRouter from "./donations";
+import donationVerificationRouter from "./donation-verification";
 import sitemapRouter from "./sitemap";
 import feedRouter from "./feed";
 
@@ -22,6 +23,7 @@ router.use(storageRouter);
 router.use(usersRouter);
 router.use(profileRouter);
 router.use(donationsRouter);
+router.use(donationVerificationRouter);
 router.use(sitemapRouter);
 router.use(feedRouter);
 

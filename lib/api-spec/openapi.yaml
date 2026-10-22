@@ -1094,6 +1094,200 @@ paths:
         "401":
           description: Unauthorized
 
+  /admin/donations/verify/status:
+    get:
+      operationId: getDonationVerificationStatus
+      tags: [donations]
+      summary: Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Verification status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationStatus"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/otp:
+    post:
+      operationId: requestDonationVerificationOtp
+      tags: [donations]
+      summary: Minta kode OTP GoPay Merchant ke nomor HP merchant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationVerificationOtpRequest"
+      responses:
+        "200":
+          description: OTP terkirim
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationOtpResponse"
+        "400":
+          description: Permintaan ditolak
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/login:
+    post:
+      operationId: loginDonationVerification
+      tags: [donations]
+      summary: Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationVerificationLoginRequest"
+      responses:
+        "200":
+          description: Berhasil terhubung
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationLoginResponse"
+        "400":
+          description: OTP salah / kadaluarsa
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/logout:
+    post:
+      operationId: logoutDonationVerification
+      tags: [donations]
+      summary: Putuskan sesi GoPay Merchant
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Sesi diputus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/run:
+    post:
+      operationId: runDonationVerification
+      tags: [donations]
+      summary: "Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                windowMinutes:
+                  type: integer
+                  description: Seberapa jauh ke belakang feed mutasi dipindai (menit)
+      responses:
+        "200":
+          description: Hasil verifikasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationRunResult"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Gagal menjalankan verifikasi
+
+  /admin/donations/verify/runs:
+    get:
+      operationId: listDonationVerificationRuns
+      tags: [donations]
+      summary: Riwayat pemeriksaan mutasi (manual & otomatis)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Riwayat pemeriksaan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DonationVerificationRun"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/settings:
+    put:
+      operationId: updateDonationVerificationSettings
+      tags: [donations]
+      summary: Setelan auto-verifikasi (nyala/mati + rentang feed)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationVerificationSettingsInput"
+      responses:
+        "200":
+          description: Setelan tersimpan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationSettings"
+        "401":
+          description: Unauthorized
+
+  /internal/donations/verify/run:
+    post:
+      operationId: runInternalDonationVerification
+      tags: [donations]
+      summary: Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+      description: >
+        Dipanggil oleh pemicu eksternal (GitHub Actions cron atau worker di
+        host gratis). Memerlukan header `x-cron-secret` yang sama dengan env
+        `CRON_SECRET` di server. Kalau auto-verifikasi dimatikan, endpoint
+        ini hanya melaporkan "skipped".
+      parameters:
+        - name: x-cron-secret
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Hasil verifikasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationRunResult"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Verifikasi otomatis tidak diaktifkan
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2086,3 +2280,191 @@ components:
           type: boolean
       required:
         - heroTitle
+
+    DonationVerificationStatus:
+      type: object
+      description: Status integrasi auto-verifikasi donasi QRIS (GoPay Merchant).
+      properties:
+        connected:
+          type: boolean
+          description: Sesi GoPay Merchant tersimpan & bisa dipakai.
+        phoneNumber:
+          type: ["string", "null"]
+        merchantId:
+          type: ["string", "null"]
+        sessionUpdatedAt:
+          type: ["string", "null"]
+        lastCheckedAt:
+          type: ["string", "null"]
+        autoVerifyEnabled:
+          type: boolean
+          description: Auto-verifikasi dinyalakan (pemicu eksternal aktif).
+        autoVerifyWindowMinutes:
+          type: integer
+        pendingCount:
+          type: integer
+          description: Jumlah transaksi donasi yang masih menunggu verifikasi.
+      required:
+        - connected
+        - autoVerifyEnabled
+        - pendingCount
+
+    DonationVerificationOtpRequest:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: Nomor HP akun GoPay Merchant (format 62xxx / 0xxx).
+      required:
+        - phoneNumber
+
+    DonationVerificationOtpResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
+        otpLength:
+          type: integer
+        expiresAt:
+          type: string
+
+    DonationVerificationLoginRequest:
+      type: object
+      properties:
+        otp:
+          type: string
+          description: Kode OTP yang dikirim ke HP merchant.
+      required:
+        - otp
+
+    DonationVerificationLoginResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
+        merchantId:
+          type: ["string", "null"]
+        merchantName:
+          type: ["string", "null"]
+
+    DonationVerificationMatch:
+      type: object
+      description: Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.
+      properties:
+        transactionId:
+          type: integer
+        referenceNumber:
+          type: string
+        amount:
+          type: integer
+          description: Nominal bersih donasi.
+        grossAmount:
+          type: integer
+          description: Nominal yang dibayar donatur (amount + fee MDR).
+        orderId:
+          type: ["string", "null"]
+          description: Order id QRIS di sisi GoPay (bukti untuk admin).
+        paidAt:
+          type: string
+
+    DonationVerificationAmbiguous:
+      type: object
+      description: Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.
+      properties:
+        transactionId:
+          type: integer
+        referenceNumber:
+          type: string
+        grossAmount:
+          type: integer
+        candidateCount:
+          type: integer
+
+    DonationVerificationRunResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["ok", "skipped", "error"]
+        message:
+          type: string
+        feedCount:
+          type: integer
+          description: Jumlah baris mutasi QRIS yang terbaca.
+        matchedCount:
+          type: integer
+          description: Jumlah transaksi donasi yang terverifikasi otomatis.
+        pendingBefore:
+          type: integer
+        pendingAfter:
+          type: integer
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationVerificationMatch"
+        ambiguous:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationVerificationAmbiguous"
+      required:
+        - status
+        - matchedCount
+
+    DonationVerificationRun:
+      type: object
+      description: Riwayat satu kali pemeriksaan mutasi.
+      properties:
+        id:
+          type: integer
+        source:
+          type: string
+          enum: ["manual", "auto"]
+        status:
+          type: string
+          enum: ["ok", "skipped", "error"]
+        message:
+          type: ["string", "null"]
+        feedCount:
+          type: integer
+        matchedCount:
+          type: integer
+        pendingBefore:
+          type: integer
+        pendingAfter:
+          type: integer
+        details:
+          type: ["object", "null"]
+        startedAt:
+          type: ["string", "null"]
+        finishedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - source
+        - status
+
+    DonationVerificationSettingsInput:
+      type: object
+      properties:
+        autoVerifyEnabled:
+          type: boolean
+        autoVerifyWindowMinutes:
+          type: integer
+          description: Seberapa jauh ke belakang feed mutasi dipindai (menit).
+
+    DonationVerificationSettings:
+      type: object
+      properties:
+        autoVerifyEnabled:
+          type: boolean
+        autoVerifyWindowMinutes:
+          type: integer
+      required:
+        - autoVerifyEnabled
+        - autoVerifyWindowMinutes

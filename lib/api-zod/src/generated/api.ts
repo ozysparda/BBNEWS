@@ -1256,3 +1256,163 @@ export const UpdateDonationSettingsResponse = zod.object({
 })
 
 
+/**
+ * @summary Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+ */
+export const GetDonationVerificationStatusResponse = zod.object({
+  "connected": zod.boolean().describe('Sesi GoPay Merchant tersimpan & bisa dipakai.'),
+  "phoneNumber": zod.string().nullish(),
+  "merchantId": zod.string().nullish(),
+  "sessionUpdatedAt": zod.string().nullish(),
+  "lastCheckedAt": zod.string().nullish(),
+  "autoVerifyEnabled": zod.boolean().describe('Auto-verifikasi dinyalakan (pemicu eksternal aktif).'),
+  "autoVerifyWindowMinutes": zod.number().optional(),
+  "pendingCount": zod.number().describe('Jumlah transaksi donasi yang masih menunggu verifikasi.')
+}).describe('Status integrasi auto-verifikasi donasi QRIS (GoPay Merchant).')
+
+
+/**
+ * @summary Minta kode OTP GoPay Merchant ke nomor HP merchant
+ */
+export const RequestDonationVerificationOtpBody = zod.object({
+  "phoneNumber": zod.string().describe('Nomor HP akun GoPay Merchant (format 62xxx \/ 0xxx).')
+})
+
+export const RequestDonationVerificationOtpResponse = zod.object({
+  "ok": zod.boolean().optional(),
+  "message": zod.string().optional(),
+  "otpLength": zod.number().optional(),
+  "expiresAt": zod.string().optional()
+})
+
+
+/**
+ * @summary Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+ */
+export const LoginDonationVerificationBody = zod.object({
+  "otp": zod.string().describe('Kode OTP yang dikirim ke HP merchant.')
+})
+
+export const LoginDonationVerificationResponse = zod.object({
+  "ok": zod.boolean().optional(),
+  "message": zod.string().optional(),
+  "merchantId": zod.string().nullish(),
+  "merchantName": zod.string().nullish()
+})
+
+
+/**
+ * @summary Putuskan sesi GoPay Merchant
+ */
+export const LogoutDonationVerificationResponse = zod.object({
+  "ok": zod.boolean().optional(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang
+ */
+export const RunDonationVerificationBody = zod.object({
+  "windowMinutes": zod.number().optional().describe('Seberapa jauh ke belakang feed mutasi dipindai (menit)')
+})
+
+export const RunDonationVerificationResponse = zod.object({
+  "status": zod.enum(['ok', 'skipped', 'error']),
+  "message": zod.string().optional(),
+  "feedCount": zod.number().optional().describe('Jumlah baris mutasi QRIS yang terbaca.'),
+  "matchedCount": zod.number().describe('Jumlah transaksi donasi yang terverifikasi otomatis.'),
+  "pendingBefore": zod.number().optional(),
+  "pendingAfter": zod.number().optional(),
+  "matches": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "amount": zod.number().optional().describe('Nominal bersih donasi.'),
+  "grossAmount": zod.number().optional().describe('Nominal yang dibayar donatur (amount + fee MDR).'),
+  "orderId": zod.string().nullish().describe('Order id QRIS di sisi GoPay (bukti untuk admin).'),
+  "paidAt": zod.string().optional()
+}).describe('Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.')).optional(),
+  "ambiguous": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "grossAmount": zod.number().optional(),
+  "candidateCount": zod.number().optional()
+}).describe('Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.')).optional()
+})
+
+
+/**
+ * @summary Riwayat pemeriksaan mutasi (manual & otomatis)
+ */
+export const listDonationVerificationRunsQueryLimitDefault = 20;
+
+export const ListDonationVerificationRunsQueryParams = zod.object({
+  "limit": zod.coerce.number().default(listDonationVerificationRunsQueryLimitDefault)
+})
+
+export const ListDonationVerificationRunsResponseItem = zod.object({
+  "id": zod.number(),
+  "source": zod.enum(['manual', 'auto']),
+  "status": zod.enum(['ok', 'skipped', 'error']),
+  "message": zod.string().nullish(),
+  "feedCount": zod.number().optional(),
+  "matchedCount": zod.number().optional(),
+  "pendingBefore": zod.number().optional(),
+  "pendingAfter": zod.number().optional(),
+  "details": zod.object({
+
+}).passthrough().nullish(),
+  "startedAt": zod.string().nullish(),
+  "finishedAt": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+}).describe('Riwayat satu kali pemeriksaan mutasi.')
+export const ListDonationVerificationRunsResponse = zod.array(ListDonationVerificationRunsResponseItem)
+
+
+/**
+ * @summary Setelan auto-verifikasi (nyala/mati + rentang feed)
+ */
+export const UpdateDonationVerificationSettingsBody = zod.object({
+  "autoVerifyEnabled": zod.boolean().optional(),
+  "autoVerifyWindowMinutes": zod.number().optional().describe('Seberapa jauh ke belakang feed mutasi dipindai (menit).')
+})
+
+export const UpdateDonationVerificationSettingsResponse = zod.object({
+  "autoVerifyEnabled": zod.boolean(),
+  "autoVerifyWindowMinutes": zod.number()
+})
+
+
+/**
+ * Dipanggil oleh pemicu eksternal (GitHub Actions cron atau worker di host gratis). Memerlukan header `x-cron-secret` yang sama dengan env `CRON_SECRET` di server. Kalau auto-verifikasi dimatikan, endpoint ini hanya melaporkan "skipped".
+
+ * @summary Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+ */
+export const RunInternalDonationVerificationHeader = zod.object({
+  "x-cron-secret": zod.string()
+})
+
+export const RunInternalDonationVerificationResponse = zod.object({
+  "status": zod.enum(['ok', 'skipped', 'error']),
+  "message": zod.string().optional(),
+  "feedCount": zod.number().optional().describe('Jumlah baris mutasi QRIS yang terbaca.'),
+  "matchedCount": zod.number().describe('Jumlah transaksi donasi yang terverifikasi otomatis.'),
+  "pendingBefore": zod.number().optional(),
+  "pendingAfter": zod.number().optional(),
+  "matches": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "amount": zod.number().optional().describe('Nominal bersih donasi.'),
+  "grossAmount": zod.number().optional().describe('Nominal yang dibayar donatur (amount + fee MDR).'),
+  "orderId": zod.string().nullish().describe('Order id QRIS di sisi GoPay (bukti untuk admin).'),
+  "paidAt": zod.string().optional()
+}).describe('Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.')).optional(),
+  "ambiguous": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "grossAmount": zod.number().optional(),
+  "candidateCount": zod.number().optional()
+}).describe('Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.')).optional()
+})
+
+

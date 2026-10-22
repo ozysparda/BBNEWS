@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp, index, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -133,6 +133,65 @@ export const donationSettingsTable = pgTable("donation_settings", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+/**
+ * Akun GoPay Merchant (GoBiz) yang dipakai untuk membaca mutasi QRIS.
+ *
+ * Satu baris saja (id = 1) - barcode konfigurasi integrasi auto-verifikasi.
+ * Token sesi & token OTP disimpan terenkripsi (AES-256-GCM) supaya tidak
+ * bisa dibaca langsung dari dump database.
+ */
+export const donationGopayAccountsTable = pgTable("donation_gopay_accounts", {
+  id: serial("id").primaryKey(),
+  // Nomor HP akun GoPay Merchant (format 62xxx, tanpa "+").
+  phoneNumber: text("phone_number"),
+  // Merchant id hasil login (dipakai sebagai filter feed mutasi).
+  merchantId: text("merchant_id"),
+  // Sesi login terenkripsi: { accessToken, refreshToken, savedAt }.
+  sessionEncrypted: text("session_encrypted"),
+  sessionUpdatedAt: timestamp("session_updated_at"),
+  // Token OTP sementara (dipakai lanjut ke /goid/token), terenkripsi.
+  otpTokenEncrypted: text("otp_token_encrypted"),
+  otpExpiresAt: timestamp("otp_expires_at"),
+  // Auto-verifikasi menyala? (dipakai oleh pemicu eksternal: cron / worker).
+  autoVerifyEnabled: boolean("auto_verify_enabled").notNull().default(false),
+  // Seberapa jauh ke belakang feed mutasi dipindai (menit).
+  autoVerifyWindowMinutes: integer("auto_verify_window_minutes").notNull().default(60),
+  // Terakhir kali mutasi dicek (manual maupun otomatis).
+  lastCheckedAt: timestamp("last_checked_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+/**
+ * Riwayat satu kali pemeriksaaan mutasi QRIS.
+ *
+ * Dipakai panel admin untuk melihat: apakah auto-verifikasi berjalan,
+ * kapan terakhir jalan, berapa transaksi yang berhasil dicocokkan, dan
+ * transaksi mana yang perlu diperiksa manual.
+ */
+export const donationVerificationRunsTable = pgTable("donation_verification_runs", {
+  id: serial("id").primaryKey(),
+  // "manual" (tombol di panel admin) | "auto" (dipicu cron/worker)
+  source: text("source").notNull().default("manual"),
+  // "ok" | "error" | "skipped"
+  status: text("status").notNull().default("ok"),
+  message: text("message"),
+  // Jumlah baris mutasi yang dibaca dari feed GoPay.
+  feedCount: integer("feed_count").notNull().default(0),
+  // Berapa transaksi donasi yang berhasil dicocokkan & diverifikasi.
+  matchedCount: integer("matched_count").notNull().default(0),
+  pendingBefore: integer("pending_before").notNull().default(0),
+  pendingAfter: integer("pending_after").notNull().default(0),
+  // Rincian tambahan (kandidat ambigu, error, dsb) - jsonb.
+  details: jsonb("details"),
+  startedAt: timestamp("started_at").notNull().defaultNow(),
+  finishedAt: timestamp("finished_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  createdAtIdx: index("donation_verification_runs_created_at_idx").on(table.createdAt),
+  sourceIdx: index("donation_verification_runs_source_idx").on(table.source),
+}));
+
 export const donationCampaignsRelations = relations(donationCampaignsTable, ({ many }) => ({
   transactions: many(donationTransactionsTable),
 }));
@@ -166,3 +225,6 @@ export type InsertDonationCampaign = z.infer<typeof insertDonationCampaignSchema
 export type DonationTransaction = typeof donationTransactionsTable.$inferSelect;
 export type InsertDonationTransaction = z.infer<typeof insertDonationTransactionSchema>;
 export type DonationSettings = typeof donationSettingsTable.$inferSelect;
+export type DonationGopayAccount = typeof donationGopayAccountsTable.$inferSelect;
+export type InsertDonationGopayAccount = typeof donationGopayAccountsTable.$inferInsert;
+export type DonationVerificationRun = typeof donationVerificationRunsTable.$inferSelect;

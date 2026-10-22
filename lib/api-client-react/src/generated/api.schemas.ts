@@ -628,6 +628,159 @@ export interface DonationSettingsInput {
   popupDismissable?: boolean;
 }
 
+/**
+ * Status integrasi auto-verifikasi donasi QRIS (GoPay Merchant).
+ */
+export interface DonationVerificationStatus {
+  /** Sesi GoPay Merchant tersimpan & bisa dipakai. */
+  connected: boolean;
+  /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
+  merchantId?: string | null;
+  /** @nullable */
+  sessionUpdatedAt?: string | null;
+  /** @nullable */
+  lastCheckedAt?: string | null;
+  /** Auto-verifikasi dinyalakan (pemicu eksternal aktif). */
+  autoVerifyEnabled: boolean;
+  autoVerifyWindowMinutes?: number;
+  /** Jumlah transaksi donasi yang masih menunggu verifikasi. */
+  pendingCount: number;
+}
+
+export interface DonationVerificationOtpRequest {
+  /** Nomor HP akun GoPay Merchant (format 62xxx / 0xxx). */
+  phoneNumber: string;
+}
+
+export interface DonationVerificationOtpResponse {
+  ok?: boolean;
+  message?: string;
+  otpLength?: number;
+  expiresAt?: string;
+}
+
+export interface DonationVerificationLoginRequest {
+  /** Kode OTP yang dikirim ke HP merchant. */
+  otp: string;
+}
+
+export interface DonationVerificationLoginResponse {
+  ok?: boolean;
+  message?: string;
+  /** @nullable */
+  merchantId?: string | null;
+  /** @nullable */
+  merchantName?: string | null;
+}
+
+/**
+ * Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.
+ */
+export interface DonationVerificationMatch {
+  transactionId?: number;
+  referenceNumber?: string;
+  /** Nominal bersih donasi. */
+  amount?: number;
+  /** Nominal yang dibayar donatur (amount + fee MDR). */
+  grossAmount?: number;
+  /**
+     * Order id QRIS di sisi GoPay (bukti untuk admin).
+     * @nullable
+     */
+  orderId?: string | null;
+  paidAt?: string;
+}
+
+/**
+ * Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.
+ */
+export interface DonationVerificationAmbiguous {
+  transactionId?: number;
+  referenceNumber?: string;
+  grossAmount?: number;
+  candidateCount?: number;
+}
+
+export type DonationVerificationRunResultStatus = typeof DonationVerificationRunResultStatus[keyof typeof DonationVerificationRunResultStatus];
+
+
+export const DonationVerificationRunResultStatus = {
+  ok: 'ok',
+  skipped: 'skipped',
+  error: 'error',
+} as const;
+
+export interface DonationVerificationRunResult {
+  status: DonationVerificationRunResultStatus;
+  message?: string;
+  /** Jumlah baris mutasi QRIS yang terbaca. */
+  feedCount?: number;
+  /** Jumlah transaksi donasi yang terverifikasi otomatis. */
+  matchedCount: number;
+  pendingBefore?: number;
+  pendingAfter?: number;
+  matches?: DonationVerificationMatch[];
+  ambiguous?: DonationVerificationAmbiguous[];
+}
+
+export type DonationVerificationRunSource = typeof DonationVerificationRunSource[keyof typeof DonationVerificationRunSource];
+
+
+export const DonationVerificationRunSource = {
+  manual: 'manual',
+  auto: 'auto',
+} as const;
+
+export type DonationVerificationRunStatus = typeof DonationVerificationRunStatus[keyof typeof DonationVerificationRunStatus];
+
+
+export const DonationVerificationRunStatus = {
+  ok: 'ok',
+  skipped: 'skipped',
+  error: 'error',
+} as const;
+
+/**
+ * @nullable
+ */
+export type DonationVerificationRunDetails = { [key: string]: unknown } | null;
+
+/**
+ * Riwayat satu kali pemeriksaan mutasi.
+ */
+export interface DonationVerificationRun {
+  id: number;
+  source: DonationVerificationRunSource;
+  status: DonationVerificationRunStatus;
+  /** @nullable */
+  message?: string | null;
+  feedCount?: number;
+  matchedCount?: number;
+  pendingBefore?: number;
+  pendingAfter?: number;
+  /** @nullable */
+  details?: DonationVerificationRunDetails;
+  /** @nullable */
+  startedAt?: string | null;
+  /** @nullable */
+  finishedAt?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+}
+
+export interface DonationVerificationSettingsInput {
+  autoVerifyEnabled?: boolean;
+  /** Seberapa jauh ke belakang feed mutasi dipindai (menit). */
+  autoVerifyWindowMinutes?: number;
+}
+
+export interface DonationVerificationSettings {
+  autoVerifyEnabled: boolean;
+  autoVerifyWindowMinutes: number;
+}
+
 export type ListArticlesParams = {
 page?: number;
 limit?: number;
@@ -666,5 +819,19 @@ limit?: number;
 status?: string;
 campaignId?: number;
 search?: string;
+};
+
+export type LogoutDonationVerification200 = {
+  ok?: boolean;
+  message?: string;
+};
+
+export type RunDonationVerificationBody = {
+  /** Seberapa jauh ke belakang feed mutasi dipindai (menit) */
+  windowMinutes?: number;
+};
+
+export type ListDonationVerificationRunsParams = {
+limit?: number;
 };
 

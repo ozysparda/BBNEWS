@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users, User, Activity, Globe, MessageSquare, Flag, Heart } from "lucide-react";
+import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users, User, Activity, Globe, MessageSquare, Flag, Heart, ShieldCheck } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useState } from "react";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
@@ -32,6 +32,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/komentar", label: "Komentar", icon: MessageSquare },
     { href: "/admin/aduan", label: "Aduan Masyarakat", icon: Flag },
     { href: "/admin/donasi", label: "Donasi", icon: Heart },
+    { href: "/admin/donasi/verifikasi", label: "Verifikasi Donasi", icon: ShieldCheck },
     ...(isOwner ? [{ href: "/admin/pengguna", label: "Pengguna", icon: Users }] : []),
     { href: "/admin/halaman", label: "Daftar Halaman", icon: Globe },
   ];

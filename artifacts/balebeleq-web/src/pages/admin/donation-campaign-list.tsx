@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Coins, HandHeart, Plus, Settings, Trash2, Wallet } from "lucide-react";
+import { Coins, HandHeart, Plus, Settings, ShieldCheck, Trash2, Wallet } from "lucide-react";
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
   draft: { label: "Draft", className: "bg-gray-100 text-gray-700" },
@@ -81,6 +81,9 @@ export default function AdminDonationCampaignList() {
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setLocation("/admin/donasi/transaksi")}>
               <Coins className="mr-2 h-4 w-4" /> Transaksi
+            </Button>
+            <Button variant="outline" onClick={() => setLocation("/admin/donasi/verifikasi")}>
+              <ShieldCheck className="mr-2 h-4 w-4" /> Verifikasi Otomatis
             </Button>
             <Button variant="outline" onClick={() => setLocation("/admin/donasi/pengaturan")}>
               <Settings className="mr-2 h-4 w-4" /> Pengaturan

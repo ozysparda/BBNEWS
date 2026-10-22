@@ -1,7 +1,7 @@
 import { useListArticles } from "@workspace/api-client-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { Flame, ChevronRight } from "lucide-react";
+import { Flame } from "lucide-react";
 
 export function NewsTicker() {
   const { data } = useListArticles({ limit: 20 });
@@ -22,18 +22,18 @@ export function NewsTicker() {
       onTouchEnd={() => setPaused(false)}
     >
       {/* Label */}
-      <div className="shrink-0 flex items-center gap-1.5 bg-primary-foreground/15 text-primary-foreground text-[11px] font-bold px-3 sm:px-4 py-2 uppercase tracking-wider whitespace-nowrap z-10">
+      <div className="shrink-0 flex items-center gap-1.5 bg-primary-foreground/20 text-primary-foreground text-[11px] font-bold px-3 sm:px-4 py-2.5 uppercase tracking-wider whitespace-nowrap z-10">
         <Flame className="h-3.5 w-3.5" />
         TERKINI
       </div>
 
       {/* Scrolling text */}
-      <div className="flex-1 overflow-hidden relative py-2">
+      <div className="flex-1 overflow-hidden relative py-2.5">
         <div
           ref={tickerRef}
-          className="flex gap-0 whitespace-nowrap"
+          className="flex items-center whitespace-nowrap"
           style={{
-            animation: paused ? "none" : "ticker-scroll 45s linear infinite",
+            animation: paused ? "none" : "ticker-scroll 50s linear infinite",
             animationPlayState: paused ? "paused" : "running",
           }}
         >
@@ -41,9 +41,9 @@ export function NewsTicker() {
             <Link
               key={i}
               href={`/berita/${item.slug}`}
-              className="inline-flex items-center text-sm hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-medium hover:opacity-80 transition-opacity shrink-0"
             >
-              <span className="text-primary-foreground/50 mx-3">◆</span>
+              <span className="text-primary-foreground/40 mx-4">◆</span>
               <span>{item.title}</span>
             </Link>
           ))}

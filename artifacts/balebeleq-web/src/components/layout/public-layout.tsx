@@ -4,6 +4,7 @@ import { Search, X, Menu, Heart } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useState, useRef, useEffect } from "react";
 import ComplaintWidget from "@/components/complaint-widget";
+import { ScrollToTop } from "@/components/scroll-to-top";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
 function SearchBar() {
@@ -233,6 +234,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </main>
       <PublicFooter />
       <ComplaintWidget />
+      <ScrollToTop />
     </div>
   );
 }

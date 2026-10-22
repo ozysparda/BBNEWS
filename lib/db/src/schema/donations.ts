@@ -53,8 +53,14 @@ export const donationTransactionsTable = pgTable("donation_transactions", {
   donorPhone: text("donor_phone"),
   isAnonymous: boolean("is_anonymous").notNull().default(false),
 
-  // Nominal rupiah (untuk QRIS & transfer bank)
+  // Nominal rupiah (untuk QRIS & transfer bank).
+  // Ini = nilai donasi yang dihitung ke total campaign (bersih, setelah MDR).
   amount: integer("amount").notNull().default(0),
+  // Nominal yang benar-benar dibayar donatur = amount + feeAmount.
+  // Berbeda dari `amount` hanya kalau MDR QRIS ditanggung donatur.
+  grossAmount: integer("gross_amount"),
+  // Biaya MDR/MDR-like yang ditanggung donatur (rupiah penuh).
+  feeAmount: integer("fee_amount"),
   // Nominal kripto (mis. "25.5" + symbol USDT) - hanya untuk method crypto
   cryptoAmount: text("crypto_amount"),
   cryptoNetwork: text("crypto_network"),
@@ -104,6 +110,16 @@ export const donationSettingsTable = pgTable("donation_settings", {
 
   // Minimum donasi global (rupiah)
   minAmount: integer("min_amount").notNull().default(1000),
+
+  /**
+   * MDR/biaya QRIS merchant dalam basis points persen (70 = 0,70%).
+   *
+   * Bila nilainya > 0, biaya tersebut dibebankan ke donatur: nominal QRIS
+   * menjadi `amount + fee`, sehingga nominal bersih yang masuk ke saldo
+   * penampung tetap sama dengan nominal donasi yang ditulis donatur.
+   * Isi 0 kalau kategori merchant-mu "Donasi/Bantuan Sosial" (MDR 0%).
+   */
+  qrisFeeBps: integer("qris_fee_bps").notNull().default(0),
 
   // Popup donasi (opsional) - tampilkan campaign donasi sebagai popup/iklan
   popupEnabled: boolean("popup_enabled").notNull().default(false),

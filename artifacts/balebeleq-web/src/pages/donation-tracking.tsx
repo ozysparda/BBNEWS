@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatRupiah } from "@/lib/format-money";
 import { CheckCircle2, Clock, Search, XCircle } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 const STATUS_META: Record<string, { label: string; icon: typeof Clock; className: string; description: string }> = {
   pending: {
@@ -130,6 +131,33 @@ export default function DonationTrackingPage() {
 
               <Card>
                 <CardContent className="space-y-3 p-5 text-sm">
+                  {data.qrisPayload && data.status === "pending" && (
+                    <div className="space-y-3 rounded-xl border border-border bg-muted/40 p-4 text-center">
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                        Scan QRIS &mdash; nominal sudah terisi
+                      </p>
+                      <div className="flex justify-center rounded-lg border border-border bg-white p-3">
+                        <QRCodeSVG value={data.qrisPayload} size={180} level="M" />
+                      </div>
+                      <p className="text-lg font-bold text-primary">
+                        {formatRupiah(
+                          data.feeAmount && data.feeAmount > 0
+                            ? data.grossAmount ?? data.amount ?? 0
+                            : data.amount ?? 0,
+                        )}
+                      </p>
+                      {data.feeAmount && data.feeAmount > 0 ? (
+                        <p className="text-xs text-muted-foreground">
+                          Donasi {formatRupiah(data.amount ?? 0)} + biaya QRIS{" "}
+                          {formatRupiah(data.feeAmount)}
+                        </p>
+                      ) : null}
+                      <p className="text-xs text-muted-foreground">
+                        Belum selesai bayar? Scan QR ini lagi di aplikasi GoPay, DANA, OVO, atau
+                        m-banking kamu.
+                      </p>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-muted-foreground">Referensi</span>
                     <span className="font-mono font-semibold">{data.referenceNumber}</span>

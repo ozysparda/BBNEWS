@@ -10,6 +10,7 @@ import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm
 import slugify from "slugify";
 import { requireAuth, type AuthRequest } from "../middlewares/auth";
 import { verifyCryptoTransaction } from "../lib/crypto";
+import { buildDynamicQris, computeQrisCharge } from "../lib/qris";
 import { generateClientTokenFromReadWriteToken } from "@vercel/blob/client";
 
 const router = Router();
@@ -232,6 +233,8 @@ router.get("/donations/campaigns/:slug", async (req, res) => {
       cryptoAddress: payment?.cryptoAddress ?? null,
       autoConfirm: payment?.autoConfirm ?? false,
       minAmount: campaign.minAmount ?? payment?.minAmount ?? 1000,
+      // MDR/biaya QRIS yang ditanggung donatur (basis points persen, 70 = 0,70%)
+      qrisFeeBps: payment?.qrisFeeBps ?? 0,
       recentDonations: recent.map((item: any) => ({
         ...item,
         donorName: item.isAnonymous ? "Hamba Tuhan" : item.donorName,
@@ -390,6 +393,12 @@ router.post("/donations/transactions", async (req, res) => {
       }
     }
 
+    // Biaya MDR/biaya QRIS (kalau dikonfigurasi) dibebankan ke donatur:
+    // nominal di QRIS menjadi `rupiah + fee`, sehingga yang masuk ke saldo
+    // penampung tetap sama dengan nominal donasi.
+    const qrisFeeBps = Math.max(0, Math.round(Number((payment as any).qrisFeeBps) || 0));
+    const charge = paymentMethod === "qris" ? computeQrisCharge(rupiah, qrisFeeBps) : { grossAmount: 0, feeAmount: 0 };
+
     // Generate reference number dengan retry (hindari collision pada unique constraint)
     let transaction: any;
     let referenceNumber = "";
@@ -406,6 +415,8 @@ router.post("/donations/transactions", async (req, res) => {
             donorPhone: anonymous ? null : phone,
             isAnonymous: anonymous,
             amount: rupiah,
+            grossAmount: paymentMethod === "qris" ? charge.grossAmount : null,
+            feeAmount: paymentMethod === "qris" ? charge.feeAmount : null,
             cryptoAmount: crypto,
             cryptoNetwork: (payment as any).cryptoNetwork || null,
             txHash: hash,
@@ -458,6 +469,14 @@ router.post("/donations/transactions", async (req, res) => {
       }
     }
 
+    // QRIS dinamis: nominal otomatis terisi di aplikasi e-wallet donatur.
+    // Dibuat lokal dari QRIS statis global (tanpa API pembayaran berbayar).
+    // Nominal yang dimasukan = nominal donasi + biaya MDR (bila ada).
+    const qrisPayload =
+      paymentMethod === "qris" && charge.grossAmount > 0 && (payment as any).qrisPayload
+        ? buildDynamicQris(String((payment as any).qrisPayload), charge.grossAmount)
+        : null;
+
     res.status(201).json({
       referenceNumber,
       status: autoVerified ? "verified" : "pending",
@@ -467,6 +486,10 @@ router.post("/donations/transactions", async (req, res) => {
         ? "Donasi kamu terverifikasi otomatis. Terima kasih!"
         : "Donasi tercatat. Admin akan memverifikasi dalam 1x24 jam.",
       donorName: anonymous ? "Hamba Tuhan" : name,
+      amount: rupiah,
+      grossAmount: paymentMethod === "qris" ? charge.grossAmount : null,
+      feeAmount: paymentMethod === "qris" ? charge.feeAmount : null,
+      qrisPayload,
     });
   } catch (error) {
     console.error("Error creating donation transaction:", error);
@@ -503,10 +526,25 @@ router.get("/donations/transactions/:reference", async (req, res) => {
       .where(eq(donationCampaignsTable.id, transaction.campaignId))
       .limit(1);
 
+    // QRIS dinamis dengan nominal transaksi ini, supaya donatur bisa scan ulang
+    // QR yang sama persis dari halaman lacik.
+    const [payment] = await db
+      .select({ qrisPayload: donationSettingsTable.qrisPayload })
+      .from(donationSettingsTable)
+      .where(eq(donationSettingsTable.id, 1))
+      .limit(1);
+    const grossAmount = transaction.grossAmount ?? transaction.amount;
+    const qrisPayload =
+      transaction.method === "qris" && grossAmount > 0 && payment?.qrisPayload
+        ? buildDynamicQris(payment.qrisPayload, grossAmount)
+        : null;
+
     res.json({
       referenceNumber: transaction.referenceNumber,
       status: transaction.status,
       amount: transaction.amount,
+      grossAmount: transaction.grossAmount ?? null,
+      feeAmount: transaction.feeAmount ?? null,
       cryptoAmount: transaction.cryptoAmount,
       method: transaction.method,
       message: transaction.message,
@@ -516,6 +554,7 @@ router.get("/donations/transactions/:reference", async (req, res) => {
       campaignSlug: campaign?.slug ?? null,
       createdAt: toIso(transaction.createdAt),
       verifiedAt: toIso(transaction.verifiedAt),
+      qrisPayload,
     });
   } catch (error) {
     console.error("Error tracking donation:", error);
@@ -982,15 +1021,63 @@ router.get("/admin/donations/settings", requireAuth, async (req: AuthRequest, re
 router.put("/admin/donations/settings", requireAuth, async (req: AuthRequest, res) => {
   try {
     const body = req.body || {};
+
+    // Baca nilai lama dulu, supaya field yang tidak dikirim API tidak ikut
+    // ter-reset (mis. hanyaPATCH sebagian field).
+    const [existing] = await db
+      .select()
+      .from(donationSettingsTable)
+      .where(eq(donationSettingsTable.id, 1))
+      .limit(1);
+    const current: any = existing ?? {};
+
+    const pickString = (key: string, fallback: string | null = null) =>
+      body[key] !== undefined ? toNullableString(body[key]) : (current[key] ?? fallback);
+    const pickBool = (key: string, fallback: boolean) =>
+      body[key] === undefined
+        ? fallback
+        : body[key] === true || body[key] === "true";
+
     const values = {
-      heroTitle: toNullableString(body.heroTitle) ?? "Berugak Donasi",
-      heroDescription: toNullableString(body.heroDescription) ?? "",
-      qrisImageUrl: toNullableString(body.qrisImageUrl),
-      qrisPayload: toNullableString(body.qrisPayload),
-      bankName: toNullableString(body.bankName),
-      bankAccountNumber: toNullableString(body.bankAccountNumber),
-      bankAccountHolder: toNullableString(body.bankAccountHolder),
-      isOpen: body.isOpen === undefined ? true : body.isOpen === true || body.isOpen === "true",
+      heroTitle: pickString("heroTitle", "Berugak Donasi") ?? "Berugak Donasi",
+      heroDescription: pickString("heroDescription", "") ?? "",
+      qrisImageUrl: pickString("qrisImageUrl"),
+      qrisPayload: pickString("qrisPayload"),
+      bankName: pickString("bankName"),
+      bankAccountNumber: pickString("bankAccountNumber"),
+      bankAccountHolder: pickString("bankAccountHolder"),
+      cryptoNetwork: pickString("cryptoNetwork"),
+      cryptoSymbol: pickString("cryptoSymbol"),
+      cryptoAddress: pickString("cryptoAddress"),
+      autoConfirm: pickBool("autoConfirm", current.autoConfirm === true),
+      minAmount:
+        body.minAmount !== undefined
+          ? Math.max(0, Math.round(Number(body.minAmount) || 1000))
+          : (current.minAmount ?? 1000),
+      // MDR/biaya QRIS yang ditanggung donatur (basis points persen, 70 = 0,70%).
+      // 0 = tidak ada biaya tambahan (mis. kategori Donasi/Bantuan Sosial).
+      qrisFeeBps:
+        body.qrisFeeBps !== undefined
+          ? Math.max(0, Math.min(Math.round(Number(body.qrisFeeBps) || 0), 1000))
+          : (current.qrisFeeBps ?? 0),
+      isOpen: pickBool("isOpen", current.isOpen !== false),
+      popupEnabled: pickBool("popupEnabled", current.popupEnabled === true),
+      popupCampaignId:
+        body.popupCampaignId !== undefined
+          ? toNullableInt(body.popupCampaignId)
+          : (current.popupCampaignId ?? null),
+      popupPlacement: (() => {
+        const value = body.popupPlacement !== undefined
+          ? toNullableString(body.popupPlacement)
+          : (current.popupPlacement ?? "floating");
+        const allowed = ["floating", "article-top", "article-middle", "article-bottom", "home-banner"];
+        return value && allowed.includes(value) ? value : "floating";
+      })(),
+      popupDelay:
+        body.popupDelay !== undefined
+          ? Math.max(0, Math.round(Number(body.popupDelay) || 5))
+          : (current.popupDelay ?? 5),
+      popupDismissable: pickBool("popupDismissable", current.popupDismissable !== false),
       updatedAt: new Date(),
     };
 

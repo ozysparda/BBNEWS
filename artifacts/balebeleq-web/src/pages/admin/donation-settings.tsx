@@ -62,6 +62,7 @@ export default function AdminDonationSettingsPage() {
   const [cryptoAddress, setCryptoAddress] = useState("");
   const [autoConfirm, setAutoConfirm] = useState(false);
   const [minAmount, setMinAmount] = useState("1000");
+  const [qrisFeePercent, setQrisFeePercent] = useState("0");
   const [isOpen, setIsOpen] = useState(true);
 
   // Popup settings
@@ -87,6 +88,7 @@ export default function AdminDonationSettingsPage() {
     setCryptoAddress(settings.cryptoAddress ?? "");
     setAutoConfirm(settings.autoConfirm ?? false);
     setMinAmount(String(settings.minAmount ?? 1000));
+    setQrisFeePercent(String((settings.qrisFeeBps ?? 0) / 100));
     setIsOpen(settings.isOpen ?? true);
     setPopupEnabled(settings.popupEnabled ?? false);
     setPopupCampaignId(settings.popupCampaignId ? String(settings.popupCampaignId) : "");
@@ -131,6 +133,7 @@ export default function AdminDonationSettingsPage() {
           cryptoAddress: cryptoAddress.trim() || null,
           autoConfirm,
           minAmount: Number(minAmount) || 1000,
+          qrisFeeBps: Math.round(Number(qrisFeePercent) * 100) || 0,
           isOpen,
           popupEnabled,
           popupCampaignId: popupCampaignId ? Number(popupCampaignId) : null,
@@ -253,6 +256,27 @@ export default function AdminDonationSettingsPage() {
                       />
                     )}
                   </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="qrisFeePercent">Biaya MDR / biaya QRIS (ditanggung donatur)</Label>
+                  <Input
+                    id="qrisFeePercent"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="10"
+                    value={qrisFeePercent}
+                    onChange={(e) => setQrisFeePercent(e.target.value)}
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Isi <strong>0</strong> kalau MDR merchant-mu 0% (kategori &ldquo;Donasi /
+                    Bantuan Sosial&rdquo;). Kalau MDR 0,7%, isi <strong>0.7</strong>: donatur isi
+                    Rp 10.000, QRIS-nya jadi Rp 10.071 (biaya 71 ditanggung donatur), MDR
+                    ±70 dipotong PJP, jadi saldo penampung masuk ±Rp 10.001 &mdash; target donasi
+                    Rp 10.000 tetap tercapai.
+                  </p>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">

@@ -67,12 +67,32 @@ export default function DonationDetailPage() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [done, setDone] = useState<{ referenceNumber: string; status: string; message: string; autoVerified: boolean } | null>(null);
+  const [done, setDone] = useState<{
+    referenceNumber: string;
+    status: string;
+    message: string;
+    autoVerified: boolean;
+    amount: number;
+    grossAmount: number | null;
+    feeAmount: number | null;
+    qrisPayload: string | null;
+  } | null>(null);
 
   const collected = campaign?.collectedAmount ?? 0;
   const target = campaign?.targetAmount ?? 0;
   const progress = campaign?.progress ?? (target > 0 ? Math.min(100, Math.round((collected / target) * 100)) : 0);
   const minAmount = campaign?.minAmount ?? 1000;
+
+  // Biaya MDR/biaya QRIS yang ditanggung donatur (basis points persen, 70 = 0,70%).
+  // Perhitungan sama dengan server (gross-up): MDR dipotong dari nominal yang
+  // dibayar, jadi nominal yang harus dibayar = nominal donasi / (1 - rate).
+  const qrisFeeBps = campaign?.qrisFeeBps ?? 0;
+  const enteredAmount = parseNominal(amount);
+  const feePreview =
+    qrisFeeBps > 0 && enteredAmount > 0
+      ? Math.ceil(enteredAmount / (1 - qrisFeeBps / 10000)) - enteredAmount
+      : 0;
+  const grossPreview = enteredAmount + feePreview;
 
   const hasQris = Boolean(campaign?.qrisImageUrl || campaign?.qrisPayload);
   const hasBank = Boolean(campaign?.bankAccountNumber);
@@ -152,6 +172,10 @@ export default function DonationDetailPage() {
         status: result.status,
         message: result.message,
         autoVerified: result.autoVerified ?? false,
+        amount: activeMethod === "crypto" ? 0 : parseNominal(amount),
+        grossAmount: result.grossAmount ?? null,
+        feeAmount: result.feeAmount ?? null,
+        qrisPayload: result.qrisPayload ?? null,
       });
       toast({
         title: result.autoVerified ? "Donasi terverifikasi otomatis" : "Donasi terkirim",
@@ -285,7 +309,8 @@ export default function DonationDetailPage() {
                         </div>
                       ) : null}
                       <p className="text-center text-xs text-muted-foreground">
-                        Scan dengan aplikasi m-banking/ e-wallet kamu.
+                        QRIS umum. Setelah donasi dikirim, kami buatkan QR khusus dengan nominal
+                        yang sudah terisi otomatis.
                       </p>
                     </CardContent>
                   </Card>
@@ -380,6 +405,42 @@ export default function DonationDetailPage() {
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">{done.message}</p>
                     </div>
+
+                    {done.qrisPayload ? (
+                      <div className="space-y-3 rounded-xl border border-border bg-muted/40 p-4">
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                          Scan QRIS &mdash; nominal sudah terisi
+                        </p>
+                        <div className="flex justify-center rounded-lg border border-border bg-white p-3">
+                          <QRCodeSVG value={done.qrisPayload} size={196} level="M" />
+                        </div>
+                        {done.feeAmount && done.feeAmount > 0 ? (
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span>Nominal donasi</span>
+                              <span>{formatRupiah(done.amount)}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span>Biaya QRIS (ditanggung donatur)</span>
+                              <span>{formatRupiah(done.feeAmount)}</span>
+                            </div>
+                            <div className="flex items-center justify-between border-t border-border pt-1">
+                              <span className="text-sm font-medium">Total yang dibayar</span>
+                              <span className="text-xl font-bold text-primary">
+                                {formatRupiah(done.grossAmount ?? done.amount)}
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-xl font-bold text-primary">{formatRupiah(done.amount)}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Buka aplikasi GoPay, DANA, OVO, atau m-banking, lalu scan QR di atas.
+                          Nominal sudah terisi otomatis &mdash; tinggal konfirmasi pembayaran.
+                        </p>
+                      </div>
+                    ) : null}
+
                     <div className="rounded-lg border border-dashed border-border bg-muted/40 px-4 py-3">
                       <p className="text-xs uppercase tracking-wider text-muted-foreground">Nomor Referensi</p>
                       <p className="mt-1 font-mono text-base font-bold">{done.referenceNumber}</p>
@@ -547,6 +608,17 @@ export default function DonationDetailPage() {
                             </button>
                           ))}
                         </div>
+                        {qrisFeeBps > 0 && enteredAmount > 0 ? (
+                          <p className="rounded-lg border border-dashed border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+                            Nominal donasi {formatRupiah(enteredAmount)} + biaya QRIS{" "}
+                            {formatRupiah(feePreview)} ={" "}
+                            <span className="font-semibold text-foreground">
+                              {formatRupiah(grossPreview)}
+                            </span>{" "}
+                            yang harus dibayar. Yang masuk ke donasi tetap{" "}
+                            {formatRupiah(enteredAmount)}.
+                          </p>
+                        ) : null}
                       </div>
                     )}
 

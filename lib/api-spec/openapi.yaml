@@ -1681,6 +1681,9 @@ components:
           type: boolean
         minAmount:
           type: integer
+        qrisFeeBps:
+          type: integer
+          description: MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).
         status:
           type: string
         startAt:
@@ -1782,6 +1785,12 @@ components:
           type: boolean
         amount:
           type: integer
+        grossAmount:
+          type: ["integer", "null"]
+          description: Nominal yang benar-benar dibayar donatur (amount + feeAmount).
+        feeAmount:
+          type: ["integer", "null"]
+          description: Biaya MDR/biaya QRIS yang ditanggung donatur.
         cryptoAmount:
           type: ["string", "null"]
         cryptoNetwork:
@@ -1873,6 +1882,18 @@ components:
           type: string
         donorName:
           type: string
+        amount:
+          type: integer
+          description: Nominal donasi bersih (yang dihitung ke total campaign).
+        grossAmount:
+          type: ["integer", "null"]
+          description: Nominal yang harus dibayar donatur (amount + feeAmount).
+        feeAmount:
+          type: ["integer", "null"]
+          description: Biaya MDR/biaya QRIS yang ditanggung donatur.
+        qrisPayload:
+          type: ["string", "null"]
+          description: Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
       required:
         - referenceNumber
         - status
@@ -1887,6 +1908,12 @@ components:
           type: string
         amount:
           type: integer
+        grossAmount:
+          type: ["integer", "null"]
+          description: Nominal yang harus dibayar donatur (amount + feeAmount).
+        feeAmount:
+          type: ["integer", "null"]
+          description: Biaya MDR/biaya QRIS yang ditanggung donatur.
         cryptoAmount:
           type: ["string", "null"]
         method:
@@ -1905,6 +1932,9 @@ components:
           type: ["string", "null"]
         verifiedAt:
           type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+          description: Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
       required:
         - referenceNumber
         - status
@@ -1989,6 +2019,9 @@ components:
           type: boolean
         minAmount:
           type: integer
+        qrisFeeBps:
+          type: integer
+          description: MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).
         isOpen:
           type: boolean
         popupEnabled:
@@ -2035,6 +2068,9 @@ components:
           type: boolean
         minAmount:
           type: integer
+        qrisFeeBps:
+          type: integer
+          description: MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).
         isOpen:
           type: boolean
         popupEnabled:

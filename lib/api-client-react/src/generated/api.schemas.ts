@@ -322,6 +322,8 @@ export interface DonationCampaign {
   cryptoAddress?: string | null;
   autoConfirm?: boolean;
   minAmount?: number;
+  /** MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%). */
+  qrisFeeBps?: number;
   status: string;
   /** @nullable */
   startAt?: string | null;
@@ -378,6 +380,16 @@ export interface DonationTransaction {
   donorPhone?: string | null;
   isAnonymous?: boolean;
   amount: number;
+  /**
+     * Nominal yang benar-benar dibayar donatur (amount + feeAmount).
+     * @nullable
+     */
+  grossAmount?: number | null;
+  /**
+     * Biaya MDR/biaya QRIS yang ditanggung donatur.
+     * @nullable
+     */
+  feeAmount?: number | null;
   /** @nullable */
   cryptoAmount?: string | null;
   /** @nullable */
@@ -439,12 +451,39 @@ export interface DonationTransactionCreated {
   note?: string | null;
   message: string;
   donorName?: string;
+  /** Nominal donasi bersih (yang dihitung ke total campaign). */
+  amount?: number;
+  /**
+     * Nominal yang harus dibayar donatur (amount + feeAmount).
+     * @nullable
+     */
+  grossAmount?: number | null;
+  /**
+     * Biaya MDR/biaya QRIS yang ditanggung donatur.
+     * @nullable
+     */
+  feeAmount?: number | null;
+  /**
+     * Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
+     * @nullable
+     */
+  qrisPayload?: string | null;
 }
 
 export interface DonationTransactionStatus {
   referenceNumber: string;
   status: string;
   amount?: number;
+  /**
+     * Nominal yang harus dibayar donatur (amount + feeAmount).
+     * @nullable
+     */
+  grossAmount?: number | null;
+  /**
+     * Biaya MDR/biaya QRIS yang ditanggung donatur.
+     * @nullable
+     */
+  feeAmount?: number | null;
   /** @nullable */
   cryptoAmount?: string | null;
   method?: string;
@@ -461,6 +500,11 @@ export interface DonationTransactionStatus {
   createdAt?: string | null;
   /** @nullable */
   verifiedAt?: string | null;
+  /**
+     * Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
+     * @nullable
+     */
+  qrisPayload?: string | null;
 }
 
 export type DonationTransactionUpdateStatus = typeof DonationTransactionUpdateStatus[keyof typeof DonationTransactionUpdateStatus];
@@ -528,6 +572,8 @@ export interface DonationSettings {
   cryptoAddress?: string | null;
   autoConfirm?: boolean;
   minAmount?: number;
+  /** MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%). */
+  qrisFeeBps?: number;
   isOpen: boolean;
   popupEnabled?: boolean;
   /** @nullable */
@@ -571,6 +617,8 @@ export interface DonationSettingsInput {
   cryptoAddress?: string | null;
   autoConfirm?: boolean;
   minAmount?: number;
+  /** MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%). */
+  qrisFeeBps?: number;
   isOpen?: boolean;
   popupEnabled?: boolean;
   /** @nullable */

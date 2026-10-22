@@ -191,6 +191,12 @@ export default function AdminDonationTransactionList() {
                           </td>
                           <td className="px-4 py-3 font-semibold tabular-nums">
                             {item.amount > 0 ? formatRupiah(item.amount) : item.cryptoAmount || "-"}
+                            {item.feeAmount && item.feeAmount > 0 ? (
+                              <p className="text-xs font-normal text-muted-foreground">
+                                dibayar {formatRupiah(item.grossAmount ?? item.amount)} (fee{" "}
+                                {formatRupiah(item.feeAmount)})
+                              </p>
+                            ) : null}
                           </td>
                           <td className="px-4 py-3 uppercase text-xs text-muted-foreground">{item.method}</td>
                           <td className="px-4 py-3">

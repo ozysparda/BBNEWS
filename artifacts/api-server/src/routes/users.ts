@@ -53,7 +53,7 @@ router.post("/admin/users", requireAuth, async (req: AuthRequest, res) => {
 router.put("/admin/users/:id", requireAuth, async (req: AuthRequest, res) => {
   if (!(await requireOwner(req, res))) return;
 
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   if (isNaN(id)) { res.status(404).json({ error: "Not found" }); return; }
 
   const { username, password, email, role } = req.body;
@@ -79,7 +79,7 @@ router.put("/admin/users/:id", requireAuth, async (req: AuthRequest, res) => {
 router.delete("/admin/users/:id", requireAuth, async (req: AuthRequest, res) => {
   if (!(await requireOwner(req, res))) return;
 
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   if (isNaN(id)) { res.status(404).json({ error: "Not found" }); return; }
 
   if (id === req.adminId) {

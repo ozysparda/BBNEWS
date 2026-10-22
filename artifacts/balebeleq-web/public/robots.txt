@@ -1,2 +1,7 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://berugaknews.vercel.app/sitemap.xml
+
+Disallow: /admin/
+Disallow: /api/

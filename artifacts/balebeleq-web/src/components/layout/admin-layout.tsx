@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users, User, Activity, Globe } from "lucide-react";
+import { LayoutDashboard, FileText, Tags, LogOut, Menu, X, Home, Users, User, Activity, Globe, MessageSquare, Flag, Heart, ShieldCheck } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useState } from "react";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
@@ -28,6 +29,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/artikel", label: "Artikel", icon: FileText },
     { href: "/admin/kategori", label: "Kategori", icon: Tags },
+    { href: "/admin/komentar", label: "Komentar", icon: MessageSquare },
+    { href: "/admin/aduan", label: "Aduan Masyarakat", icon: Flag },
+    { href: "/admin/donasi", label: "Donasi", icon: Heart },
+    { href: "/admin/donasi/verifikasi", label: "Verifikasi Donasi", icon: ShieldCheck },
     ...(isOwner ? [{ href: "/admin/pengguna", label: "Pengguna", icon: Users }] : []),
     { href: "/admin/halaman", label: "Daftar Halaman", icon: Globe },
   ];
@@ -104,14 +109,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="p-3 border-t border-sidebar-border">
-          <div className="flex items-center gap-3 px-3 py-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-              {user.username.charAt(0).toUpperCase()}
+          <div className="flex items-center justify-between px-3 py-2 mb-1">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                {user.username.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-sidebar-foreground truncate">{user.username}</div>
+                <div className="text-[10px] text-muted-foreground capitalize">{(user as any).role ?? "editor"}</div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="text-sm font-semibold text-sidebar-foreground truncate">{user.username}</div>
-              <div className="text-[10px] text-muted-foreground capitalize">{(user as any).role ?? "editor"}</div>
-            </div>
+            <ThemeToggle />
           </div>
           <button
             onClick={logout}

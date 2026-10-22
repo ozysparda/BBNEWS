@@ -121,6 +121,666 @@ export interface AdminUserCreate {
   role: string;
 }
 
+export interface Comment {
+  id: number;
+  articleId: number;
+  email: string;
+  content: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminComment {
+  id: number;
+  articleId: number;
+  articleTitle: string;
+  email: string;
+  content: string;
+  /** @nullable */
+  ipAddress: string | null;
+  /** @nullable */
+  userAgent: string | null;
+  /** @nullable */
+  location: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommentInput {
+  email: string;
+  content: string;
+  /** @nullable */
+  location?: string | null;
+}
+
+export interface PublicComplaint {
+  id: number;
+  complaintNumber: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminComplaint {
+  id: number;
+  complaintNumber: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  category: string;
+  title: string;
+  description: string;
+  /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
+  videoUrl?: string | null;
+  /** @nullable */
+  pdfUrl?: string | null;
+  status: string;
+  /** @nullable */
+  adminResponse: string | null;
+  /** @nullable */
+  assignedOfficer?: string | null;
+  /** @nullable */
+  latitude?: number | null;
+  /** @nullable */
+  longitude?: number | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  province?: string | null;
+  /** @nullable */
+  country?: string | null;
+  /** @nullable */
+  deviceName?: string | null;
+  /** @nullable */
+  deviceType?: string | null;
+  /** @nullable */
+  operatingSystem?: string | null;
+  /** @nullable */
+  browser?: string | null;
+  /** @nullable */
+  browserVersion?: string | null;
+  /** @nullable */
+  screenResolution?: string | null;
+  /** @nullable */
+  timezone?: string | null;
+  /** @nullable */
+  localTime?: string | null;
+  /** @nullable */
+  ipAddress?: string | null;
+  /** @nullable */
+  userAgent?: string | null;
+  /** @nullable */
+  language?: string | null;
+  /** @nullable */
+  deviceFingerprint?: string | null;
+  agreementAccepted: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminComplaintList {
+  complaints: AdminComplaint[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export type ComplaintInputAgreementAccepted = typeof ComplaintInputAgreementAccepted[keyof typeof ComplaintInputAgreementAccepted];
+
+
+export const ComplaintInputAgreementAccepted = {
+  true: 'true',
+} as const;
+
+export interface ComplaintInput {
+  fullName?: string;
+  email: string;
+  phoneNumber?: string;
+  category?: string;
+  title?: string;
+  description?: string;
+  content?: string;
+  agreementAccepted?: ComplaintInputAgreementAccepted;
+  terms: boolean;
+  latitude?: number;
+  longitude?: number;
+  /** @nullable */
+  location?: string | null;
+  address?: string;
+  city?: string;
+  province?: string;
+  country?: string;
+  photoUrl?: string;
+  videoUrl?: string;
+  pdfUrl?: string;
+}
+
+export interface ComplaintStatusUpdate {
+  status: string;
+  /** @nullable */
+  adminResponse?: string | null;
+  /** @nullable */
+  assignedOfficer?: string | null;
+}
+
+export interface TrackedComplaint {
+  complaintNumber: string;
+  status: string;
+  title: string;
+  /** @nullable */
+  adminResponse: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DonationRecentDonation {
+  id: number;
+  donorName: string;
+  isAnonymous?: boolean;
+  amount: number;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+}
+
+export interface DonationCampaign {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  content?: string;
+  /** @nullable */
+  coverImageUrl?: string | null;
+  targetAmount?: number;
+  collectedAmount?: number;
+  donorCount?: number;
+  pendingCount?: number;
+  progress?: number;
+  /** @nullable */
+  qrisImageUrl?: string | null;
+  /** @nullable */
+  qrisPayload?: string | null;
+  /** @nullable */
+  bankName?: string | null;
+  /** @nullable */
+  bankAccountNumber?: string | null;
+  /** @nullable */
+  bankAccountHolder?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  cryptoSymbol?: string | null;
+  /** @nullable */
+  cryptoAddress?: string | null;
+  autoConfirm?: boolean;
+  minAmount?: number;
+  /** MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%). */
+  qrisFeeBps?: number;
+  status: string;
+  /** @nullable */
+  startAt?: string | null;
+  /** @nullable */
+  deadline?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  recentDonations?: DonationRecentDonation[];
+}
+
+export type DonationCampaignInputStatus = typeof DonationCampaignInputStatus[keyof typeof DonationCampaignInputStatus];
+
+
+export const DonationCampaignInputStatus = {
+  draft: 'draft',
+  active: 'active',
+  closed: 'closed',
+  archived: 'archived',
+} as const;
+
+export interface DonationCampaignInput {
+  title: string;
+  excerpt?: string;
+  content?: string;
+  /** @nullable */
+  coverImageUrl?: string | null;
+  targetAmount?: number;
+  minAmount?: number;
+  status?: DonationCampaignInputStatus;
+  /** @nullable */
+  startAt?: string | null;
+  /** @nullable */
+  deadline?: string | null;
+}
+
+export interface DonationCampaignListResponse {
+  campaigns: DonationCampaign[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface DonationTransaction {
+  id: number;
+  referenceNumber: string;
+  campaignId: number;
+  donorName: string;
+  /** @nullable */
+  donorEmail?: string | null;
+  /** @nullable */
+  donorPhone?: string | null;
+  isAnonymous?: boolean;
+  amount: number;
+  /**
+     * Nominal yang benar-benar dibayar donatur (amount + feeAmount).
+     * @nullable
+     */
+  grossAmount?: number | null;
+  /**
+     * Biaya MDR/biaya QRIS yang ditanggung donatur.
+     * @nullable
+     */
+  feeAmount?: number | null;
+  /** @nullable */
+  cryptoAmount?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  txHash?: string | null;
+  method: string;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  proofUrl?: string | null;
+  status: string;
+  /** @nullable */
+  adminNote?: string | null;
+  /** @nullable */
+  verifiedBy?: string | null;
+  /** @nullable */
+  verifiedAt?: string | null;
+  autoVerified?: boolean;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export type DonationTransactionInputMethod = typeof DonationTransactionInputMethod[keyof typeof DonationTransactionInputMethod];
+
+
+export const DonationTransactionInputMethod = {
+  qris: 'qris',
+  bank: 'bank',
+  crypto: 'crypto',
+} as const;
+
+export interface DonationTransactionInput {
+  campaignId?: number;
+  campaignSlug?: string;
+  /** Nama donatur. Opsional bila isAnonymous = true (donasi anonim). Wajib bila isAnonymous = false. */
+  donorName?: string;
+  /** Email donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true. Jika diisi, dipakai untuk verifikasi saat melacak status donasi. */
+  donorEmail?: string;
+  /** Nomor WhatsApp donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true. */
+  donorPhone?: string;
+  amount?: number;
+  cryptoAmount?: string;
+  txHash?: string;
+  method?: DonationTransactionInputMethod;
+  message?: string;
+  proofUrl?: string;
+  /** Bila true, identitas donatur disembunyikan: nama tidak ditampilkan di daftar donatur publik dan email/WhatsApp tidak disimpan. */
+  isAnonymous?: boolean;
+}
+
+export interface DonationTransactionCreated {
+  referenceNumber: string;
+  status: string;
+  autoVerified?: boolean;
+  /** @nullable */
+  note?: string | null;
+  message: string;
+  donorName?: string;
+  /** Nominal donasi bersih (yang dihitung ke total campaign). */
+  amount?: number;
+  /**
+     * Nominal yang harus dibayar donatur (amount + feeAmount).
+     * @nullable
+     */
+  grossAmount?: number | null;
+  /**
+     * Biaya MDR/biaya QRIS yang ditanggung donatur.
+     * @nullable
+     */
+  feeAmount?: number | null;
+  /**
+     * Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
+     * @nullable
+     */
+  qrisPayload?: string | null;
+}
+
+export interface DonationTransactionStatus {
+  referenceNumber: string;
+  status: string;
+  amount?: number;
+  /**
+     * Nominal yang harus dibayar donatur (amount + feeAmount).
+     * @nullable
+     */
+  grossAmount?: number | null;
+  /**
+     * Biaya MDR/biaya QRIS yang ditanggung donatur.
+     * @nullable
+     */
+  feeAmount?: number | null;
+  /** @nullable */
+  cryptoAmount?: string | null;
+  method?: string;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  adminNote?: string | null;
+  autoVerified?: boolean;
+  /** @nullable */
+  campaignTitle?: string | null;
+  /** @nullable */
+  campaignSlug?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  verifiedAt?: string | null;
+  /**
+     * Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
+     * @nullable
+     */
+  qrisPayload?: string | null;
+}
+
+export type DonationTransactionUpdateStatus = typeof DonationTransactionUpdateStatus[keyof typeof DonationTransactionUpdateStatus];
+
+
+export const DonationTransactionUpdateStatus = {
+  pending: 'pending',
+  verified: 'verified',
+  rejected: 'rejected',
+} as const;
+
+export interface DonationTransactionUpdate {
+  status: DonationTransactionUpdateStatus;
+  /** @nullable */
+  adminNote?: string | null;
+}
+
+export interface DonationTransactionListResponse {
+  transactions: DonationTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface DonationStats {
+  activeCampaigns: number;
+  totalCampaigns: number;
+  collectedAmount: number;
+  pendingCount: number;
+  verifiedCount: number;
+  donorCount: number;
+}
+
+export type DonationSettingsPopupPlacement = typeof DonationSettingsPopupPlacement[keyof typeof DonationSettingsPopupPlacement];
+
+
+export const DonationSettingsPopupPlacement = {
+  floating: 'floating',
+  'article-top': 'article-top',
+  'article-middle': 'article-middle',
+  'article-bottom': 'article-bottom',
+  'home-banner': 'home-banner',
+} as const;
+
+export interface DonationSettings {
+  id?: number;
+  heroTitle: string;
+  heroDescription?: string;
+  /** @nullable */
+  qrisImageUrl?: string | null;
+  /** @nullable */
+  qrisPayload?: string | null;
+  /** @nullable */
+  bankName?: string | null;
+  /** @nullable */
+  bankAccountNumber?: string | null;
+  /** @nullable */
+  bankAccountHolder?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  cryptoSymbol?: string | null;
+  /** @nullable */
+  cryptoAddress?: string | null;
+  autoConfirm?: boolean;
+  minAmount?: number;
+  /** MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%). */
+  qrisFeeBps?: number;
+  isOpen: boolean;
+  popupEnabled?: boolean;
+  /** @nullable */
+  popupCampaignId?: number | null;
+  popupPlacement?: DonationSettingsPopupPlacement;
+  popupDelay?: number;
+  popupDismissable?: boolean;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export type DonationSettingsInputPopupPlacement = typeof DonationSettingsInputPopupPlacement[keyof typeof DonationSettingsInputPopupPlacement];
+
+
+export const DonationSettingsInputPopupPlacement = {
+  floating: 'floating',
+  'article-top': 'article-top',
+  'article-middle': 'article-middle',
+  'article-bottom': 'article-bottom',
+  'home-banner': 'home-banner',
+} as const;
+
+export interface DonationSettingsInput {
+  heroTitle: string;
+  heroDescription?: string;
+  /** @nullable */
+  qrisImageUrl?: string | null;
+  /** @nullable */
+  qrisPayload?: string | null;
+  /** @nullable */
+  bankName?: string | null;
+  /** @nullable */
+  bankAccountNumber?: string | null;
+  /** @nullable */
+  bankAccountHolder?: string | null;
+  /** @nullable */
+  cryptoNetwork?: string | null;
+  /** @nullable */
+  cryptoSymbol?: string | null;
+  /** @nullable */
+  cryptoAddress?: string | null;
+  autoConfirm?: boolean;
+  minAmount?: number;
+  /** MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%). */
+  qrisFeeBps?: number;
+  isOpen?: boolean;
+  popupEnabled?: boolean;
+  /** @nullable */
+  popupCampaignId?: number | null;
+  popupPlacement?: DonationSettingsInputPopupPlacement;
+  popupDelay?: number;
+  popupDismissable?: boolean;
+}
+
+/**
+ * Status integrasi auto-verifikasi donasi QRIS (GoPay Merchant).
+ */
+export interface DonationVerificationStatus {
+  /** Sesi GoPay Merchant tersimpan & bisa dipakai. */
+  connected: boolean;
+  /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
+  merchantId?: string | null;
+  /** @nullable */
+  sessionUpdatedAt?: string | null;
+  /** @nullable */
+  lastCheckedAt?: string | null;
+  /** Auto-verifikasi dinyalakan (pemicu eksternal aktif). */
+  autoVerifyEnabled: boolean;
+  autoVerifyWindowMinutes?: number;
+  /** Jumlah transaksi donasi yang masih menunggu verifikasi. */
+  pendingCount: number;
+}
+
+export interface DonationVerificationOtpRequest {
+  /** Nomor HP akun GoPay Merchant (format 62xxx / 0xxx). */
+  phoneNumber: string;
+}
+
+export interface DonationVerificationOtpResponse {
+  ok?: boolean;
+  message?: string;
+  otpLength?: number;
+  expiresAt?: string;
+}
+
+export interface DonationVerificationLoginRequest {
+  /** Kode OTP yang dikirim ke HP merchant. */
+  otp: string;
+}
+
+export interface DonationVerificationLoginResponse {
+  ok?: boolean;
+  message?: string;
+  /** @nullable */
+  merchantId?: string | null;
+  /** @nullable */
+  merchantName?: string | null;
+}
+
+/**
+ * Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.
+ */
+export interface DonationVerificationMatch {
+  transactionId?: number;
+  referenceNumber?: string;
+  /** Nominal bersih donasi. */
+  amount?: number;
+  /** Nominal yang dibayar donatur (amount + fee MDR). */
+  grossAmount?: number;
+  /**
+     * Order id QRIS di sisi GoPay (bukti untuk admin).
+     * @nullable
+     */
+  orderId?: string | null;
+  paidAt?: string;
+}
+
+/**
+ * Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.
+ */
+export interface DonationVerificationAmbiguous {
+  transactionId?: number;
+  referenceNumber?: string;
+  grossAmount?: number;
+  candidateCount?: number;
+}
+
+export type DonationVerificationRunResultStatus = typeof DonationVerificationRunResultStatus[keyof typeof DonationVerificationRunResultStatus];
+
+
+export const DonationVerificationRunResultStatus = {
+  ok: 'ok',
+  skipped: 'skipped',
+  error: 'error',
+} as const;
+
+export interface DonationVerificationRunResult {
+  status: DonationVerificationRunResultStatus;
+  message?: string;
+  /** Jumlah baris mutasi QRIS yang terbaca. */
+  feedCount?: number;
+  /** Jumlah transaksi donasi yang terverifikasi otomatis. */
+  matchedCount: number;
+  pendingBefore?: number;
+  pendingAfter?: number;
+  matches?: DonationVerificationMatch[];
+  ambiguous?: DonationVerificationAmbiguous[];
+}
+
+export type DonationVerificationRunSource = typeof DonationVerificationRunSource[keyof typeof DonationVerificationRunSource];
+
+
+export const DonationVerificationRunSource = {
+  manual: 'manual',
+  auto: 'auto',
+} as const;
+
+export type DonationVerificationRunStatus = typeof DonationVerificationRunStatus[keyof typeof DonationVerificationRunStatus];
+
+
+export const DonationVerificationRunStatus = {
+  ok: 'ok',
+  skipped: 'skipped',
+  error: 'error',
+} as const;
+
+/**
+ * @nullable
+ */
+export type DonationVerificationRunDetails = { [key: string]: unknown } | null;
+
+/**
+ * Riwayat satu kali pemeriksaan mutasi.
+ */
+export interface DonationVerificationRun {
+  id: number;
+  source: DonationVerificationRunSource;
+  status: DonationVerificationRunStatus;
+  /** @nullable */
+  message?: string | null;
+  feedCount?: number;
+  matchedCount?: number;
+  pendingBefore?: number;
+  pendingAfter?: number;
+  /** @nullable */
+  details?: DonationVerificationRunDetails;
+  /** @nullable */
+  startedAt?: string | null;
+  /** @nullable */
+  finishedAt?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+}
+
+export interface DonationVerificationSettingsInput {
+  autoVerifyEnabled?: boolean;
+  /** Seberapa jauh ke belakang feed mutasi dipindai (menit). */
+  autoVerifyWindowMinutes?: number;
+}
+
+export interface DonationVerificationSettings {
+  autoVerifyEnabled: boolean;
+  autoVerifyWindowMinutes: number;
+}
+
 export type ListArticlesParams = {
 page?: number;
 limit?: number;
@@ -130,6 +790,48 @@ search?: string;
 
 export type ListAllArticlesParams = {
 page?: number;
+limit?: number;
+};
+
+export type UpdateAdminCommentBody = {
+  content: string;
+};
+
+export type TrackComplaintParams = {
+complaintNumber: string;
+email: string;
+};
+
+export type TrackDonationTransactionParams = {
+email?: string;
+};
+
+export type ListAdminDonationCampaignsParams = {
+page?: number;
+limit?: number;
+search?: string;
+status?: string;
+};
+
+export type ListAdminDonationTransactionsParams = {
+page?: number;
+limit?: number;
+status?: string;
+campaignId?: number;
+search?: string;
+};
+
+export type LogoutDonationVerification200 = {
+  ok?: boolean;
+  message?: string;
+};
+
+export type RunDonationVerificationBody = {
+  /** Seberapa jauh ke belakang feed mutasi dipindai (menit) */
+  windowMinutes?: number;
+};
+
+export type ListDonationVerificationRunsParams = {
 limit?: number;
 };
 

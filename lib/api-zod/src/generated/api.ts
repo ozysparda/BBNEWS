@@ -310,6 +310,290 @@ export const IncrementArticleViewsParams = zod.object({
 
 
 /**
+ * @summary List comments for an article
+ */
+export const ListCommentsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListCommentsResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListCommentsResponse = zod.array(ListCommentsResponseItem)
+
+
+/**
+ * @summary Create a comment on an article
+ */
+export const CreateCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CreateCommentBody = zod.object({
+  "email": zod.string(),
+  "content": zod.string(),
+  "location": zod.string().nullish()
+})
+
+
+/**
+ * @summary List all comments with sender details (admin only)
+ */
+export const ListAdminCommentsResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "articleTitle": zod.string(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListAdminCommentsResponse = zod.array(ListAdminCommentsResponseItem)
+
+
+/**
+ * @summary Update a comment (admin only)
+ */
+export const UpdateAdminCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminCommentBody = zod.object({
+  "content": zod.string()
+})
+
+export const UpdateAdminCommentResponse = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "articleTitle": zod.string(),
+  "email": zod.string(),
+  "content": zod.string(),
+  "ipAddress": zod.string().nullable(),
+  "userAgent": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a comment (admin only)
+ */
+export const DeleteAdminCommentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Submit a public complaint/report
+ */
+export const CreateComplaintBody = zod.object({
+  "fullName": zod.string().optional(),
+  "email": zod.string(),
+  "phoneNumber": zod.string().optional(),
+  "category": zod.string().optional(),
+  "title": zod.string().optional(),
+  "description": zod.string().optional(),
+  "content": zod.string().optional(),
+  "agreementAccepted": zod.enum(['true']).optional(),
+  "terms": zod.boolean(),
+  "latitude": zod.number().optional(),
+  "longitude": zod.number().optional(),
+  "location": zod.string().nullish(),
+  "address": zod.string().optional(),
+  "city": zod.string().optional(),
+  "province": zod.string().optional(),
+  "country": zod.string().optional(),
+  "photoUrl": zod.string().optional(),
+  "videoUrl": zod.string().optional(),
+  "pdfUrl": zod.string().optional()
+})
+
+
+/**
+ * @summary Track a complaint using complaint number and email
+ */
+export const TrackComplaintQueryParams = zod.object({
+  "complaintNumber": zod.coerce.string(),
+  "email": zod.coerce.string().email()
+})
+
+export const TrackComplaintResponse = zod.object({
+  "complaintNumber": zod.string(),
+  "status": zod.string(),
+  "title": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List all complaints (admin only)
+ */
+export const ListAdminComplaintsResponse = zod.object({
+  "complaints": zod.array(zod.object({
+  "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Get a complaint (admin only)
+ */
+export const GetAdminComplaintParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminComplaintResponse = zod.object({
+  "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a complaint (admin only)
+ */
+export const DeleteAdminComplaintParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Update complaint status (admin only)
+ */
+export const UpdateComplaintStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateComplaintStatusBody = zod.object({
+  "status": zod.string(),
+  "adminResponse": zod.string().nullish(),
+  "assignedOfficer": zod.string().nullish()
+})
+
+export const UpdateComplaintStatusResponse = zod.object({
+  "id": zod.number(),
+  "complaintNumber": zod.string(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "phoneNumber": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "photoUrl": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminResponse": zod.string().nullable(),
+  "assignedOfficer": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "province": zod.string().nullish(),
+  "country": zod.string().nullish(),
+  "deviceName": zod.string().nullish(),
+  "deviceType": zod.string().nullish(),
+  "operatingSystem": zod.string().nullish(),
+  "browser": zod.string().nullish(),
+  "browserVersion": zod.string().nullish(),
+  "screenResolution": zod.string().nullish(),
+  "timezone": zod.string().nullish(),
+  "localTime": zod.string().nullish(),
+  "ipAddress": zod.string().nullish(),
+  "userAgent": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "deviceFingerprint": zod.string().nullish(),
+  "agreementAccepted": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
  * @summary List all categories
  */
 export const ListCategoriesResponseItem = zod.object({
@@ -440,6 +724,695 @@ export const UpdateAdminUserResponse = zod.object({
  */
 export const DeleteAdminUserParams = zod.object({
   "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Public donation settings (hero text, default QRIS/rekening)
+ */
+export const GetDonationSettingsResponse = zod.object({
+  "id": zod.number().optional(),
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "isOpen": zod.boolean(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional(),
+  "updatedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary List active donation campaigns
+ */
+export const ListDonationCampaignsResponseItem = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+export const ListDonationCampaignsResponse = zod.array(ListDonationCampaignsResponseItem)
+
+
+/**
+ * @summary Get a donation campaign by slug
+ */
+export const GetDonationCampaignParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetDonationCampaignResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+
+
+/**
+ * @summary Submit a donation
+ */
+export const CreateDonationTransactionBody = zod.object({
+  "campaignId": zod.number().optional(),
+  "campaignSlug": zod.string().optional(),
+  "donorName": zod.string().optional().describe('Nama donatur. Opsional bila isAnonymous = true (donasi anonim). Wajib bila isAnonymous = false.'),
+  "donorEmail": zod.string().optional().describe('Email donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true. Jika diisi, dipakai untuk verifikasi saat melacak status donasi.'),
+  "donorPhone": zod.string().optional().describe('Nomor WhatsApp donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true.'),
+  "amount": zod.number().optional(),
+  "cryptoAmount": zod.string().optional(),
+  "txHash": zod.string().optional(),
+  "method": zod.enum(['qris', 'bank', 'crypto']).optional(),
+  "message": zod.string().optional(),
+  "proofUrl": zod.string().optional(),
+  "isAnonymous": zod.boolean().optional().describe('Bila true, identitas donatur disembunyikan: nama tidak ditampilkan di daftar donatur publik dan email\/WhatsApp tidak disimpan.')
+})
+
+
+/**
+ * @summary Track donation status by reference number
+ */
+export const TrackDonationTransactionParams = zod.object({
+  "reference": zod.coerce.string()
+})
+
+export const TrackDonationTransactionQueryParams = zod.object({
+  "email": zod.coerce.string().optional()
+})
+
+export const TrackDonationTransactionResponse = zod.object({
+  "referenceNumber": zod.string(),
+  "status": zod.string(),
+  "amount": zod.number().optional(),
+  "grossAmount": zod.number().nullish().describe('Nominal yang harus dibayar donatur (amount + feeAmount).'),
+  "feeAmount": zod.number().nullish().describe('Biaya MDR\/biaya QRIS yang ditanggung donatur.'),
+  "cryptoAmount": zod.string().nullish(),
+  "method": zod.string().optional(),
+  "message": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "autoVerified": zod.boolean().optional(),
+  "campaignTitle": zod.string().nullish(),
+  "campaignSlug": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "verifiedAt": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish().describe('Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.')
+})
+
+
+/**
+ * @summary List all donation campaigns (admin only)
+ */
+export const listAdminDonationCampaignsQueryPageDefault = 1;
+export const listAdminDonationCampaignsQueryLimitDefault = 20;
+
+export const ListAdminDonationCampaignsQueryParams = zod.object({
+  "page": zod.coerce.number().default(listAdminDonationCampaignsQueryPageDefault),
+  "limit": zod.coerce.number().default(listAdminDonationCampaignsQueryLimitDefault),
+  "search": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListAdminDonationCampaignsResponse = zod.object({
+  "campaigns": zod.array(zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Create a donation campaign (admin only)
+ */
+export const CreateDonationCampaignBody = zod.object({
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.enum(['draft', 'active', 'closed', 'archived']).optional(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get a donation campaign (admin only)
+ */
+export const GetAdminDonationCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminDonationCampaignResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+
+
+/**
+ * @summary Update a donation campaign (admin only)
+ */
+export const UpdateDonationCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateDonationCampaignBody = zod.object({
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "minAmount": zod.number().optional(),
+  "status": zod.enum(['draft', 'active', 'closed', 'archived']).optional(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish()
+})
+
+export const UpdateDonationCampaignResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "excerpt": zod.string().optional(),
+  "content": zod.string().optional(),
+  "coverImageUrl": zod.string().nullish(),
+  "targetAmount": zod.number().optional(),
+  "collectedAmount": zod.number().optional(),
+  "donorCount": zod.number().optional(),
+  "pendingCount": zod.number().optional(),
+  "progress": zod.number().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "status": zod.string(),
+  "startAt": zod.string().nullish(),
+  "deadline": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish(),
+  "recentDonations": zod.array(zod.object({
+  "id": zod.number(),
+  "donorName": zod.string(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+})).optional()
+})
+
+
+/**
+ * @summary Delete a donation campaign (admin only)
+ */
+export const DeleteDonationCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List donation transactions (admin only)
+ */
+export const listAdminDonationTransactionsQueryPageDefault = 1;
+export const listAdminDonationTransactionsQueryLimitDefault = 20;
+
+export const ListAdminDonationTransactionsQueryParams = zod.object({
+  "page": zod.coerce.number().default(listAdminDonationTransactionsQueryPageDefault),
+  "limit": zod.coerce.number().default(listAdminDonationTransactionsQueryLimitDefault),
+  "status": zod.coerce.string().optional(),
+  "campaignId": zod.coerce.number().optional(),
+  "search": zod.coerce.string().optional()
+})
+
+export const ListAdminDonationTransactionsResponse = zod.object({
+  "transactions": zod.array(zod.object({
+  "id": zod.number(),
+  "referenceNumber": zod.string(),
+  "campaignId": zod.number(),
+  "donorName": zod.string(),
+  "donorEmail": zod.string().nullish(),
+  "donorPhone": zod.string().nullish(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "grossAmount": zod.number().nullish().describe('Nominal yang benar-benar dibayar donatur (amount + feeAmount).'),
+  "feeAmount": zod.number().nullish().describe('Biaya MDR\/biaya QRIS yang ditanggung donatur.'),
+  "cryptoAmount": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "txHash": zod.string().nullish(),
+  "method": zod.string(),
+  "message": zod.string().nullish(),
+  "proofUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminNote": zod.string().nullish(),
+  "verifiedBy": zod.string().nullish(),
+  "verifiedAt": zod.string().nullish(),
+  "autoVerified": zod.boolean().optional(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Verify or reject a donation transaction (admin only)
+ */
+export const UpdateDonationTransactionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateDonationTransactionBody = zod.object({
+  "status": zod.enum(['pending', 'verified', 'rejected']),
+  "adminNote": zod.string().nullish()
+})
+
+export const UpdateDonationTransactionResponse = zod.object({
+  "id": zod.number(),
+  "referenceNumber": zod.string(),
+  "campaignId": zod.number(),
+  "donorName": zod.string(),
+  "donorEmail": zod.string().nullish(),
+  "donorPhone": zod.string().nullish(),
+  "isAnonymous": zod.boolean().optional(),
+  "amount": zod.number(),
+  "grossAmount": zod.number().nullish().describe('Nominal yang benar-benar dibayar donatur (amount + feeAmount).'),
+  "feeAmount": zod.number().nullish().describe('Biaya MDR\/biaya QRIS yang ditanggung donatur.'),
+  "cryptoAmount": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "txHash": zod.string().nullish(),
+  "method": zod.string(),
+  "message": zod.string().nullish(),
+  "proofUrl": zod.string().nullish(),
+  "status": zod.string(),
+  "adminNote": zod.string().nullish(),
+  "verifiedBy": zod.string().nullish(),
+  "verifiedAt": zod.string().nullish(),
+  "autoVerified": zod.boolean().optional(),
+  "createdAt": zod.string().nullish(),
+  "updatedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Donation summary for admin dashboard (admin only)
+ */
+export const GetDonationStatsResponse = zod.object({
+  "activeCampaigns": zod.number(),
+  "totalCampaigns": zod.number(),
+  "collectedAmount": zod.number(),
+  "pendingCount": zod.number(),
+  "verifiedCount": zod.number(),
+  "donorCount": zod.number()
+})
+
+
+/**
+ * @summary Get donation settings (admin only)
+ */
+export const GetAdminDonationSettingsResponse = zod.object({
+  "id": zod.number().optional(),
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "isOpen": zod.boolean(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional(),
+  "updatedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update donation settings (admin only)
+ */
+export const UpdateDonationSettingsBody = zod.object({
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "isOpen": zod.boolean().optional(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional()
+})
+
+export const UpdateDonationSettingsResponse = zod.object({
+  "id": zod.number().optional(),
+  "heroTitle": zod.string(),
+  "heroDescription": zod.string().optional(),
+  "qrisImageUrl": zod.string().nullish(),
+  "qrisPayload": zod.string().nullish(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountHolder": zod.string().nullish(),
+  "cryptoNetwork": zod.string().nullish(),
+  "cryptoSymbol": zod.string().nullish(),
+  "cryptoAddress": zod.string().nullish(),
+  "autoConfirm": zod.boolean().optional(),
+  "minAmount": zod.number().optional(),
+  "qrisFeeBps": zod.number().optional().describe('MDR\/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).'),
+  "isOpen": zod.boolean(),
+  "popupEnabled": zod.boolean().optional(),
+  "popupCampaignId": zod.number().nullish(),
+  "popupPlacement": zod.enum(['floating', 'article-top', 'article-middle', 'article-bottom', 'home-banner']).optional(),
+  "popupDelay": zod.number().optional(),
+  "popupDismissable": zod.boolean().optional(),
+  "updatedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+ */
+export const GetDonationVerificationStatusResponse = zod.object({
+  "connected": zod.boolean().describe('Sesi GoPay Merchant tersimpan & bisa dipakai.'),
+  "phoneNumber": zod.string().nullish(),
+  "merchantId": zod.string().nullish(),
+  "sessionUpdatedAt": zod.string().nullish(),
+  "lastCheckedAt": zod.string().nullish(),
+  "autoVerifyEnabled": zod.boolean().describe('Auto-verifikasi dinyalakan (pemicu eksternal aktif).'),
+  "autoVerifyWindowMinutes": zod.number().optional(),
+  "pendingCount": zod.number().describe('Jumlah transaksi donasi yang masih menunggu verifikasi.')
+}).describe('Status integrasi auto-verifikasi donasi QRIS (GoPay Merchant).')
+
+
+/**
+ * @summary Minta kode OTP GoPay Merchant ke nomor HP merchant
+ */
+export const RequestDonationVerificationOtpBody = zod.object({
+  "phoneNumber": zod.string().describe('Nomor HP akun GoPay Merchant (format 62xxx \/ 0xxx).')
+})
+
+export const RequestDonationVerificationOtpResponse = zod.object({
+  "ok": zod.boolean().optional(),
+  "message": zod.string().optional(),
+  "otpLength": zod.number().optional(),
+  "expiresAt": zod.string().optional()
+})
+
+
+/**
+ * @summary Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+ */
+export const LoginDonationVerificationBody = zod.object({
+  "otp": zod.string().describe('Kode OTP yang dikirim ke HP merchant.')
+})
+
+export const LoginDonationVerificationResponse = zod.object({
+  "ok": zod.boolean().optional(),
+  "message": zod.string().optional(),
+  "merchantId": zod.string().nullish(),
+  "merchantName": zod.string().nullish()
+})
+
+
+/**
+ * @summary Putuskan sesi GoPay Merchant
+ */
+export const LogoutDonationVerificationResponse = zod.object({
+  "ok": zod.boolean().optional(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang
+ */
+export const RunDonationVerificationBody = zod.object({
+  "windowMinutes": zod.number().optional().describe('Seberapa jauh ke belakang feed mutasi dipindai (menit)')
+})
+
+export const RunDonationVerificationResponse = zod.object({
+  "status": zod.enum(['ok', 'skipped', 'error']),
+  "message": zod.string().optional(),
+  "feedCount": zod.number().optional().describe('Jumlah baris mutasi QRIS yang terbaca.'),
+  "matchedCount": zod.number().describe('Jumlah transaksi donasi yang terverifikasi otomatis.'),
+  "pendingBefore": zod.number().optional(),
+  "pendingAfter": zod.number().optional(),
+  "matches": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "amount": zod.number().optional().describe('Nominal bersih donasi.'),
+  "grossAmount": zod.number().optional().describe('Nominal yang dibayar donatur (amount + fee MDR).'),
+  "orderId": zod.string().nullish().describe('Order id QRIS di sisi GoPay (bukti untuk admin).'),
+  "paidAt": zod.string().optional()
+}).describe('Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.')).optional(),
+  "ambiguous": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "grossAmount": zod.number().optional(),
+  "candidateCount": zod.number().optional()
+}).describe('Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.')).optional()
+})
+
+
+/**
+ * @summary Riwayat pemeriksaan mutasi (manual & otomatis)
+ */
+export const listDonationVerificationRunsQueryLimitDefault = 20;
+
+export const ListDonationVerificationRunsQueryParams = zod.object({
+  "limit": zod.coerce.number().default(listDonationVerificationRunsQueryLimitDefault)
+})
+
+export const ListDonationVerificationRunsResponseItem = zod.object({
+  "id": zod.number(),
+  "source": zod.enum(['manual', 'auto']),
+  "status": zod.enum(['ok', 'skipped', 'error']),
+  "message": zod.string().nullish(),
+  "feedCount": zod.number().optional(),
+  "matchedCount": zod.number().optional(),
+  "pendingBefore": zod.number().optional(),
+  "pendingAfter": zod.number().optional(),
+  "details": zod.object({
+
+}).passthrough().nullish(),
+  "startedAt": zod.string().nullish(),
+  "finishedAt": zod.string().nullish(),
+  "createdAt": zod.string().nullish()
+}).describe('Riwayat satu kali pemeriksaan mutasi.')
+export const ListDonationVerificationRunsResponse = zod.array(ListDonationVerificationRunsResponseItem)
+
+
+/**
+ * @summary Setelan auto-verifikasi (nyala/mati + rentang feed)
+ */
+export const UpdateDonationVerificationSettingsBody = zod.object({
+  "autoVerifyEnabled": zod.boolean().optional(),
+  "autoVerifyWindowMinutes": zod.number().optional().describe('Seberapa jauh ke belakang feed mutasi dipindai (menit).')
+})
+
+export const UpdateDonationVerificationSettingsResponse = zod.object({
+  "autoVerifyEnabled": zod.boolean(),
+  "autoVerifyWindowMinutes": zod.number()
+})
+
+
+/**
+ * Dipanggil oleh pemicu eksternal (GitHub Actions cron atau worker di host gratis). Memerlukan header `x-cron-secret` yang sama dengan env `CRON_SECRET` di server. Kalau auto-verifikasi dimatikan, endpoint ini hanya melaporkan "skipped".
+
+ * @summary Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+ */
+export const RunInternalDonationVerificationHeader = zod.object({
+  "x-cron-secret": zod.string()
+})
+
+export const RunInternalDonationVerificationResponse = zod.object({
+  "status": zod.enum(['ok', 'skipped', 'error']),
+  "message": zod.string().optional(),
+  "feedCount": zod.number().optional().describe('Jumlah baris mutasi QRIS yang terbaca.'),
+  "matchedCount": zod.number().describe('Jumlah transaksi donasi yang terverifikasi otomatis.'),
+  "pendingBefore": zod.number().optional(),
+  "pendingAfter": zod.number().optional(),
+  "matches": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "amount": zod.number().optional().describe('Nominal bersih donasi.'),
+  "grossAmount": zod.number().optional().describe('Nominal yang dibayar donatur (amount + fee MDR).'),
+  "orderId": zod.string().nullish().describe('Order id QRIS di sisi GoPay (bukti untuk admin).'),
+  "paidAt": zod.string().optional()
+}).describe('Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.')).optional(),
+  "ambiguous": zod.array(zod.object({
+  "transactionId": zod.number().optional(),
+  "referenceNumber": zod.string().optional(),
+  "grossAmount": zod.number().optional(),
+  "candidateCount": zod.number().optional()
+}).describe('Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.')).optional()
 })
 
 

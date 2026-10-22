@@ -20,6 +20,8 @@ tags:
     description: File upload operations
   - name: users
     description: Admin user management (owner only)
+  - name: donations
+    description: Berugak Donasi - campaign donasi & transaksi donatur
 paths:
   /healthz:
     get:
@@ -271,6 +273,270 @@ paths:
         "204":
           description: View incremented
 
+  /articles/{id}/comments:
+    get:
+      operationId: listComments
+      tags: [articles]
+      summary: List comments for an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+    post:
+      operationId: createComment
+      tags: [articles]
+      summary: Create a comment on an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Invalid input
+        "404":
+          description: Article not found
+
+  /admin/comments:
+    get:
+      operationId: listAdminComments
+      tags: [articles]
+      summary: List all comments with sender details (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of admin comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminComment"
+        "401":
+          description: Unauthorized
+
+  /admin/comments/{id}:
+    put:
+      operationId: updateAdminComment
+      tags: [articles]
+      summary: Update a comment (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+              required:
+                - content
+      responses:
+        "200":
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminComment"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteAdminComment
+      tags: [articles]
+      summary: Delete a comment (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /complaints:
+    post:
+      operationId: createComplaint
+      tags: [complaints]
+      summary: Submit a public complaint/report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplaintInput"
+      responses:
+        "201":
+          description: Complaint submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicComplaint"
+        "400":
+          description: Invalid input
+
+  /complaints/track:
+    get:
+      operationId: trackComplaint
+      tags: [complaints]
+      summary: Track a complaint using complaint number and email
+      parameters:
+        - name: complaintNumber
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: Complaint tracking result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrackedComplaint"
+        "400":
+          description: Missing tracking fields
+        "404":
+          description: Complaint not found
+
+  /admin/complaints:
+    get:
+      operationId: listAdminComplaints
+      tags: [complaints]
+      summary: List all complaints (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of complaints
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminComplaintList"
+        "401":
+          description: Unauthorized
+
+  /admin/complaints/{id}:
+    get:
+      operationId: getAdminComplaint
+      tags: [complaints]
+      summary: Get a complaint (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Complaint details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminComplaint"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteAdminComplaint
+      tags: [complaints]
+      summary: Delete a complaint (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /admin/complaints/{id}/status:
+    patch:
+      operationId: updateComplaintStatus
+      tags: [complaints]
+      summary: Update complaint status (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplaintStatusUpdate"
+      responses:
+        "200":
+          description: Complaint updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminComplaint"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
   /categories:
     get:
       operationId: listCategories
@@ -476,6 +742,551 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden (owner only)
+
+  /donations/settings:
+    get:
+      operationId: getDonationSettings
+      tags: [donations]
+      summary: Public donation settings (hero text, default QRIS/rekening)
+      responses:
+        "200":
+          description: Donation settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationSettings"
+
+  /donations/campaigns:
+    get:
+      operationId: listDonationCampaigns
+      tags: [donations]
+      summary: List active donation campaigns
+      responses:
+        "200":
+          description: List of active campaigns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DonationCampaign"
+
+  /donations/campaigns/{slug}:
+    get:
+      operationId: getDonationCampaign
+      tags: [donations]
+      summary: Get a donation campaign by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Campaign found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "404":
+          description: Not found
+
+  /donations/transactions:
+    post:
+      operationId: createDonationTransaction
+      tags: [donations]
+      summary: Submit a donation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationTransactionInput"
+      responses:
+        "201":
+          description: Donation submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransactionCreated"
+        "400":
+          description: Invalid payload
+        "404":
+          description: Campaign not found
+
+  /donations/transactions/{reference}:
+    get:
+      operationId: trackDonationTransaction
+      tags: [donations]
+      summary: Track donation status by reference number
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Donation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransactionStatus"
+        "404":
+          description: Not found
+
+  /admin/donations/campaigns:
+    get:
+      operationId: listAdminDonationCampaigns
+      tags: [donations]
+      summary: List all donation campaigns (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated campaigns
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaignListResponse"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createDonationCampaign
+      tags: [donations]
+      summary: Create a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationCampaignInput"
+      responses:
+        "201":
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/campaigns/{id}:
+    get:
+      operationId: getAdminDonationCampaign
+      tags: [donations]
+      summary: Get a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    put:
+      operationId: updateDonationCampaign
+      tags: [donations]
+      summary: Update a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationCampaignInput"
+      responses:
+        "200":
+          description: Campaign updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationCampaign"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteDonationCampaign
+      tags: [donations]
+      summary: Delete a donation campaign (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+
+  /admin/donations/transactions:
+    get:
+      operationId: listAdminDonationTransactions
+      tags: [donations]
+      summary: List donation transactions (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: campaignId
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransactionListResponse"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/transactions/{id}:
+    patch:
+      operationId: updateDonationTransaction
+      tags: [donations]
+      summary: Verify or reject a donation transaction (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationTransactionUpdate"
+      responses:
+        "200":
+          description: Transaction updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationTransaction"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /admin/donations/stats:
+    get:
+      operationId: getDonationStats
+      tags: [donations]
+      summary: Donation summary for admin dashboard (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Donation stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationStats"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/settings:
+    get:
+      operationId: getAdminDonationSettings
+      tags: [donations]
+      summary: Get donation settings (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Donation settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationSettings"
+        "401":
+          description: Unauthorized
+    put:
+      operationId: updateDonationSettings
+      tags: [donations]
+      summary: Update donation settings (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationSettingsInput"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationSettings"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/status:
+    get:
+      operationId: getDonationVerificationStatus
+      tags: [donations]
+      summary: Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Verification status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationStatus"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/otp:
+    post:
+      operationId: requestDonationVerificationOtp
+      tags: [donations]
+      summary: Minta kode OTP GoPay Merchant ke nomor HP merchant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationVerificationOtpRequest"
+      responses:
+        "200":
+          description: OTP terkirim
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationOtpResponse"
+        "400":
+          description: Permintaan ditolak
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/login:
+    post:
+      operationId: loginDonationVerification
+      tags: [donations]
+      summary: Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationVerificationLoginRequest"
+      responses:
+        "200":
+          description: Berhasil terhubung
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationLoginResponse"
+        "400":
+          description: OTP salah / kadaluarsa
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/logout:
+    post:
+      operationId: logoutDonationVerification
+      tags: [donations]
+      summary: Putuskan sesi GoPay Merchant
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Sesi diputus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/run:
+    post:
+      operationId: runDonationVerification
+      tags: [donations]
+      summary: "Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                windowMinutes:
+                  type: integer
+                  description: Seberapa jauh ke belakang feed mutasi dipindai (menit)
+      responses:
+        "200":
+          description: Hasil verifikasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationRunResult"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Gagal menjalankan verifikasi
+
+  /admin/donations/verify/runs:
+    get:
+      operationId: listDonationVerificationRuns
+      tags: [donations]
+      summary: Riwayat pemeriksaan mutasi (manual & otomatis)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Riwayat pemeriksaan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DonationVerificationRun"
+        "401":
+          description: Unauthorized
+
+  /admin/donations/verify/settings:
+    put:
+      operationId: updateDonationVerificationSettings
+      tags: [donations]
+      summary: Setelan auto-verifikasi (nyala/mati + rentang feed)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationVerificationSettingsInput"
+      responses:
+        "200":
+          description: Setelan tersimpan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationSettings"
+        "401":
+          description: Unauthorized
+
+  /internal/donations/verify/run:
+    post:
+      operationId: runInternalDonationVerification
+      tags: [donations]
+      summary: Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+      description: >
+        Dipanggil oleh pemicu eksternal (GitHub Actions cron atau worker di
+        host gratis). Memerlukan header `x-cron-secret` yang sama dengan env
+        `CRON_SECRET` di server. Kalau auto-verifikasi dimatikan, endpoint
+        ini hanya melaporkan "skipped".
+      parameters:
+        - name: x-cron-secret
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Hasil verifikasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DonationVerificationRunResult"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Verifikasi otomatis tidak diaktifkan
 
 components:
   securitySchemes:
@@ -735,3 +1546,925 @@ components:
         - username
         - password
         - role
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        articleId:
+          type: integer
+        email:
+          type: string
+        content:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - articleId
+        - email
+        - content
+        - status
+        - createdAt
+        - updatedAt
+
+    AdminComment:
+      type: object
+      properties:
+        id:
+          type: integer
+        articleId:
+          type: integer
+        articleTitle:
+          type: string
+        email:
+          type: string
+        content:
+          type: string
+        ipAddress:
+          type: ["string", "null"]
+        userAgent:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - articleId
+        - articleTitle
+        - email
+        - content
+        - ipAddress
+        - userAgent
+        - location
+        - status
+        - createdAt
+        - updatedAt
+
+    CommentInput:
+      type: object
+      properties:
+        email:
+          type: string
+        content:
+          type: string
+        location:
+          type: ["string", "null"]
+      required:
+        - email
+        - content
+
+    PublicComplaint:
+      type: object
+      properties:
+        id:
+          type: integer
+        complaintNumber:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - complaintNumber
+        - status
+        - createdAt
+        - updatedAt
+
+    AdminComplaint:
+      type: object
+      properties:
+        id:
+          type: integer
+        complaintNumber:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        videoUrl:
+          type: ["string", "null"]
+        pdfUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+        adminResponse:
+          type: ["string", "null"]
+        assignedOfficer:
+          type: ["string", "null"]
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        address:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        province:
+          type: ["string", "null"]
+        country:
+          type: ["string", "null"]
+        deviceName:
+          type: ["string", "null"]
+        deviceType:
+          type: ["string", "null"]
+        operatingSystem:
+          type: ["string", "null"]
+        browser:
+          type: ["string", "null"]
+        browserVersion:
+          type: ["string", "null"]
+        screenResolution:
+          type: ["string", "null"]
+        timezone:
+          type: ["string", "null"]
+        localTime:
+          type: ["string", "null"]
+        ipAddress:
+          type: ["string", "null"]
+        userAgent:
+          type: ["string", "null"]
+        language:
+          type: ["string", "null"]
+        deviceFingerprint:
+          type: ["string", "null"]
+        agreementAccepted:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - complaintNumber
+        - fullName
+        - email
+        - phoneNumber
+        - category
+        - title
+        - description
+        - status
+        - adminResponse
+        - agreementAccepted
+        - createdAt
+        - updatedAt
+
+    AdminComplaintList:
+      type: object
+      properties:
+        complaints:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminComplaint"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [complaints, total, page, limit, totalPages]
+
+    ComplaintInput:
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+        agreementAccepted:
+          type: string
+          enum: ["true"]
+        terms:
+          type: boolean
+        latitude:
+          type: number
+        longitude:
+          type: number
+        location:
+          type: ["string", "null"]
+        address:
+          type: string
+        city:
+          type: string
+        province:
+          type: string
+        country:
+          type: string
+        photoUrl:
+          type: string
+        videoUrl:
+          type: string
+        pdfUrl:
+          type: string
+      required:
+        - email
+        - terms
+
+    ComplaintStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        adminResponse:
+          type: ["string", "null"]
+        assignedOfficer:
+          type: ["string", "null"]
+      required:
+        - status
+
+    TrackedComplaint:
+      type: object
+      properties:
+        complaintNumber:
+          type: string
+        status:
+          type: string
+        title:
+          type: string
+        adminResponse:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - complaintNumber
+        - status
+        - title
+        - adminResponse
+        - createdAt
+        - updatedAt
+
+    DonationCampaign:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        coverImageUrl:
+          type: ["string", "null"]
+        targetAmount:
+          type: integer
+        collectedAmount:
+          type: integer
+        donorCount:
+          type: integer
+        pendingCount:
+          type: integer
+        progress:
+          type: integer
+        qrisImageUrl:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+        bankAccountNumber:
+          type: ["string", "null"]
+        bankAccountHolder:
+          type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        cryptoSymbol:
+          type: ["string", "null"]
+        cryptoAddress:
+          type: ["string", "null"]
+        autoConfirm:
+          type: boolean
+        minAmount:
+          type: integer
+        qrisFeeBps:
+          type: integer
+          description: MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).
+        status:
+          type: string
+        startAt:
+          type: ["string", "null"]
+        deadline:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+        updatedAt:
+          type: ["string", "null"]
+        recentDonations:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationRecentDonation"
+      required:
+        - id
+        - slug
+        - title
+        - status
+
+    DonationRecentDonation:
+      type: object
+      properties:
+        id:
+          type: integer
+        donorName:
+          type: string
+        isAnonymous:
+          type: boolean
+        amount:
+          type: integer
+        message:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - donorName
+        - amount
+
+    DonationCampaignInput:
+      type: object
+      properties:
+        title:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        coverImageUrl:
+          type: ["string", "null"]
+        targetAmount:
+          type: integer
+        minAmount:
+          type: integer
+        status:
+          type: string
+          enum: ["draft", "active", "closed", "archived"]
+        startAt:
+          type: ["string", "null"]
+        deadline:
+          type: ["string", "null"]
+      required:
+        - title
+
+    DonationCampaignListResponse:
+      type: object
+      properties:
+        campaigns:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationCampaign"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [campaigns, total, page, limit, totalPages]
+
+    DonationTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        referenceNumber:
+          type: string
+        campaignId:
+          type: integer
+        donorName:
+          type: string
+        donorEmail:
+          type: ["string", "null"]
+        donorPhone:
+          type: ["string", "null"]
+        isAnonymous:
+          type: boolean
+        amount:
+          type: integer
+        grossAmount:
+          type: ["integer", "null"]
+          description: Nominal yang benar-benar dibayar donatur (amount + feeAmount).
+        feeAmount:
+          type: ["integer", "null"]
+          description: Biaya MDR/biaya QRIS yang ditanggung donatur.
+        cryptoAmount:
+          type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        txHash:
+          type: ["string", "null"]
+        method:
+          type: string
+        message:
+          type: ["string", "null"]
+        proofUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+        adminNote:
+          type: ["string", "null"]
+        verifiedBy:
+          type: ["string", "null"]
+        verifiedAt:
+          type: ["string", "null"]
+        autoVerified:
+          type: boolean
+        createdAt:
+          type: ["string", "null"]
+        updatedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - referenceNumber
+        - campaignId
+        - donorName
+        - amount
+        - method
+        - status
+
+    DonationTransactionInput:
+      type: object
+      properties:
+        campaignId:
+          type: integer
+        campaignSlug:
+          type: string
+        donorName:
+          type: string
+          description: >-
+            Nama donatur. Opsional bila isAnonymous = true (donasi anonim).
+            Wajib bila isAnonymous = false.
+        donorEmail:
+          type: string
+          description: >-
+            Email donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true.
+            Jika diisi, dipakai untuk verifikasi saat melacak status donasi.
+        donorPhone:
+          type: string
+          description: >-
+            Nomor WhatsApp donatur. Selalu opsional. Tidak disimpan bila
+            isAnonymous = true.
+        amount:
+          type: number
+        cryptoAmount:
+          type: string
+        txHash:
+          type: string
+        method:
+          type: string
+          enum: ["qris", "bank", "crypto"]
+        message:
+          type: string
+        proofUrl:
+          type: string
+        isAnonymous:
+          type: boolean
+          description: >-
+            Bila true, identitas donatur disembunyikan: nama tidak ditampilkan
+            di daftar donatur publik dan email/WhatsApp tidak disimpan.
+
+    DonationTransactionCreated:
+      type: object
+      properties:
+        referenceNumber:
+          type: string
+        status:
+          type: string
+        autoVerified:
+          type: boolean
+        note:
+          type: ["string", "null"]
+        message:
+          type: string
+        donorName:
+          type: string
+        amount:
+          type: integer
+          description: Nominal donasi bersih (yang dihitung ke total campaign).
+        grossAmount:
+          type: ["integer", "null"]
+          description: Nominal yang harus dibayar donatur (amount + feeAmount).
+        feeAmount:
+          type: ["integer", "null"]
+          description: Biaya MDR/biaya QRIS yang ditanggung donatur.
+        qrisPayload:
+          type: ["string", "null"]
+          description: Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
+      required:
+        - referenceNumber
+        - status
+        - message
+
+    DonationTransactionStatus:
+      type: object
+      properties:
+        referenceNumber:
+          type: string
+        status:
+          type: string
+        amount:
+          type: integer
+        grossAmount:
+          type: ["integer", "null"]
+          description: Nominal yang harus dibayar donatur (amount + feeAmount).
+        feeAmount:
+          type: ["integer", "null"]
+          description: Biaya MDR/biaya QRIS yang ditanggung donatur.
+        cryptoAmount:
+          type: ["string", "null"]
+        method:
+          type: string
+        message:
+          type: ["string", "null"]
+        adminNote:
+          type: ["string", "null"]
+        autoVerified:
+          type: boolean
+        campaignTitle:
+          type: ["string", "null"]
+        campaignSlug:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+        verifiedAt:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+          description: Payload QRIS dinamis (nominal sudah terisi) khusus transaksi ini.
+      required:
+        - referenceNumber
+        - status
+
+    DonationTransactionUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["pending", "verified", "rejected"]
+        adminNote:
+          type: ["string", "null"]
+      required:
+        - status
+
+    DonationTransactionListResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationTransaction"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [transactions, total, page, limit, totalPages]
+
+    DonationStats:
+      type: object
+      properties:
+        activeCampaigns:
+          type: integer
+        totalCampaigns:
+          type: integer
+        collectedAmount:
+          type: integer
+        pendingCount:
+          type: integer
+        verifiedCount:
+          type: integer
+        donorCount:
+          type: integer
+      required:
+        - activeCampaigns
+        - totalCampaigns
+        - collectedAmount
+        - pendingCount
+        - verifiedCount
+        - donorCount
+
+    DonationSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        heroTitle:
+          type: string
+        heroDescription:
+          type: string
+        qrisImageUrl:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+        bankAccountNumber:
+          type: ["string", "null"]
+        bankAccountHolder:
+          type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        cryptoSymbol:
+          type: ["string", "null"]
+        cryptoAddress:
+          type: ["string", "null"]
+        autoConfirm:
+          type: boolean
+        minAmount:
+          type: integer
+        qrisFeeBps:
+          type: integer
+          description: MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).
+        isOpen:
+          type: boolean
+        popupEnabled:
+          type: boolean
+        popupCampaignId:
+          type: ["integer", "null"]
+        popupPlacement:
+          type: string
+          enum: ["floating", "article-top", "article-middle", "article-bottom", "home-banner"]
+        popupDelay:
+          type: integer
+        popupDismissable:
+          type: boolean
+        updatedAt:
+          type: ["string", "null"]
+      required:
+        - heroTitle
+        - isOpen
+
+    DonationSettingsInput:
+      type: object
+      properties:
+        heroTitle:
+          type: string
+        heroDescription:
+          type: string
+        qrisImageUrl:
+          type: ["string", "null"]
+        qrisPayload:
+          type: ["string", "null"]
+        bankName:
+          type: ["string", "null"]
+        bankAccountNumber:
+          type: ["string", "null"]
+        bankAccountHolder:
+          type: ["string", "null"]
+        cryptoNetwork:
+          type: ["string", "null"]
+        cryptoSymbol:
+          type: ["string", "null"]
+        cryptoAddress:
+          type: ["string", "null"]
+        autoConfirm:
+          type: boolean
+        minAmount:
+          type: integer
+        qrisFeeBps:
+          type: integer
+          description: MDR/biaya QRIS yang ditanggung donatur, basis points persen (70 = 0,70%).
+        isOpen:
+          type: boolean
+        popupEnabled:
+          type: boolean
+        popupCampaignId:
+          type: ["integer", "null"]
+        popupPlacement:
+          type: string
+          enum: ["floating", "article-top", "article-middle", "article-bottom", "home-banner"]
+        popupDelay:
+          type: integer
+        popupDismissable:
+          type: boolean
+      required:
+        - heroTitle
+
+    DonationVerificationStatus:
+      type: object
+      description: Status integrasi auto-verifikasi donasi QRIS (GoPay Merchant).
+      properties:
+        connected:
+          type: boolean
+          description: Sesi GoPay Merchant tersimpan & bisa dipakai.
+        phoneNumber:
+          type: ["string", "null"]
+        merchantId:
+          type: ["string", "null"]
+        sessionUpdatedAt:
+          type: ["string", "null"]
+        lastCheckedAt:
+          type: ["string", "null"]
+        autoVerifyEnabled:
+          type: boolean
+          description: Auto-verifikasi dinyalakan (pemicu eksternal aktif).
+        autoVerifyWindowMinutes:
+          type: integer
+        pendingCount:
+          type: integer
+          description: Jumlah transaksi donasi yang masih menunggu verifikasi.
+      required:
+        - connected
+        - autoVerifyEnabled
+        - pendingCount
+
+    DonationVerificationOtpRequest:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: Nomor HP akun GoPay Merchant (format 62xxx / 0xxx).
+      required:
+        - phoneNumber
+
+    DonationVerificationOtpResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
+        otpLength:
+          type: integer
+        expiresAt:
+          type: string
+
+    DonationVerificationLoginRequest:
+      type: object
+      properties:
+        otp:
+          type: string
+          description: Kode OTP yang dikirim ke HP merchant.
+      required:
+        - otp
+
+    DonationVerificationLoginResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
+        merchantId:
+          type: ["string", "null"]
+        merchantName:
+          type: ["string", "null"]
+
+    DonationVerificationMatch:
+      type: object
+      description: Satu transaksi donasi yang berhasil dicocokkan dengan mutasi.
+      properties:
+        transactionId:
+          type: integer
+        referenceNumber:
+          type: string
+        amount:
+          type: integer
+          description: Nominal bersih donasi.
+        grossAmount:
+          type: integer
+          description: Nominal yang dibayar donatur (amount + fee MDR).
+        orderId:
+          type: ["string", "null"]
+          description: Order id QRIS di sisi GoPay (bukti untuk admin).
+        paidAt:
+          type: string
+
+    DonationVerificationAmbiguous:
+      type: object
+      description: Transaksi yang tidak bisa dicocokkan secara pasti -> perlu dicek admin.
+      properties:
+        transactionId:
+          type: integer
+        referenceNumber:
+          type: string
+        grossAmount:
+          type: integer
+        candidateCount:
+          type: integer
+
+    DonationVerificationRunResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["ok", "skipped", "error"]
+        message:
+          type: string
+        feedCount:
+          type: integer
+          description: Jumlah baris mutasi QRIS yang terbaca.
+        matchedCount:
+          type: integer
+          description: Jumlah transaksi donasi yang terverifikasi otomatis.
+        pendingBefore:
+          type: integer
+        pendingAfter:
+          type: integer
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationVerificationMatch"
+        ambiguous:
+          type: array
+          items:
+            $ref: "#/components/schemas/DonationVerificationAmbiguous"
+      required:
+        - status
+        - matchedCount
+
+    DonationVerificationRun:
+      type: object
+      description: Riwayat satu kali pemeriksaan mutasi.
+      properties:
+        id:
+          type: integer
+        source:
+          type: string
+          enum: ["manual", "auto"]
+        status:
+          type: string
+          enum: ["ok", "skipped", "error"]
+        message:
+          type: ["string", "null"]
+        feedCount:
+          type: integer
+        matchedCount:
+          type: integer
+        pendingBefore:
+          type: integer
+        pendingAfter:
+          type: integer
+        details:
+          type: ["object", "null"]
+        startedAt:
+          type: ["string", "null"]
+        finishedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - source
+        - status
+
+    DonationVerificationSettingsInput:
+      type: object
+      properties:
+        autoVerifyEnabled:
+          type: boolean
+        autoVerifyWindowMinutes:
+          type: integer
+          description: Seberapa jauh ke belakang feed mutasi dipindai (menit).
+
+    DonationVerificationSettings:
+      type: object
+      properties:
+        autoVerifyEnabled:
+          type: boolean
+        autoVerifyWindowMinutes:
+          type: integer
+      required:
+        - autoVerifyEnabled
+        - autoVerifyWindowMinutes

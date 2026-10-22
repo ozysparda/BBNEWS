@@ -21,7 +21,7 @@ export default function AdminLogin() {
   const loginMutation = useAdminLogin();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema as any),
     defaultValues: {
       username: "",
       password: "",

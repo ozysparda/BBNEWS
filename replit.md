@@ -1,45 +1,66 @@
-# [Project name]
+# BerugakNews
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Portal berita online untuk Lombok. Dibangun dengan React + Vite di frontend, Express + Drizzle ORM di backend, dan PostgreSQL sebagai database.
 
-## Run & Operate
+## Run & Operate (Replit)
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/balebeleq-web run dev` — jalankan frontend
+- `pnpm --filter @workspace/api-server run dev` — jalankan API server
+- `pnpm run typecheck` — typecheck seluruh workspace
+- `pnpm --filter @workspace/db run push` — push schema DB ke PostgreSQL (dev)
+- `pnpm --filter @workspace/api-server run seed:vercel` — seed data awal (admin + kategori)
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- pnpm workspaces, TypeScript 5.9
+- Frontend: React 19, Vite 7, Tailwind 4, wouter, TanStack Query
+- Backend: Express 5, Drizzle ORM, PostgreSQL (Vercel Postgres)
+- Upload: Vercel Blob
+- Auth: JWT di `localStorage`
 
-## Where things live
+## Deploy ke Vercel + GitHub
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+1. **Push project ini ke GitHub**:
+   ```bash
+   git init
+   git add .
+   git commit -m "Siap deploy ke Vercel"
+   git branch -M main
+   git remote add origin https://github.com/username/berugaknews.git
+   git push -u origin main
+   ```
 
-## Architecture decisions
+2. **Buat project di Vercel**:
+   - Buka [vercel.com](https://vercel.com) → Add New Project → Import dari GitHub.
+   - Pilih repository BerugakNews.
+   - Framework Preset: **Other** (karena project ini monorepo custom).
+   - Build Command: `pnpm run vercel-build`
+   - Output Directory: `artifacts/balebeleq-web/dist/public`
+   - Klik **Deploy**.
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+3. **Tambahkan Environment Variables di Vercel** (Settings → Environment Variables):
+   - `POSTGRES_URL` — connection string Vercel Postgres
+   - `BLOB_READ_WRITE_TOKEN` — token dari Vercel Blob
+   - `JWT_SECRET` — string acak untuk sign JWT (min. 32 karakter)
+   - `SESSION_SECRET` — string acak untuk session (jika diperlukan)
 
-## Product
+4. **Setup database**:
+   - Provision **Vercel Postgres** dari dashboard Vercel.
+   - Setelah `POSTGRES_URL` tersedia, jalankan **Drizzle push** untuk membuat tabel:
+     ```bash
+     vercel --prod env pull .env.production.local
+     POSTGRES_URL="..." pnpm --filter @workspace/db run push
+     ```
+   - Seed data awal (admin default `admin` / `admin123` + 6 kategori):
+     ```bash
+     vercel --prod env pull .env.production.local
+     pnpm --filter @workspace/api-server run seed:vercel
+     ```
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+5. **Redeploy**: Setelah env variables lengkap dan database siap, klik **Redeploy** di Vercel.
 
-## User preferences
+## Catatan Penting
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Semua file hasil build (`dist/`, `api/index.mjs`) tidak perlu di-push ke GitHub — sudah ada di `.gitignore`.
+- Untuk development lokal, tetap gunakan `DATABASE_URL`. Untuk Vercel, gunakan `POSTGRES_URL`.
+- Gambar/gambar artikel diunggah langsung ke **Vercel Blob**, bukan ke disk server.

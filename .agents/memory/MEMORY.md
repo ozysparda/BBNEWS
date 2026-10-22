@@ -1,3 +1,7 @@
 - [BaleBeleqNews Stack](balebeleq-stack.md) — React 19+Vite 7+Tailwind 4+wouter+Express 5+Drizzle ORM+PostgreSQL+JWT; codegen via orval
 - [Orval api-zod config pitfall](orval-api-zod-index.md) — removing `schemas` from orval zod config leaves index.ts broken; fix by echoing only `export * from "./generated/api"` AFTER codegen runs
 - [BaleBeleqNews Auth Accounts](balebeleq-auth.md) — admin/owner, hendra/owner, toni/owner; JWT in localStorage as admin_token
+- [Vercel API build](vercel-api-build.md) — Express backend exported directly as Vercel function; built to `api/index.mjs` by `build-vercel.mjs`
+- [Vercel Blob frontend upload](vercel-blob-upload.md) — server generates client token; browser uses `put` from `@vercel/blob/client`
+- [External database schema](external-database-schema.md) — POSTGRES_URL may lag the Drizzle schema; use additive migrations and never force-push schema changes
+- [Admin Select and session guards](admin-select-session-guards.md) — Radix Select requires non-empty item values; admin 401 responses should clear JWT and redirect to login

@@ -20,6 +20,9 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminComment,
+  AdminComplaint,
+  AdminComplaintList,
   AdminUser,
   AdminUserCreate,
   Article,
@@ -28,13 +31,48 @@ import type {
   ArticleStats,
   Category,
   CategoryInput,
+  Comment,
+  CommentInput,
+  ComplaintInput,
+  ComplaintStatusUpdate,
+  DonationCampaign,
+  DonationCampaignInput,
+  DonationCampaignListResponse,
+  DonationSettings,
+  DonationSettingsInput,
+  DonationStats,
+  DonationTransaction,
+  DonationTransactionCreated,
+  DonationTransactionInput,
+  DonationTransactionListResponse,
+  DonationTransactionStatus,
+  DonationTransactionUpdate,
+  DonationVerificationLoginRequest,
+  DonationVerificationLoginResponse,
+  DonationVerificationOtpRequest,
+  DonationVerificationOtpResponse,
+  DonationVerificationRun,
+  DonationVerificationRunResult,
+  DonationVerificationSettings,
+  DonationVerificationSettingsInput,
+  DonationVerificationStatus,
   HealthStatus,
+  ListAdminDonationCampaignsParams,
+  ListAdminDonationTransactionsParams,
   ListAllArticlesParams,
   ListArticlesParams,
+  ListDonationVerificationRunsParams,
   LoginCredentials,
   LoginResponse,
+  LogoutDonationVerification200,
+  PublicComplaint,
   RequestUploadUrlBody,
-  RequestUploadUrlResponse
+  RequestUploadUrlResponse,
+  RunDonationVerificationBody,
+  TrackComplaintParams,
+  TrackDonationTransactionParams,
+  TrackedComplaint,
+  UpdateAdminCommentBody
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -962,6 +1000,825 @@ export const useIncrementArticleViews = <TError = ErrorType<unknown>,
       return useMutation(getIncrementArticleViewsMutationOptions(options));
     }
 
+export const getListCommentsUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}/comments`
+}
+
+/**
+ * @summary List comments for an article
+ */
+export const listComments = async (id: number, options?: RequestInit): Promise<Comment[]> => {
+
+  return customFetch<Comment[]>(getListCommentsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCommentsQueryKey = (id: number,) => {
+    return [
+    `/api/articles/${id}/comments`
+    ] as const;
+    }
+
+
+export const getListCommentsQueryOptions = <TData = Awaited<ReturnType<typeof listComments>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCommentsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listComments>>> = ({ signal }) => listComments(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listComments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCommentsQueryResult = NonNullable<Awaited<ReturnType<typeof listComments>>>
+export type ListCommentsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List comments for an article
+ */
+
+export function useListComments<TData = Awaited<ReturnType<typeof listComments>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCommentsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateCommentUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}/comments`
+}
+
+/**
+ * @summary Create a comment on an article
+ */
+export const createComment = async (id: number,
+    commentInput: CommentInput, options?: RequestInit): Promise<Comment> => {
+
+  return customFetch<Comment>(getCreateCommentUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      commentInput,)
+  }
+);}
+
+
+
+
+export const getCreateCommentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createComment>>, TError,{id: number;data: BodyType<CommentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createComment>>, TError,{id: number;data: BodyType<CommentInput>}, TContext> => {
+
+const mutationKey = ['createComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createComment>>, {id: number;data: BodyType<CommentInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createComment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateCommentMutationResult = NonNullable<Awaited<ReturnType<typeof createComment>>>
+    export type CreateCommentMutationBody = BodyType<CommentInput>
+    export type CreateCommentMutationError = ErrorType<void>
+
+    /**
+ * @summary Create a comment on an article
+ */
+export const useCreateComment = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createComment>>, TError,{id: number;data: BodyType<CommentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createComment>>,
+        TError,
+        {id: number;data: BodyType<CommentInput>},
+        TContext
+      > => {
+      return useMutation(getCreateCommentMutationOptions(options));
+    }
+
+export const getListAdminCommentsUrl = () => {
+
+
+
+
+  return `/api/admin/comments`
+}
+
+/**
+ * @summary List all comments with sender details (admin only)
+ */
+export const listAdminComments = async ( options?: RequestInit): Promise<AdminComment[]> => {
+
+  return customFetch<AdminComment[]>(getListAdminCommentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminCommentsQueryKey = () => {
+    return [
+    `/api/admin/comments`
+    ] as const;
+    }
+
+
+export const getListAdminCommentsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminComments>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminCommentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminComments>>> = ({ signal }) => listAdminComments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminComments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminCommentsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminComments>>>
+export type ListAdminCommentsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all comments with sender details (admin only)
+ */
+
+export function useListAdminComments<TData = Awaited<ReturnType<typeof listAdminComments>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminCommentsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAdminCommentUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/comments/${id}`
+}
+
+/**
+ * @summary Update a comment (admin only)
+ */
+export const updateAdminComment = async (id: number,
+    updateAdminCommentBody: UpdateAdminCommentBody, options?: RequestInit): Promise<AdminComment> => {
+
+  return customFetch<AdminComment>(getUpdateAdminCommentUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAdminCommentBody,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminCommentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminComment>>, TError,{id: number;data: BodyType<UpdateAdminCommentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminComment>>, TError,{id: number;data: BodyType<UpdateAdminCommentBody>}, TContext> => {
+
+const mutationKey = ['updateAdminComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminComment>>, {id: number;data: BodyType<UpdateAdminCommentBody>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminComment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminCommentMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminComment>>>
+    export type UpdateAdminCommentMutationBody = BodyType<UpdateAdminCommentBody>
+    export type UpdateAdminCommentMutationError = ErrorType<void>
+
+    /**
+ * @summary Update a comment (admin only)
+ */
+export const useUpdateAdminComment = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminComment>>, TError,{id: number;data: BodyType<UpdateAdminCommentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminComment>>,
+        TError,
+        {id: number;data: BodyType<UpdateAdminCommentBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminCommentMutationOptions(options));
+    }
+
+export const getDeleteAdminCommentUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/comments/${id}`
+}
+
+/**
+ * @summary Delete a comment (admin only)
+ */
+export const deleteAdminComment = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAdminCommentUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdminCommentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComment>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAdminComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminComment>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdminComment(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminCommentMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminComment>>>
+
+    export type DeleteAdminCommentMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete a comment (admin only)
+ */
+export const useDeleteAdminComment = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminComment>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAdminCommentMutationOptions(options));
+    }
+
+export const getCreateComplaintUrl = () => {
+
+
+
+
+  return `/api/complaints`
+}
+
+/**
+ * @summary Submit a public complaint/report
+ */
+export const createComplaint = async (complaintInput: ComplaintInput, options?: RequestInit): Promise<PublicComplaint> => {
+
+  return customFetch<PublicComplaint>(getCreateComplaintUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      complaintInput,)
+  }
+);}
+
+
+
+
+export const getCreateComplaintMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createComplaint>>, TError,{data: BodyType<ComplaintInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createComplaint>>, TError,{data: BodyType<ComplaintInput>}, TContext> => {
+
+const mutationKey = ['createComplaint'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createComplaint>>, {data: BodyType<ComplaintInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createComplaint(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateComplaintMutationResult = NonNullable<Awaited<ReturnType<typeof createComplaint>>>
+    export type CreateComplaintMutationBody = BodyType<ComplaintInput>
+    export type CreateComplaintMutationError = ErrorType<void>
+
+    /**
+ * @summary Submit a public complaint/report
+ */
+export const useCreateComplaint = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createComplaint>>, TError,{data: BodyType<ComplaintInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createComplaint>>,
+        TError,
+        {data: BodyType<ComplaintInput>},
+        TContext
+      > => {
+      return useMutation(getCreateComplaintMutationOptions(options));
+    }
+
+export const getTrackComplaintUrl = (params: TrackComplaintParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/complaints/track?${stringifiedParams}` : `/api/complaints/track`
+}
+
+/**
+ * @summary Track a complaint using complaint number and email
+ */
+export const trackComplaint = async (params: TrackComplaintParams, options?: RequestInit): Promise<TrackedComplaint> => {
+
+  return customFetch<TrackedComplaint>(getTrackComplaintUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getTrackComplaintQueryKey = (params?: TrackComplaintParams,) => {
+    return [
+    `/api/complaints/track`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getTrackComplaintQueryOptions = <TData = Awaited<ReturnType<typeof trackComplaint>>, TError = ErrorType<void>>(params: TrackComplaintParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTrackComplaintQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof trackComplaint>>> = ({ signal }) => trackComplaint(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof trackComplaint>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type TrackComplaintQueryResult = NonNullable<Awaited<ReturnType<typeof trackComplaint>>>
+export type TrackComplaintQueryError = ErrorType<void>
+
+
+/**
+ * @summary Track a complaint using complaint number and email
+ */
+
+export function useTrackComplaint<TData = Awaited<ReturnType<typeof trackComplaint>>, TError = ErrorType<void>>(
+ params: TrackComplaintParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getTrackComplaintQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListAdminComplaintsUrl = () => {
+
+
+
+
+  return `/api/admin/complaints`
+}
+
+/**
+ * @summary List all complaints (admin only)
+ */
+export const listAdminComplaints = async ( options?: RequestInit): Promise<AdminComplaintList> => {
+
+  return customFetch<AdminComplaintList>(getListAdminComplaintsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminComplaintsQueryKey = () => {
+    return [
+    `/api/admin/complaints`
+    ] as const;
+    }
+
+
+export const getListAdminComplaintsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminComplaints>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComplaints>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminComplaintsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminComplaints>>> = ({ signal }) => listAdminComplaints({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminComplaints>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminComplaintsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminComplaints>>>
+export type ListAdminComplaintsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all complaints (admin only)
+ */
+
+export function useListAdminComplaints<TData = Awaited<ReturnType<typeof listAdminComplaints>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminComplaints>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminComplaintsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAdminComplaintUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/complaints/${id}`
+}
+
+/**
+ * @summary Get a complaint (admin only)
+ */
+export const getAdminComplaint = async (id: number, options?: RequestInit): Promise<AdminComplaint> => {
+
+  return customFetch<AdminComplaint>(getGetAdminComplaintUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminComplaintQueryKey = (id: number,) => {
+    return [
+    `/api/admin/complaints/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdminComplaintQueryOptions = <TData = Awaited<ReturnType<typeof getAdminComplaint>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminComplaintQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminComplaint>>> = ({ signal }) => getAdminComplaint(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminComplaint>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminComplaintQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminComplaint>>>
+export type GetAdminComplaintQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a complaint (admin only)
+ */
+
+export function useGetAdminComplaint<TData = Awaited<ReturnType<typeof getAdminComplaint>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminComplaint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminComplaintQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getDeleteAdminComplaintUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/complaints/${id}`
+}
+
+/**
+ * @summary Delete a complaint (admin only)
+ */
+export const deleteAdminComplaint = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAdminComplaintUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdminComplaintMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComplaint>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComplaint>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAdminComplaint'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminComplaint>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdminComplaint(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminComplaintMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminComplaint>>>
+
+    export type DeleteAdminComplaintMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete a complaint (admin only)
+ */
+export const useDeleteAdminComplaint = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminComplaint>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminComplaint>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAdminComplaintMutationOptions(options));
+    }
+
+export const getUpdateComplaintStatusUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/complaints/${id}/status`
+}
+
+/**
+ * @summary Update complaint status (admin only)
+ */
+export const updateComplaintStatus = async (id: number,
+    complaintStatusUpdate: ComplaintStatusUpdate, options?: RequestInit): Promise<AdminComplaint> => {
+
+  return customFetch<AdminComplaint>(getUpdateComplaintStatusUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      complaintStatusUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateComplaintStatusMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext> => {
+
+const mutationKey = ['updateComplaintStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateComplaintStatus>>, {id: number;data: BodyType<ComplaintStatusUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateComplaintStatus(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateComplaintStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateComplaintStatus>>>
+    export type UpdateComplaintStatusMutationBody = BodyType<ComplaintStatusUpdate>
+    export type UpdateComplaintStatusMutationError = ErrorType<void>
+
+    /**
+ * @summary Update complaint status (admin only)
+ */
+export const useUpdateComplaintStatus = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateComplaintStatus>>, TError,{id: number;data: BodyType<ComplaintStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateComplaintStatus>>,
+        TError,
+        {id: number;data: BodyType<ComplaintStatusUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateComplaintStatusMutationOptions(options));
+    }
+
 export const getListCategoriesUrl = () => {
 
 
@@ -1694,5 +2551,1738 @@ export const useDeleteAdminUser = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getDeleteAdminUserMutationOptions(options));
+    }
+
+export const getGetDonationSettingsUrl = () => {
+
+
+
+
+  return `/api/donations/settings`
+}
+
+/**
+ * @summary Public donation settings (hero text, default QRIS/rekening)
+ */
+export const getDonationSettings = async ( options?: RequestInit): Promise<DonationSettings> => {
+
+  return customFetch<DonationSettings>(getGetDonationSettingsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDonationSettingsQueryKey = () => {
+    return [
+    `/api/donations/settings`
+    ] as const;
+    }
+
+
+export const getGetDonationSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getDonationSettings>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDonationSettingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDonationSettings>>> = ({ signal }) => getDonationSettings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDonationSettings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDonationSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getDonationSettings>>>
+export type GetDonationSettingsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Public donation settings (hero text, default QRIS/rekening)
+ */
+
+export function useGetDonationSettings<TData = Awaited<ReturnType<typeof getDonationSettings>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDonationSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListDonationCampaignsUrl = () => {
+
+
+
+
+  return `/api/donations/campaigns`
+}
+
+/**
+ * @summary List active donation campaigns
+ */
+export const listDonationCampaigns = async ( options?: RequestInit): Promise<DonationCampaign[]> => {
+
+  return customFetch<DonationCampaign[]>(getListDonationCampaignsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListDonationCampaignsQueryKey = () => {
+    return [
+    `/api/donations/campaigns`
+    ] as const;
+    }
+
+
+export const getListDonationCampaignsQueryOptions = <TData = Awaited<ReturnType<typeof listDonationCampaigns>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDonationCampaigns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDonationCampaignsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDonationCampaigns>>> = ({ signal }) => listDonationCampaigns({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDonationCampaigns>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListDonationCampaignsQueryResult = NonNullable<Awaited<ReturnType<typeof listDonationCampaigns>>>
+export type ListDonationCampaignsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List active donation campaigns
+ */
+
+export function useListDonationCampaigns<TData = Awaited<ReturnType<typeof listDonationCampaigns>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDonationCampaigns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListDonationCampaignsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetDonationCampaignUrl = (slug: string,) => {
+
+
+
+
+  return `/api/donations/campaigns/${slug}`
+}
+
+/**
+ * @summary Get a donation campaign by slug
+ */
+export const getDonationCampaign = async (slug: string, options?: RequestInit): Promise<DonationCampaign> => {
+
+  return customFetch<DonationCampaign>(getGetDonationCampaignUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDonationCampaignQueryKey = (slug: string,) => {
+    return [
+    `/api/donations/campaigns/${slug}`
+    ] as const;
+    }
+
+
+export const getGetDonationCampaignQueryOptions = <TData = Awaited<ReturnType<typeof getDonationCampaign>>, TError = ErrorType<void>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationCampaign>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDonationCampaignQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDonationCampaign>>> = ({ signal }) => getDonationCampaign(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDonationCampaign>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDonationCampaignQueryResult = NonNullable<Awaited<ReturnType<typeof getDonationCampaign>>>
+export type GetDonationCampaignQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a donation campaign by slug
+ */
+
+export function useGetDonationCampaign<TData = Awaited<ReturnType<typeof getDonationCampaign>>, TError = ErrorType<void>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationCampaign>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDonationCampaignQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateDonationTransactionUrl = () => {
+
+
+
+
+  return `/api/donations/transactions`
+}
+
+/**
+ * @summary Submit a donation
+ */
+export const createDonationTransaction = async (donationTransactionInput: DonationTransactionInput, options?: RequestInit): Promise<DonationTransactionCreated> => {
+
+  return customFetch<DonationTransactionCreated>(getCreateDonationTransactionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationTransactionInput,)
+  }
+);}
+
+
+
+
+export const getCreateDonationTransactionMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDonationTransaction>>, TError,{data: BodyType<DonationTransactionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDonationTransaction>>, TError,{data: BodyType<DonationTransactionInput>}, TContext> => {
+
+const mutationKey = ['createDonationTransaction'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDonationTransaction>>, {data: BodyType<DonationTransactionInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createDonationTransaction(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateDonationTransactionMutationResult = NonNullable<Awaited<ReturnType<typeof createDonationTransaction>>>
+    export type CreateDonationTransactionMutationBody = BodyType<DonationTransactionInput>
+    export type CreateDonationTransactionMutationError = ErrorType<void>
+
+    /**
+ * @summary Submit a donation
+ */
+export const useCreateDonationTransaction = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDonationTransaction>>, TError,{data: BodyType<DonationTransactionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createDonationTransaction>>,
+        TError,
+        {data: BodyType<DonationTransactionInput>},
+        TContext
+      > => {
+      return useMutation(getCreateDonationTransactionMutationOptions(options));
+    }
+
+export const getTrackDonationTransactionUrl = (reference: string,
+    params?: TrackDonationTransactionParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/donations/transactions/${reference}?${stringifiedParams}` : `/api/donations/transactions/${reference}`
+}
+
+/**
+ * @summary Track donation status by reference number
+ */
+export const trackDonationTransaction = async (reference: string,
+    params?: TrackDonationTransactionParams, options?: RequestInit): Promise<DonationTransactionStatus> => {
+
+  return customFetch<DonationTransactionStatus>(getTrackDonationTransactionUrl(reference,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getTrackDonationTransactionQueryKey = (reference: string,
+    params?: TrackDonationTransactionParams,) => {
+    return [
+    `/api/donations/transactions/${reference}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getTrackDonationTransactionQueryOptions = <TData = Awaited<ReturnType<typeof trackDonationTransaction>>, TError = ErrorType<void>>(reference: string,
+    params?: TrackDonationTransactionParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackDonationTransaction>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTrackDonationTransactionQueryKey(reference,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof trackDonationTransaction>>> = ({ signal }) => trackDonationTransaction(reference,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(reference), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof trackDonationTransaction>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type TrackDonationTransactionQueryResult = NonNullable<Awaited<ReturnType<typeof trackDonationTransaction>>>
+export type TrackDonationTransactionQueryError = ErrorType<void>
+
+
+/**
+ * @summary Track donation status by reference number
+ */
+
+export function useTrackDonationTransaction<TData = Awaited<ReturnType<typeof trackDonationTransaction>>, TError = ErrorType<void>>(
+ reference: string,
+    params?: TrackDonationTransactionParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackDonationTransaction>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getTrackDonationTransactionQueryOptions(reference,params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListAdminDonationCampaignsUrl = (params?: ListAdminDonationCampaignsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/donations/campaigns?${stringifiedParams}` : `/api/admin/donations/campaigns`
+}
+
+/**
+ * @summary List all donation campaigns (admin only)
+ */
+export const listAdminDonationCampaigns = async (params?: ListAdminDonationCampaignsParams, options?: RequestInit): Promise<DonationCampaignListResponse> => {
+
+  return customFetch<DonationCampaignListResponse>(getListAdminDonationCampaignsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminDonationCampaignsQueryKey = (params?: ListAdminDonationCampaignsParams,) => {
+    return [
+    `/api/admin/donations/campaigns`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListAdminDonationCampaignsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminDonationCampaigns>>, TError = ErrorType<void>>(params?: ListAdminDonationCampaignsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminDonationCampaigns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminDonationCampaignsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminDonationCampaigns>>> = ({ signal }) => listAdminDonationCampaigns(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminDonationCampaigns>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminDonationCampaignsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminDonationCampaigns>>>
+export type ListAdminDonationCampaignsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all donation campaigns (admin only)
+ */
+
+export function useListAdminDonationCampaigns<TData = Awaited<ReturnType<typeof listAdminDonationCampaigns>>, TError = ErrorType<void>>(
+ params?: ListAdminDonationCampaignsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminDonationCampaigns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminDonationCampaignsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateDonationCampaignUrl = () => {
+
+
+
+
+  return `/api/admin/donations/campaigns`
+}
+
+/**
+ * @summary Create a donation campaign (admin only)
+ */
+export const createDonationCampaign = async (donationCampaignInput: DonationCampaignInput, options?: RequestInit): Promise<DonationCampaign> => {
+
+  return customFetch<DonationCampaign>(getCreateDonationCampaignUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationCampaignInput,)
+  }
+);}
+
+
+
+
+export const getCreateDonationCampaignMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDonationCampaign>>, TError,{data: BodyType<DonationCampaignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDonationCampaign>>, TError,{data: BodyType<DonationCampaignInput>}, TContext> => {
+
+const mutationKey = ['createDonationCampaign'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDonationCampaign>>, {data: BodyType<DonationCampaignInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createDonationCampaign(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateDonationCampaignMutationResult = NonNullable<Awaited<ReturnType<typeof createDonationCampaign>>>
+    export type CreateDonationCampaignMutationBody = BodyType<DonationCampaignInput>
+    export type CreateDonationCampaignMutationError = ErrorType<void>
+
+    /**
+ * @summary Create a donation campaign (admin only)
+ */
+export const useCreateDonationCampaign = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDonationCampaign>>, TError,{data: BodyType<DonationCampaignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createDonationCampaign>>,
+        TError,
+        {data: BodyType<DonationCampaignInput>},
+        TContext
+      > => {
+      return useMutation(getCreateDonationCampaignMutationOptions(options));
+    }
+
+export const getGetAdminDonationCampaignUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/donations/campaigns/${id}`
+}
+
+/**
+ * @summary Get a donation campaign (admin only)
+ */
+export const getAdminDonationCampaign = async (id: number, options?: RequestInit): Promise<DonationCampaign> => {
+
+  return customFetch<DonationCampaign>(getGetAdminDonationCampaignUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminDonationCampaignQueryKey = (id: number,) => {
+    return [
+    `/api/admin/donations/campaigns/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdminDonationCampaignQueryOptions = <TData = Awaited<ReturnType<typeof getAdminDonationCampaign>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminDonationCampaign>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminDonationCampaignQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminDonationCampaign>>> = ({ signal }) => getAdminDonationCampaign(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminDonationCampaign>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminDonationCampaignQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminDonationCampaign>>>
+export type GetAdminDonationCampaignQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a donation campaign (admin only)
+ */
+
+export function useGetAdminDonationCampaign<TData = Awaited<ReturnType<typeof getAdminDonationCampaign>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminDonationCampaign>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminDonationCampaignQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateDonationCampaignUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/donations/campaigns/${id}`
+}
+
+/**
+ * @summary Update a donation campaign (admin only)
+ */
+export const updateDonationCampaign = async (id: number,
+    donationCampaignInput: DonationCampaignInput, options?: RequestInit): Promise<DonationCampaign> => {
+
+  return customFetch<DonationCampaign>(getUpdateDonationCampaignUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationCampaignInput,)
+  }
+);}
+
+
+
+
+export const getUpdateDonationCampaignMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationCampaign>>, TError,{id: number;data: BodyType<DonationCampaignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDonationCampaign>>, TError,{id: number;data: BodyType<DonationCampaignInput>}, TContext> => {
+
+const mutationKey = ['updateDonationCampaign'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDonationCampaign>>, {id: number;data: BodyType<DonationCampaignInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateDonationCampaign(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateDonationCampaignMutationResult = NonNullable<Awaited<ReturnType<typeof updateDonationCampaign>>>
+    export type UpdateDonationCampaignMutationBody = BodyType<DonationCampaignInput>
+    export type UpdateDonationCampaignMutationError = ErrorType<void>
+
+    /**
+ * @summary Update a donation campaign (admin only)
+ */
+export const useUpdateDonationCampaign = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationCampaign>>, TError,{id: number;data: BodyType<DonationCampaignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateDonationCampaign>>,
+        TError,
+        {id: number;data: BodyType<DonationCampaignInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateDonationCampaignMutationOptions(options));
+    }
+
+export const getDeleteDonationCampaignUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/donations/campaigns/${id}`
+}
+
+/**
+ * @summary Delete a donation campaign (admin only)
+ */
+export const deleteDonationCampaign = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteDonationCampaignUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteDonationCampaignMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDonationCampaign>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDonationCampaign>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteDonationCampaign'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDonationCampaign>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteDonationCampaign(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteDonationCampaignMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDonationCampaign>>>
+
+    export type DeleteDonationCampaignMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete a donation campaign (admin only)
+ */
+export const useDeleteDonationCampaign = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDonationCampaign>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteDonationCampaign>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteDonationCampaignMutationOptions(options));
+    }
+
+export const getListAdminDonationTransactionsUrl = (params?: ListAdminDonationTransactionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/donations/transactions?${stringifiedParams}` : `/api/admin/donations/transactions`
+}
+
+/**
+ * @summary List donation transactions (admin only)
+ */
+export const listAdminDonationTransactions = async (params?: ListAdminDonationTransactionsParams, options?: RequestInit): Promise<DonationTransactionListResponse> => {
+
+  return customFetch<DonationTransactionListResponse>(getListAdminDonationTransactionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminDonationTransactionsQueryKey = (params?: ListAdminDonationTransactionsParams,) => {
+    return [
+    `/api/admin/donations/transactions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListAdminDonationTransactionsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminDonationTransactions>>, TError = ErrorType<void>>(params?: ListAdminDonationTransactionsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminDonationTransactions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminDonationTransactionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminDonationTransactions>>> = ({ signal }) => listAdminDonationTransactions(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminDonationTransactions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminDonationTransactionsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminDonationTransactions>>>
+export type ListAdminDonationTransactionsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List donation transactions (admin only)
+ */
+
+export function useListAdminDonationTransactions<TData = Awaited<ReturnType<typeof listAdminDonationTransactions>>, TError = ErrorType<void>>(
+ params?: ListAdminDonationTransactionsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminDonationTransactions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminDonationTransactionsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateDonationTransactionUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/donations/transactions/${id}`
+}
+
+/**
+ * @summary Verify or reject a donation transaction (admin only)
+ */
+export const updateDonationTransaction = async (id: number,
+    donationTransactionUpdate: DonationTransactionUpdate, options?: RequestInit): Promise<DonationTransaction> => {
+
+  return customFetch<DonationTransaction>(getUpdateDonationTransactionUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationTransactionUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateDonationTransactionMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationTransaction>>, TError,{id: number;data: BodyType<DonationTransactionUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDonationTransaction>>, TError,{id: number;data: BodyType<DonationTransactionUpdate>}, TContext> => {
+
+const mutationKey = ['updateDonationTransaction'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDonationTransaction>>, {id: number;data: BodyType<DonationTransactionUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateDonationTransaction(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateDonationTransactionMutationResult = NonNullable<Awaited<ReturnType<typeof updateDonationTransaction>>>
+    export type UpdateDonationTransactionMutationBody = BodyType<DonationTransactionUpdate>
+    export type UpdateDonationTransactionMutationError = ErrorType<void>
+
+    /**
+ * @summary Verify or reject a donation transaction (admin only)
+ */
+export const useUpdateDonationTransaction = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationTransaction>>, TError,{id: number;data: BodyType<DonationTransactionUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateDonationTransaction>>,
+        TError,
+        {id: number;data: BodyType<DonationTransactionUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateDonationTransactionMutationOptions(options));
+    }
+
+export const getGetDonationStatsUrl = () => {
+
+
+
+
+  return `/api/admin/donations/stats`
+}
+
+/**
+ * @summary Donation summary for admin dashboard (admin only)
+ */
+export const getDonationStats = async ( options?: RequestInit): Promise<DonationStats> => {
+
+  return customFetch<DonationStats>(getGetDonationStatsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDonationStatsQueryKey = () => {
+    return [
+    `/api/admin/donations/stats`
+    ] as const;
+    }
+
+
+export const getGetDonationStatsQueryOptions = <TData = Awaited<ReturnType<typeof getDonationStats>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDonationStatsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDonationStats>>> = ({ signal }) => getDonationStats({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDonationStats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDonationStatsQueryResult = NonNullable<Awaited<ReturnType<typeof getDonationStats>>>
+export type GetDonationStatsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Donation summary for admin dashboard (admin only)
+ */
+
+export function useGetDonationStats<TData = Awaited<ReturnType<typeof getDonationStats>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDonationStatsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAdminDonationSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/donations/settings`
+}
+
+/**
+ * @summary Get donation settings (admin only)
+ */
+export const getAdminDonationSettings = async ( options?: RequestInit): Promise<DonationSettings> => {
+
+  return customFetch<DonationSettings>(getGetAdminDonationSettingsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminDonationSettingsQueryKey = () => {
+    return [
+    `/api/admin/donations/settings`
+    ] as const;
+    }
+
+
+export const getGetAdminDonationSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminDonationSettings>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminDonationSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminDonationSettingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminDonationSettings>>> = ({ signal }) => getAdminDonationSettings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminDonationSettings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminDonationSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminDonationSettings>>>
+export type GetAdminDonationSettingsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get donation settings (admin only)
+ */
+
+export function useGetAdminDonationSettings<TData = Awaited<ReturnType<typeof getAdminDonationSettings>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminDonationSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminDonationSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateDonationSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/donations/settings`
+}
+
+/**
+ * @summary Update donation settings (admin only)
+ */
+export const updateDonationSettings = async (donationSettingsInput: DonationSettingsInput, options?: RequestInit): Promise<DonationSettings> => {
+
+  return customFetch<DonationSettings>(getUpdateDonationSettingsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationSettingsInput,)
+  }
+);}
+
+
+
+
+export const getUpdateDonationSettingsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationSettings>>, TError,{data: BodyType<DonationSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDonationSettings>>, TError,{data: BodyType<DonationSettingsInput>}, TContext> => {
+
+const mutationKey = ['updateDonationSettings'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDonationSettings>>, {data: BodyType<DonationSettingsInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateDonationSettings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateDonationSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updateDonationSettings>>>
+    export type UpdateDonationSettingsMutationBody = BodyType<DonationSettingsInput>
+    export type UpdateDonationSettingsMutationError = ErrorType<void>
+
+    /**
+ * @summary Update donation settings (admin only)
+ */
+export const useUpdateDonationSettings = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationSettings>>, TError,{data: BodyType<DonationSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateDonationSettings>>,
+        TError,
+        {data: BodyType<DonationSettingsInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateDonationSettingsMutationOptions(options));
+    }
+
+export const getGetDonationVerificationStatusUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/status`
+}
+
+/**
+ * @summary Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+ */
+export const getDonationVerificationStatus = async ( options?: RequestInit): Promise<DonationVerificationStatus> => {
+
+  return customFetch<DonationVerificationStatus>(getGetDonationVerificationStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDonationVerificationStatusQueryKey = () => {
+    return [
+    `/api/admin/donations/verify/status`
+    ] as const;
+    }
+
+
+export const getGetDonationVerificationStatusQueryOptions = <TData = Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDonationVerificationStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDonationVerificationStatus>>> = ({ signal }) => getDonationVerificationStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDonationVerificationStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getDonationVerificationStatus>>>
+export type GetDonationVerificationStatusQueryError = ErrorType<void>
+
+
+/**
+ * @summary Status auto-verifikasi donasi QRIS (terhubung? auto aktif?)
+ */
+
+export function useGetDonationVerificationStatus<TData = Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationVerificationStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDonationVerificationStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRequestDonationVerificationOtpUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/otp`
+}
+
+/**
+ * @summary Minta kode OTP GoPay Merchant ke nomor HP merchant
+ */
+export const requestDonationVerificationOtp = async (donationVerificationOtpRequest: DonationVerificationOtpRequest, options?: RequestInit): Promise<DonationVerificationOtpResponse> => {
+
+  return customFetch<DonationVerificationOtpResponse>(getRequestDonationVerificationOtpUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationVerificationOtpRequest,)
+  }
+);}
+
+
+
+
+export const getRequestDonationVerificationOtpMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, TError,{data: BodyType<DonationVerificationOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, TError,{data: BodyType<DonationVerificationOtpRequest>}, TContext> => {
+
+const mutationKey = ['requestDonationVerificationOtp'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, {data: BodyType<DonationVerificationOtpRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestDonationVerificationOtp(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestDonationVerificationOtpMutationResult = NonNullable<Awaited<ReturnType<typeof requestDonationVerificationOtp>>>
+    export type RequestDonationVerificationOtpMutationBody = BodyType<DonationVerificationOtpRequest>
+    export type RequestDonationVerificationOtpMutationError = ErrorType<void>
+
+    /**
+ * @summary Minta kode OTP GoPay Merchant ke nomor HP merchant
+ */
+export const useRequestDonationVerificationOtp = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestDonationVerificationOtp>>, TError,{data: BodyType<DonationVerificationOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestDonationVerificationOtp>>,
+        TError,
+        {data: BodyType<DonationVerificationOtpRequest>},
+        TContext
+      > => {
+      return useMutation(getRequestDonationVerificationOtpMutationOptions(options));
+    }
+
+export const getLoginDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/login`
+}
+
+/**
+ * @summary Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+ */
+export const loginDonationVerification = async (donationVerificationLoginRequest: DonationVerificationLoginRequest, options?: RequestInit): Promise<DonationVerificationLoginResponse> => {
+
+  return customFetch<DonationVerificationLoginResponse>(getLoginDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationVerificationLoginRequest,)
+  }
+);}
+
+
+
+
+export const getLoginDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginDonationVerification>>, TError,{data: BodyType<DonationVerificationLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginDonationVerification>>, TError,{data: BodyType<DonationVerificationLoginRequest>}, TContext> => {
+
+const mutationKey = ['loginDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginDonationVerification>>, {data: BodyType<DonationVerificationLoginRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  loginDonationVerification(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof loginDonationVerification>>>
+    export type LoginDonationVerificationMutationBody = BodyType<DonationVerificationLoginRequest>
+    export type LoginDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Tukar kode OTP dengan sesi GoPay Merchant (disimpan terenkripsi)
+ */
+export const useLoginDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginDonationVerification>>, TError,{data: BodyType<DonationVerificationLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof loginDonationVerification>>,
+        TError,
+        {data: BodyType<DonationVerificationLoginRequest>},
+        TContext
+      > => {
+      return useMutation(getLoginDonationVerificationMutationOptions(options));
+    }
+
+export const getLogoutDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/logout`
+}
+
+/**
+ * @summary Putuskan sesi GoPay Merchant
+ */
+export const logoutDonationVerification = async ( options?: RequestInit): Promise<LogoutDonationVerification200> => {
+
+  return customFetch<LogoutDonationVerification200>(getLogoutDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getLogoutDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof logoutDonationVerification>>, TError,void, TContext> => {
+
+const mutationKey = ['logoutDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutDonationVerification>>, void> = () => {
+
+
+          return  logoutDonationVerification(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogoutDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof logoutDonationVerification>>>
+
+    export type LogoutDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Putuskan sesi GoPay Merchant
+ */
+export const useLogoutDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof logoutDonationVerification>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getLogoutDonationVerificationMutationOptions(options));
+    }
+
+export const getRunDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/run`
+}
+
+/**
+ * @summary Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang
+ */
+export const runDonationVerification = async (runDonationVerificationBody?: RunDonationVerificationBody, options?: RequestInit): Promise<DonationVerificationRunResult> => {
+
+  return customFetch<DonationVerificationRunResult>(getRunDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      runDonationVerificationBody,)
+  }
+);}
+
+
+
+
+export const getRunDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runDonationVerification>>, TError,{data?: BodyType<RunDonationVerificationBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runDonationVerification>>, TError,{data?: BodyType<RunDonationVerificationBody>}, TContext> => {
+
+const mutationKey = ['runDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runDonationVerification>>, {data?: BodyType<RunDonationVerificationBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  runDonationVerification(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof runDonationVerification>>>
+    export type RunDonationVerificationMutationBody = BodyType<RunDonationVerificationBody> | undefined
+    export type RunDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Opsi 1 - verifikasi manual: tarik mutasi QRIS & cocokkan sekarang
+ */
+export const useRunDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runDonationVerification>>, TError,{data?: BodyType<RunDonationVerificationBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof runDonationVerification>>,
+        TError,
+        {data?: BodyType<RunDonationVerificationBody>},
+        TContext
+      > => {
+      return useMutation(getRunDonationVerificationMutationOptions(options));
+    }
+
+export const getListDonationVerificationRunsUrl = (params?: ListDonationVerificationRunsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/donations/verify/runs?${stringifiedParams}` : `/api/admin/donations/verify/runs`
+}
+
+/**
+ * @summary Riwayat pemeriksaan mutasi (manual & otomatis)
+ */
+export const listDonationVerificationRuns = async (params?: ListDonationVerificationRunsParams, options?: RequestInit): Promise<DonationVerificationRun[]> => {
+
+  return customFetch<DonationVerificationRun[]>(getListDonationVerificationRunsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListDonationVerificationRunsQueryKey = (params?: ListDonationVerificationRunsParams,) => {
+    return [
+    `/api/admin/donations/verify/runs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListDonationVerificationRunsQueryOptions = <TData = Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError = ErrorType<void>>(params?: ListDonationVerificationRunsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDonationVerificationRunsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDonationVerificationRuns>>> = ({ signal }) => listDonationVerificationRuns(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListDonationVerificationRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listDonationVerificationRuns>>>
+export type ListDonationVerificationRunsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Riwayat pemeriksaan mutasi (manual & otomatis)
+ */
+
+export function useListDonationVerificationRuns<TData = Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError = ErrorType<void>>(
+ params?: ListDonationVerificationRunsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDonationVerificationRuns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListDonationVerificationRunsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateDonationVerificationSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/donations/verify/settings`
+}
+
+/**
+ * @summary Setelan auto-verifikasi (nyala/mati + rentang feed)
+ */
+export const updateDonationVerificationSettings = async (donationVerificationSettingsInput: DonationVerificationSettingsInput, options?: RequestInit): Promise<DonationVerificationSettings> => {
+
+  return customFetch<DonationVerificationSettings>(getUpdateDonationVerificationSettingsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      donationVerificationSettingsInput,)
+  }
+);}
+
+
+
+
+export const getUpdateDonationVerificationSettingsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, TError,{data: BodyType<DonationVerificationSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, TError,{data: BodyType<DonationVerificationSettingsInput>}, TContext> => {
+
+const mutationKey = ['updateDonationVerificationSettings'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, {data: BodyType<DonationVerificationSettingsInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateDonationVerificationSettings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateDonationVerificationSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updateDonationVerificationSettings>>>
+    export type UpdateDonationVerificationSettingsMutationBody = BodyType<DonationVerificationSettingsInput>
+    export type UpdateDonationVerificationSettingsMutationError = ErrorType<void>
+
+    /**
+ * @summary Setelan auto-verifikasi (nyala/mati + rentang feed)
+ */
+export const useUpdateDonationVerificationSettings = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDonationVerificationSettings>>, TError,{data: BodyType<DonationVerificationSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateDonationVerificationSettings>>,
+        TError,
+        {data: BodyType<DonationVerificationSettingsInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateDonationVerificationSettingsMutationOptions(options));
+    }
+
+export const getRunInternalDonationVerificationUrl = () => {
+
+
+
+
+  return `/api/internal/donations/verify/run`
+}
+
+/**
+ * Dipanggil oleh pemicu eksternal (GitHub Actions cron atau worker di host gratis). Memerlukan header `x-cron-secret` yang sama dengan env `CRON_SECRET` di server. Kalau auto-verifikasi dimatikan, endpoint ini hanya melaporkan "skipped".
+
+ * @summary Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+ */
+export const runInternalDonationVerification = async ( options?: RequestInit): Promise<DonationVerificationRunResult> => {
+
+  return customFetch<DonationVerificationRunResult>(getRunInternalDonationVerificationUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRunInternalDonationVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runInternalDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runInternalDonationVerification>>, TError,void, TContext> => {
+
+const mutationKey = ['runInternalDonationVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runInternalDonationVerification>>, void> = () => {
+
+
+          return  runInternalDonationVerification(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunInternalDonationVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof runInternalDonationVerification>>>
+
+    export type RunInternalDonationVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Opsi 2 - endpoint internal untuk pemicu otomatis (cron/worker)
+ */
+export const useRunInternalDonationVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runInternalDonationVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof runInternalDonationVerification>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRunInternalDonationVerificationMutationOptions(options));
     }
 

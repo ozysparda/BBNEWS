@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { timingSafeEqual } from "node:crypto";
 import { db } from "@workspace/db";
 import {
   donationCampaignsTable,
@@ -238,6 +239,19 @@ router.get("/donations/campaigns/:slug", async (req, res) => {
 // Public: kirim donasi
 router.post("/donations/transactions", async (req, res) => {
   try {
+    const ip = getClientIp(req);
+    const now = Date.now();
+    const entry = donationCounter.get(ip);
+    if (!entry || now > entry.resetAt) {
+      donationCounter.set(ip, { count: 1, resetAt: now + DONATION_WINDOW_MS });
+    } else {
+      entry.count += 1;
+      if (entry.count > DONATION_MAX_PER_WINDOW) {
+        res.status(429).json({ error: "Terlalu banyak donasi dari IP ini. Coba lagi nanti." });
+        return;
+      }
+    }
+
     const {
       campaignId,
       campaignSlug,
@@ -483,6 +497,10 @@ const uploadCounter = new Map<string, { count: number; resetAt: number }>();
 const UPLOAD_WINDOW_MS = 60 * 60 * 1000;
 const UPLOAD_MAX_PER_WINDOW = 8;
 
+const donationCounter = new Map<string, { count: number; resetAt: number }>();
+const DONATION_WINDOW_MS = 60 * 60 * 1000;
+const DONATION_MAX_PER_WINDOW = 20;
+
 router.post("/donations/upload-token", async (req, res) => {
   try {
     const ip = getClientIp(req);
@@ -537,7 +555,12 @@ router.post("/donations/webhook", async (req, res) => {
       return;
     }
     const provided = String(req.headers["x-donation-secret"] || "");
-    if (provided !== secret) {
+    // Perbandingan konstan-waktu untuk mencegah timing attack pada secret.
+    const a = Buffer.from(provided);
+    const b = Buffer.from(secret);
+    const equal =
+      a.length === b.length && timingSafeEqual(a, b);
+    if (!equal) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }

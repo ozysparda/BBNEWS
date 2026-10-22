@@ -21,7 +21,7 @@ export function ScrollToTop() {
       size="icon"
       variant="secondary"
       aria-label="Kembali ke atas"
-      className="fixed bottom-6 right-6 z-40 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+      className="fixed bottom-28 right-6 z-40 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
     >
       <ArrowUp className="h-4 w-4" />

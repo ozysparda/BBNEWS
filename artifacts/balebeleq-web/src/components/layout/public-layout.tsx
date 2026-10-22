@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useState, useRef, useEffect } from "react";
 import ComplaintWidget from "@/components/complaint-widget";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { DonationFab } from "@/components/donation-fab";
 const logoImg = `${import.meta.env.BASE_URL}logo-berugak.png`;
 
 function SearchBar() {
@@ -234,6 +235,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </main>
       <PublicFooter />
       <ComplaintWidget />
+      <DonationFab />
       <ScrollToTop />
     </div>
   );

@@ -41,7 +41,14 @@ async function main() {
   console.log("\nCopying static files...");
   await cp(webDist, staticDir, { recursive: true, force: true });
 
-  // 5. Generate SEO files (sitemap.xml, feed.xml) into static dir\n  console.log("\\nGenerating SEO files...");\n  execSync("node scripts/generate-seo-files.mjs " + JSON.stringify(staticDir), {\n    cwd: root,\n    stdio: "inherit",\n  });\n\n  // 6. Copy API function bundle into Build Output API function directory
+  // 5. Generate SEO files (sitemap.xml, feed.xml) into static dir
+  console.log("\nGenerating SEO files...");
+  execSync("node scripts/generate-seo-files.mjs " + JSON.stringify(staticDir), {
+    cwd: root,
+    stdio: "inherit",
+  });
+
+  // 6. Copy API function bundle into Build Output API function directory
   console.log("\nCopying API function...");
   await cp(apiDist, funcDir, { recursive: true, force: true });
 

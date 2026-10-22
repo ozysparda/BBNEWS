@@ -8,6 +8,8 @@ import storageRouter from "./storage";
 import usersRouter from "./users";
 import profileRouter from "./profile";
 import donationsRouter from "./donations";
+import sitemapRouter from "./sitemap";
+import feedRouter from "./feed";
 
 const router: IRouter = Router();
 
@@ -20,5 +22,7 @@ router.use(storageRouter);
 router.use(usersRouter);
 router.use(profileRouter);
 router.use(donationsRouter);
+router.use(sitemapRouter);
+router.use(feedRouter);
 
 export default router;

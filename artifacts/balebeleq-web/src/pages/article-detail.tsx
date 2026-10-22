@@ -2,25 +2,36 @@ import { useEffect, useRef } from "react";
 import { useParams } from "wouter";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { useGetArticleBySlug, getGetArticleBySlugQueryKey, useIncrementArticleViews } from "@workspace/api-client-react";
+import { useGetArticleBySlug, getGetArticleBySlugQueryKey, useIncrementArticleViews, useListArticles, getListArticlesQueryKey } from "@workspace/api-client-react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SEO } from "@/components/seo";
+import { Helmet } from "react-helmet-async";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Calendar, Copy, Check } from "lucide-react";
+import { Eye, Calendar, Copy, Check, Clock, Share2 } from "lucide-react";
 import { FaFacebook, FaWhatsapp, FaTwitter } from "react-icons/fa";
 import { useState } from "react";
 import CommentSection from "@/components/comment-section";
+import { ArticleCard } from "@/components/article-card";
 import { DonationPopup } from "@/components/donation-popup";
 
 function ShareButtons({ title, url }: { title: string; url: string }) {
   const [copied, setCopied] = useState(false);
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   function copyLink() {
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+  }
+
+  async function nativeShare() {
+    try {
+      await navigator.share({ title, text: title, url });
+    } catch {
+      // user cancelled or not supported
+    }
   }
 
   const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
@@ -30,6 +41,15 @@ function ShareButtons({ title, url }: { title: string; url: string }) {
   return (
     <div className="flex flex-wrap items-center gap-3 mt-8 pt-8 border-t border-border">
       <span className="text-sm font-semibold text-muted-foreground">Bagikan:</span>
+      {canShare && (
+        <button
+          onClick={nativeShare}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+        >
+          <Share2 className="w-4 h-4" />
+          Bagikan
+        </button>
+      )}
       <a
         href={fbUrl}
         target="_blank"
@@ -81,6 +101,29 @@ export default function ArticleDetail() {
 
   const incrementViews = useIncrementArticleViews();
   const incrementedRef = useRef(false);
+
+  // Reading progress
+  const [readingProgress, setReadingProgress] = useState(0);
+  useEffect(() => {
+    function onScroll() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0) setReadingProgress(Math.min(100, (scrollTop / docHeight) * 100));
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Related articles
+  const { data: relatedData } = useListArticles(
+    { categoryId: article?.category?.id, limit: 4 },
+    { query: { queryKey: getListArticlesQueryKey({ categoryId: article?.category?.id, limit: 4 }), enabled: !!article?.category?.id } }
+  );
+  const relatedArticles = (relatedData?.articles ?? []).filter((a) => a.slug !== slug).slice(0, 3);
+
+  // Reading time
+  const wordCount = article?.content ? article.content.replace(/<[^>]*>/g, "").split(/\s+/).length : 0;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   useEffect(() => {
     if (article?.id && !incrementedRef.current) {
@@ -135,7 +178,40 @@ export default function ArticleDetail() {
         articleSection={article.category?.name}
         keywords={article.category?.name ? `${article.category.name}, berita, lombok, berugak` : "berita, lombok, berugak"}
       />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "NewsArticle",
+            headline: article.title,
+            description: article.excerpt,
+            image: article.imageUrl ? [article.imageUrl] : [],
+            datePublished: article.createdAt,
+            dateModified: article.updatedAt || article.createdAt,
+            author: {
+              "@type": "Person",
+              name: article.category?.name || "BerugakNews",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "BerugakNews",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://berugaknews.vercel.app/logo-berugak.png",
+              },
+            },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": `https://berugaknews.vercel.app/berita/${article.slug}`,
+            },
+            articleSection: article.category?.name,
+            wordCount: article.content ? article.content.replace(/<[^>]*>/g, "").split(/\s+/).length : 0,
+          })}
+        </script>
+      </Helmet>
       <PublicLayout>
+        {/* Reading progress bar */}
+        <div className="fixed top-0 left-0 z-50 h-1 bg-primary transition-all duration-150" style={{ width: `${readingProgress}%` }} />
         <article className="container mx-auto px-4 py-12 max-w-4xl">
           <header className="mb-10 text-center">
             {article.category && (
@@ -159,6 +235,10 @@ export default function ArticleDetail() {
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
                 <span>{article.viewCount} Dilihat</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{readingTime} menit baca</span>
               </div>
             </div>
           </header>
@@ -188,6 +268,17 @@ export default function ArticleDetail() {
           <DonationPopup filterPlacement="article-bottom" />
 
           <ShareButtons title={article.title} url={articleUrl} />
+
+          {relatedArticles.length > 0 && (
+            <section className="mt-12 border-t border-border pt-8">
+              <h2 className="mb-6 font-serif text-2xl font-bold">Artikel Terkait</h2>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {relatedArticles.map((rel) => (
+                  <ArticleCard key={rel.id} article={rel} />
+                ))}
+              </div>
+            </section>
+          )}
 
           <CommentSection articleId={article.id} />
         </article>

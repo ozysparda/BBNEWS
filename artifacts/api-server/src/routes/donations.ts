@@ -303,16 +303,23 @@ router.post("/donations/transactions", async (req, res) => {
       .limit(1);
     const payment = globalSettings ?? {};
 
-    const name = toNullableString(donorName);
-    if (!name || name.length < 2) {
+    // Mode anonim: donatur boleh sama sekali tidak mengisi nama/email/WhatsApp.
+    // Nama hanya WAJIB bila donatur tidak memilih mode anonim.
+    const anonymous = isAnonymous === true || isAnonymous === "true";
+    const rawName = toNullableString(donorName);
+    if (!anonymous && (!rawName || rawName.length < 2)) {
       res.status(400).json({ error: "Nama donatur wajib diisi" });
       return;
     }
+    // Setelah validasi di atas: non-anonim pasti punya nama, anonim boleh kosong.
+    const name = rawName ?? "Hamba Tuhan";
     if (name.length > 100) {
       res.status(400).json({ error: "Nama donatur terlalu panjang (maks 100 karakter)" });
       return;
     }
 
+    // Email & WhatsApp selalu opsional. Kalau mode anonim, data kontak
+    // TIDAK disimpan sama sekali (anonymitas penuh).
     const email = toNullableString(donorEmail)?.toLowerCase() ?? null;
     if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
       res.status(400).json({ error: "Format email tidak valid" });
@@ -349,7 +356,6 @@ router.post("/donations/transactions", async (req, res) => {
       res.status(400).json({ error: "Pesan terlalu panjang (maks 500 karakter)" });
       return;
     }
-    const anonymous = isAnonymous === true || isAnonymous === "true";
 
     if (paymentMethod === "crypto") {
       if (!hash) {
@@ -396,8 +402,8 @@ router.post("/donations/transactions", async (req, res) => {
             referenceNumber,
             campaignId: campaign.id,
             donorName: name,
-            donorEmail: email,
-            donorPhone: phone,
+            donorEmail: anonymous ? null : email,
+            donorPhone: anonymous ? null : phone,
             isAnonymous: anonymous,
             amount: rupiah,
             cryptoAmount: crypto,
@@ -484,7 +490,9 @@ router.get("/donations/transactions/:reference", async (req, res) => {
       res.status(404).json({ error: "Nomor referensi tidak ditemukan" });
       return;
     }
-    if (transaction.donorEmail && email && transaction.donorEmail !== email) {
+    // Kalau transaksi punya email, email yang sama wajib diisi (verifikasi 2 faktor).
+    // Transaksi anonim (tanpa email) cukup nomor referensi saja.
+    if (transaction.donorEmail && transaction.donorEmail !== email) {
       res.status(404).json({ error: "Nomor referensi atau email tidak cocok" });
       return;
     }

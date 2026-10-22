@@ -112,7 +112,8 @@ export default function DonationDetailPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (donorName.trim().length < 2) {
+    // Nama hanya wajib bila donatur tidak memilih mode anonim.
+    if (!isAnonymous && donorName.trim().length < 2) {
       toast({ variant: "destructive", title: "Nama donatur wajib diisi" });
       return;
     }
@@ -133,9 +134,9 @@ export default function DonationDetailPage() {
         data: {
           campaignId: campaign!.id,
           campaignSlug: campaign!.slug,
-          donorName: donorName.trim(),
-          donorEmail: donorEmail.trim() || undefined,
-          donorPhone: donorPhone.trim() || undefined,
+          donorName: donorName.trim() || undefined,
+          donorEmail: isAnonymous ? undefined : donorEmail.trim() || undefined,
+          donorPhone: isAnonymous ? undefined : donorPhone.trim() || undefined,
           amount: activeMethod === "crypto" ? 0 : parseNominal(amount),
           cryptoAmount: activeMethod === "crypto" ? cryptoAmount.trim() || undefined : undefined,
           txHash: activeMethod === "crypto" ? txHash.trim() : undefined,
@@ -423,38 +424,79 @@ export default function DonationDetailPage() {
                       </div>
                     )}
 
+                    <div className="rounded-lg border border-border bg-muted/40 p-3">
+                      <div className="flex items-start gap-2.5">
+                        <Checkbox
+                          id="anonymous"
+                          className="mt-0.5"
+                          checked={isAnonymous}
+                          onCheckedChange={(checked) => {
+                            const next = checked === true;
+                            setIsAnonymous(next);
+                            if (next) {
+                              setDonorEmail("");
+                              setDonorPhone("");
+                            }
+                          }}
+                        />
+                        <div className="space-y-0.5">
+                          <Label htmlFor="anonymous" className="text-sm font-medium">
+                            Saya ingin menyembunyikan identitas saya
+                          </Label>
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            Nama tidak akan tampil di daftar donatur publik. Email & WhatsApp tidak
+                            disimpan sama sekali. Kamu tetap bisa menulis doa atau pesan di bawah.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-1.5">
-                      <Label htmlFor="donorName">Nama Donatur *</Label>
+                      <Label htmlFor="donorName">
+                        Nama Donatur{isAnonymous ? " (opsional)" : " *"}
+                      </Label>
                       <Input
                         id="donorName"
                         value={donorName}
                         onChange={(e) => setDonorName(e.target.value)}
-                        placeholder="Nama lengkap atau nama samaran"
-                        required
+                        placeholder={
+                          isAnonymous
+                            ? "Boleh dikosongkan (donasi anonim)"
+                            : "Nama lengkap atau nama samaran"
+                        }
+                        required={!isAnonymous}
                       />
                     </div>
 
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="donorEmail">Email</Label>
-                        <Input
-                          id="donorEmail"
-                          type="email"
-                          value={donorEmail}
-                          onChange={(e) => setDonorEmail(e.target.value)}
-                          placeholder="email@contoh.com"
-                        />
+                    {!isAnonymous && (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="donorEmail">Email (opsional)</Label>
+                          <Input
+                            id="donorEmail"
+                            type="email"
+                            value={donorEmail}
+                            onChange={(e) => setDonorEmail(e.target.value)}
+                            placeholder="email@contoh.com"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Dipakai untuk mengecek status donasi & pemberitahuan.
+                          </p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="donorPhone">WhatsApp (opsional)</Label>
+                          <Input
+                            id="donorPhone"
+                            value={donorPhone}
+                            onChange={(e) => setDonorPhone(e.target.value)}
+                            placeholder="08xxxxxxxxxx"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Hanya untuk komunikasi dari admin.
+                          </p>
+                        </div>
                       </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="donorPhone">WhatsApp</Label>
-                        <Input
-                          id="donorPhone"
-                          value={donorPhone}
-                          onChange={(e) => setDonorPhone(e.target.value)}
-                          placeholder="08xxxxxxxxxx"
-                        />
-                      </div>
-                    </div>
+                    )}
 
                     {activeMethod === "crypto" ? (
                       <>
@@ -553,17 +595,6 @@ export default function DonationDetailPage() {
                         placeholder="Semoga bermanfaat untuk penerima manfaat."
                         rows={3}
                       />
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="anonymous"
-                        checked={isAnonymous}
-                        onCheckedChange={(checked) => setIsAnonymous(checked === true)}
-                      />
-                      <Label htmlFor="anonymous" className="text-sm font-normal">
-                        Sembunyikan nama saya di daftar donatur
-                      </Label>
                     </div>
 
                     <Button type="submit" size="lg" className="w-full" disabled={createDonation.isPending}>

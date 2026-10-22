@@ -1826,10 +1826,19 @@ components:
           type: string
         donorName:
           type: string
+          description: >-
+            Nama donatur. Opsional bila isAnonymous = true (donasi anonim).
+            Wajib bila isAnonymous = false.
         donorEmail:
           type: string
+          description: >-
+            Email donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true.
+            Jika diisi, dipakai untuk verifikasi saat melacak status donasi.
         donorPhone:
           type: string
+          description: >-
+            Nomor WhatsApp donatur. Selalu opsional. Tidak disimpan bila
+            isAnonymous = true.
         amount:
           type: number
         cryptoAmount:
@@ -1845,8 +1854,9 @@ components:
           type: string
         isAnonymous:
           type: boolean
-      required:
-        - donorName
+          description: >-
+            Bila true, identitas donatur disembunyikan: nama tidak ditampilkan
+            di daftar donatur publik dan email/WhatsApp tidak disimpan.
 
     DonationTransactionCreated:
       type: object

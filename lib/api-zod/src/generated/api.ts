@@ -847,16 +847,16 @@ export const GetDonationCampaignResponse = zod.object({
 export const CreateDonationTransactionBody = zod.object({
   "campaignId": zod.number().optional(),
   "campaignSlug": zod.string().optional(),
-  "donorName": zod.string(),
-  "donorEmail": zod.string().optional(),
-  "donorPhone": zod.string().optional(),
+  "donorName": zod.string().optional().describe('Nama donatur. Opsional bila isAnonymous = true (donasi anonim). Wajib bila isAnonymous = false.'),
+  "donorEmail": zod.string().optional().describe('Email donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true. Jika diisi, dipakai untuk verifikasi saat melacak status donasi.'),
+  "donorPhone": zod.string().optional().describe('Nomor WhatsApp donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true.'),
   "amount": zod.number().optional(),
   "cryptoAmount": zod.string().optional(),
   "txHash": zod.string().optional(),
   "method": zod.enum(['qris', 'bank', 'crypto']).optional(),
   "message": zod.string().optional(),
   "proofUrl": zod.string().optional(),
-  "isAnonymous": zod.boolean().optional()
+  "isAnonymous": zod.boolean().optional().describe('Bila true, identitas donatur disembunyikan: nama tidak ditampilkan di daftar donatur publik dan email\/WhatsApp tidak disimpan.')
 })
 
 

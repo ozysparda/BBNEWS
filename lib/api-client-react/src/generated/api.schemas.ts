@@ -415,8 +415,11 @@ export const DonationTransactionInputMethod = {
 export interface DonationTransactionInput {
   campaignId?: number;
   campaignSlug?: string;
-  donorName: string;
+  /** Nama donatur. Opsional bila isAnonymous = true (donasi anonim). Wajib bila isAnonymous = false. */
+  donorName?: string;
+  /** Email donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true. Jika diisi, dipakai untuk verifikasi saat melacak status donasi. */
   donorEmail?: string;
+  /** Nomor WhatsApp donatur. Selalu opsional. Tidak disimpan bila isAnonymous = true. */
   donorPhone?: string;
   amount?: number;
   cryptoAmount?: string;
@@ -424,6 +427,7 @@ export interface DonationTransactionInput {
   method?: DonationTransactionInputMethod;
   message?: string;
   proofUrl?: string;
+  /** Bila true, identitas donatur disembunyikan: nama tidak ditampilkan di daftar donatur publik dan email/WhatsApp tidak disimpan. */
   isAnonymous?: boolean;
 }
 

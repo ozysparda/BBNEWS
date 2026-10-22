@@ -66,6 +66,8 @@ async function main() {
       {
         version: 3,
         routes: [
+          { src: "^/sitemap\\.xml$", dest: "/api/sitemap.xml" },
+          { src: "^/feed\\.xml$", dest: "/api/feed.xml" },
           { src: "^/api/(.*)$", dest: "/api" },
           { handle: "filesystem" },
           { src: "/(.*)", dest: "/index.html" },

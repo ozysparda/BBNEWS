@@ -22,9 +22,12 @@ const verifiedCountSql = sql<number>`COUNT(*) FILTER (WHERE ${donationTransactio
 const pendingCountSql = sql<number>`COUNT(*) FILTER (WHERE ${donationTransactionsTable.status} = 'pending')::int`;
 
 function getClientIp(req: { headers: Record<string, unknown>; ip?: string }): string {
+  // Vercel menetapkan req.ip dari sisi platform; pakai itu dulu agar tidak bisa
+  // dipalsukan lewat header x-forwarded-for oleh klien.
+  if (req.ip && req.ip.length > 0) return req.ip;
   const forwarded = req.headers["x-forwarded-for"];
   if (typeof forwarded === "string" && forwarded.length > 0) return forwarded.split(",")[0].trim();
-  return req.ip || "unknown";
+  return "unknown";
 }
 
 function generateReference(): string {
@@ -193,6 +196,10 @@ router.get("/donations/campaigns/:slug", async (req, res) => {
       res.status(404).json({ error: "Campaign tidak ditemukan" });
       return;
     }
+    if (campaign.status !== "active" && campaign.status !== "closed") {
+      res.status(404).json({ error: "Campaign tidak ditemukan" });
+      return;
+    }
 
     // Donatur yang tidak boleh melihat identitas (anonim) tidak ditampilkan
     const recent = await db
@@ -271,15 +278,47 @@ router.post("/donations/transactions", async (req, res) => {
       res.status(400).json({ error: "Nama donatur wajib diisi" });
       return;
     }
+    if (name.length > 100) {
+      res.status(400).json({ error: "Nama donatur terlalu panjang (maks 100 karakter)" });
+      return;
+    }
 
     const email = toNullableString(donorEmail)?.toLowerCase() ?? null;
+    if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      res.status(400).json({ error: "Format email tidak valid" });
+      return;
+    }
     const phone = toNullableString(donorPhone);
-    const paymentMethod = PAYMENT_METHODS.includes(method as any) ? String(method) : "qris";
+    if (phone && phone.length > 30) {
+      res.status(400).json({ error: "Nomor telepon terlalu panjang" });
+      return;
+    }
+    if (typeof method !== "undefined" && method !== null && method !== "" && !PAYMENT_METHODS.includes(method as any)) {
+      res.status(400).json({ error: "Metode pembayaran tidak valid" });
+      return;
+    }
+    const paymentMethod = (PAYMENT_METHODS.includes(method as any) ? String(method) : "qris") as (typeof PAYMENT_METHODS)[number];
     const rupiah = parseAmount(amount);
     const crypto = toNullableString(cryptoAmount);
+    if (crypto && crypto.length > 50) {
+      res.status(400).json({ error: "Nominal kripto terlalu panjang" });
+      return;
+    }
     const hash = toNullableString(txHash);
+    if (hash && hash.length > 200) {
+      res.status(400).json({ error: "tx hash terlalu panjang" });
+      return;
+    }
     const proof = toNullableString(proofUrl);
+    if (proof && proof.length > 500) {
+      res.status(400).json({ error: "URL bukti terlalu panjang" });
+      return;
+    }
     const note = toNullableString(message);
+    if (note && note.length > 500) {
+      res.status(400).json({ error: "Pesan terlalu panjang (maks 500 karakter)" });
+      return;
+    }
     const anonymous = isAnonymous === true || isAnonymous === "true";
 
     if (paymentMethod === "crypto") {
@@ -311,26 +350,44 @@ router.post("/donations/transactions", async (req, res) => {
       }
     }
 
-    const referenceNumber = generateReference();
-    const [transaction] = await db
-      .insert(donationTransactionsTable)
-      .values({
-        referenceNumber,
-        campaignId: campaign.id,
-        donorName: name,
-        donorEmail: email,
-        donorPhone: phone,
-        isAnonymous: anonymous,
-        amount: rupiah,
-        cryptoAmount: crypto,
-        cryptoNetwork: campaign.cryptoNetwork,
-        txHash: hash,
-        method: paymentMethod,
-        message: note,
-        proofUrl: proof,
-        status: "pending",
-      })
-      .returning();
+    // Generate reference number dengan retry (hindari collision pada unique constraint)
+    let transaction: any;
+    let referenceNumber = "";
+    for (let attempt = 0; attempt < 5; attempt++) {
+      referenceNumber = generateReference();
+      try {
+        const [inserted] = await db
+          .insert(donationTransactionsTable)
+          .values({
+            referenceNumber,
+            campaignId: campaign.id,
+            donorName: name,
+            donorEmail: email,
+            donorPhone: phone,
+            isAnonymous: anonymous,
+            amount: rupiah,
+            cryptoAmount: crypto,
+            cryptoNetwork: campaign.cryptoNetwork,
+            txHash: hash,
+            method: paymentMethod,
+            message: note,
+            proofUrl: proof,
+            status: "pending",
+          })
+          .returning();
+        transaction = inserted;
+        break;
+      } catch (error: any) {
+        const isUniqueViolation =
+          error?.code === "23505" ||
+          (typeof error?.message === "string" && error.message.includes("unique"));
+        if (!isUniqueViolation || attempt === 4) throw error;
+      }
+    }
+    if (!transaction) {
+      res.status(500).json({ error: "Gagal membuat transaksi donasi" });
+      return;
+    }
 
     // Auto konfirmasi kripto (kalau campaign mengaktifkan & tx-nya valid)
     let autoVerified = false;
@@ -610,6 +667,10 @@ router.post("/admin/donations/campaigns", requireAuth, async (req: AuthRequest, 
       res.status(400).json({ error: "Judul campaign minimal 4 karakter" });
       return;
     }
+    if (title.length > 200) {
+      res.status(400).json({ error: "Judul campaign terlalu panjang (maks 200 karakter)" });
+      return;
+    }
 
     const status = CAMPAIGN_STATUSES.includes(body.status as any) ? String(body.status) : "draft";
     const slug = await uniqueSlug(title);
@@ -810,6 +871,10 @@ router.patch("/admin/donations/transactions/:id", requireAuth, async (req: AuthR
     const { status, adminNote } = req.body || {};
     if (!status || !TRANSACTION_STATUSES.includes(status as any)) {
       res.status(400).json({ error: "status tidak valid" });
+      return;
+    }
+    if (adminNote !== undefined && adminNote !== null && String(adminNote).length > 500) {
+      res.status(400).json({ error: "Catatan admin terlalu panjang (maks 500 karakter)" });
       return;
     }
 

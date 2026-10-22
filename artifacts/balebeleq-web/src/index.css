@@ -253,6 +253,22 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* Mobile: ensure touch targets are at least 44px */
+  @media (max-width: 768px) {
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}
+
+/* Mobile-friendly table scrolling */
+@media (max-width: 768px) {
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @layer utilities {

@@ -162,7 +162,7 @@ export default function AdminDonationCampaignList() {
                 Belum ada campaign. Klik "Campaign Baru" untuk membuat campaign pertama.
               </p>
             ) : (
-              <Table>
+              <div className="overflow-x-auto"><Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Judul</TableHead>
@@ -241,7 +241,7 @@ export default function AdminDonationCampaignList() {
                     );
                   })}
                 </TableBody>
-              </Table>
+              </Table></div>
             )}
           </CardContent>
         </Card>

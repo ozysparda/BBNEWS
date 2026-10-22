@@ -214,7 +214,7 @@ export default function ComplaintManagement() {
 
       {/* Table */}
       <div className="border rounded-lg overflow-hidden">
-        <Table>
+        <div className="overflow-x-auto"><Table>
           <TableHeader>
             <TableRow>
               <TableHead>No. Aduan</TableHead>
@@ -289,7 +289,7 @@ export default function ComplaintManagement() {
               ))
             )}
           </TableBody>
-        </Table>
+        </Table></div>
       </div>
 
       {/* Pagination */}

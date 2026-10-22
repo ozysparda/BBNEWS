@@ -43,7 +43,7 @@ async function main() {
 
   // 5. Generate SEO files (sitemap.xml, feed.xml) into static dir
   console.log("\nGenerating SEO files...");
-  execSync("node scripts/generate-seo-files.mjs " + JSON.stringify(staticDir), {
+  execSync("node lib/db/scripts/generate-seo-files.mjs " + JSON.stringify(staticDir), {
     cwd: root,
     stdio: "inherit",
   });
